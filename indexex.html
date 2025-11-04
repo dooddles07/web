@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dijkstra Map Route Example</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+  <style>
+    #map {
+      height: 100vh;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script>
+    // 1. Initialize the map
+    const map = L.map('map').setView([13.6245, 123.243], 15);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // 2. Define node coordinates
+    const nodeCoordinates = {
+      brix: [13.628913, 123.240131],
+      pointA: [13.628832, 123.240675],
+      pointB: [13.629782, 123.240870],
+      pointC: [13.629755, 123.241241],
+      pointD: [13.629759, 123.241730],
+      pointE: [13.630114, 123.241777],
+      pointF: [13.630495, 123.241833],
+      pointG: [13.630673, 123.241859],
+      pointH: [13.630496, 123.241354],
+      pointK: [13.630133, 123.241310],
+      pointL: [13.630542, 123.241007],
+      pointM: [13.630155, 123.240939],
+      pointN: [13.629856, 123.239827],
+      pointO: [13.630205, 123.239887],
+      pointP: [13.630572, 123.239963],
+      pointQ: [13.630320, 123.238813],
+      pointR: [13.630524, 123.238829],
+      pointS: [13.630702, 123.238855],
+      pointT: [13.630652, 123.238855],
+      pointU: [13.630952, 123.238855],
+      pointV: [13.631422, 123.238855],
+      pointW: [13.631812, 123.238875],
+      pointX: [13.631852, 123.239155],
+      pointY: [13.632102, 123.239185],
+      pointZ: [13.632002, 123.238555],
+      pointaa: [13.631822, 123.238535],
+      pointab: [13.631452, 123.238505],
+      pointac: [13.629127, 123.238700],
+        pointad: [13.628950, 123.239650],
+        pointae: [13.629219,123.237519],
+        pointaf: [13.629999,123.237707],
+        pointag: [13.630379,123.237800],
+        pointah: [13.630769,123.237850],
+        pointai: [13.630730,123.238300],
+        pointaj: [13.630550,123.238300],
+        pointak: [13.629950,123.238768],
+        pointal: [13.631040, 123.239980],
+        pointam: [13.631440, 123.239961],
+        pointan: [13.632980, 123.239842],
+        pointao: [13.631500, 123.239010],
+        pointap: [13.628787, 123.238600],
+        pointaq: [13.629050, 123.238180],
+        pointar: [13.629080, 123.237935],
+        pointas: [13.628400, 123.238530],
+        pointat: [13.628480, 123.238100],
+        pointau: [13.628100, 123.238050],
+        pointav: [13.628890, 123.239400],
+        pointaw: [13.6286590, 123.239320],
+        pointax: [13.628440, 123.240550],
+        pointay: [13.628150, 123.240400],
+        pointaz: [13.628250, 123.239600],
+        pointba: [13.628080, 123.239050],
+        pointbb: [13.627800, 123.239030],
+        pointbc: [13.628200, 123.239950],
+        pointbd: [13.627770, 123.239810],
+        pointbe: [13.628722, 123.240615],
+        pointbf: [13.629940, 123.229870],
+        pointbg: [13.631350, 123.230020],
+        pointbh: [13.631360, 123.231050],
+        pointbi: [13.631930, 123.232070],
+        pointbj: [13.631470, 123.231690],
+        pointbk: [13.631280, 123.231650],
+        pointbl: [13.631970, 123.231740],
+        pointbm: [13.632360, 123.231780],
+        pointbn: [13.632070, 123.230730],
+        pointbo: [13.632300, 123.230750],
+        pointbp: [13.632530, 123.230770],
+        pointbq: [13.632750, 123.230790],
+        pointbr: [13.632970, 123.230820],
+        pointbs: [13.631650, 123.230680],
+        pointbt: [13.631850, 123.230700],
+        pointbu: [13.632220, 123.231200],
+        pointbv: [13.632460, 123.231250],
+        pointbw: [13.632660, 123.231280],
+        pointbx: [13.632900, 123.231300],
+        pointby: [13.632680, 123.231450],
+        pointbz: [13.632000, 123.231150],
+        pointca: [13.631790, 123.231120],
+        pointcb: [13.631550, 123.231090],
+        pointcc: [13.631700, 123.231720],
+        pointcd: [13.631750, 123.229710],
+        pointce: [13.631570, 123.229680],
+        pointcf: [13.632000, 123.229750],
+        pointcg: [13.632200, 123.229795],
+        pointch: [13.632400, 123.229790],
+        pointci: [13.632640, 123.229800],
+        pointcj: [13.632800, 123.229810],
+        pointck: [13.632900, 123.229820],
+        pointcl: [13.633400, 123.229900],
+        pointcm: [13.633580, 123.229935],
+        pointcn: [13.634270, 123.230000],
+        pointco: [13.634020, 123.229550],
+        pointcp: [13.633150, 123.230640],
+        pointcq: [13.632820, 123.230610],
+        pointcr: [13.632850, 123.230400],
+        pointcs: [13.632880, 123.230225],
+        pointct: [13.632900, 123.230040],
+        pointcu: [13.633350, 123.230460],
+        pointcv: [13.633410, 123.230280],
+        pointcw: [13.633450, 123.230100],
+        pointcx: [13.633560, 123.230070],
+        pointcy: [13.633400, 123.229680],
+        pointcz: [13.632760, 123.229600],
+        pointda: [13.632760, 123.229390],
+        pointdb: [13.632760, 123.229150],
+        pointdc: [13.632790, 123.228930],
+        pointdd: [13.632830, 123.228530],
+        pointde: [13.633300, 123.229430],
+        pointdf: [13.633160, 123.229170],
+        pointdg: [13.632990, 123.228630],
+        pointdh: [13.632300, 123.228995],
+        pointdi: [13.632100, 123.228870],
+        pointdj: [13.631890, 123.228860],
+        pointdk: [13.631600, 123.228800],
+        pointdl: [13.631900, 123.228600],
+        pointdm: [13.632150, 123.228640],
+        pointdn: [13.631650, 123.228550],
+        pointdo: [13.632050, 123.227730],
+        pointdp: [13.632260, 123.227760],
+        pointdq: [13.632460, 123.227790],
+        pointdr: [13.632430, 123.228150],
+        pointds: [13.632230, 123.228130],
+        pointdt: [13.631780, 123.227680],
+        pointdu: [13.629600, 123.229050],
+        pointdv: [13.630250, 123.228620],
+        pointdw: [13.630300, 123.229050],
+        pointdx: [13.631500, 123.229270],
+        pointdy: [13.631900, 123.226700],
+        pointdz: [13.631440, 123.226500],
+        pointea: [13.63212, 123.22579],
+        pointeb: [13.63130, 123.22558],
+        pointec: [13.63160, 123.22586],
+        pointed: [13.63220, 123.22518],
+        pointef: [13.63275, 123.22527],
+        pointeg: [13.63273, 123.22618],
+        pointeh: [13.63316, 123.22629],  
+        pointei: [13.63269, 123.22640],    
+        pointej: [13.63266, 123.22658],  
+        pointfk: [13.63297, 123.22668],
+        pointfl: [13.63307, 123.22651],
+        pointfm: [13.63331, 123.22550],
+        pointfn: [13.63228, 123.22458],
+        pointfo: [13.63298, 123.22471],
+        pointfp: [13.63239, 123.22390],
+        pointfq: [13.63316, 123.22402],
+        pointfr: [13.63220, 123.22447],
+        pointfs: [13.63199, 123.22441],
+        pointft: [13.63187, 123.22511],
+        pointfu: [13.63163, 123.22507],
+        pointfv: [13.63174, 123.22437],
+        pointfw: [13.63180, 123.22388],
+        pointfx: [13.63204, 123.22388],
+        pointfy: [13.63136, 123.22502],
+        pointfz: [13.63111, 123.22500],
+        pointga: [13.63110, 123.22484],
+        pointgb: [13.63104, 123.22512],
+        pointgc: [13.63147, 123.22434],
+        pointgd: [13.63123, 123.22430],
+        pointge: [13.63115, 123.22455],
+        pointgf: [13.63134, 123.22383],
+        pointgg: [13.63144, 123.22403],
+        pointgh: [13.63114, 123.22428],
+        pointgi: [13.63069, 123.22425],
+        pointgj: [13.62995, 123.22393],
+        pointgk: [13.62995, 123.22373],
+        pointgl: [13.62903, 123.22303],
+        pointgm: [13.62977, 123.22421],
+        pointgn: [13.62958, 123.22448],
+        pointgo: [13.62936, 123.22475],
+        pointgp: [13.62958, 123.22509],
+        pointgq: [13.62975, 123.22538],
+        pointgr: [13.62995, 123.22566],
+        pointgs: [13.63003, 123.22629],
+        pointgt: [13.63019, 123.22629],
+        pointgu: [13.63008, 123.22539],
+        pointgv: [13.63053, 123.22537],
+        pointgw: [13.63052, 123.22612],
+        pointgx: [13.63091, 123.22539],
+        pointgy: [13.63261, 123.22256],
+        pointgz: [13.63319, 123.22264],
+        pointha: [13.63268, 123.22167],
+        pointhb: [13.63289, 123.22165],
+        pointhc: [13.63262, 123.22123],
+        pointhd: [13.63320, 123.22125],
+        pointhf: [13.63318, 123.22054],
+        pointhg: [13.63397, 123.22046],
+        pointhh: [13.63314, 123.22039],
+        pointhi: [13.63242, 123.22061],
+        pointij: [13.63563, 123.22235],
+        pointik: [13.63416, 123.21700],
+        pointil: [13.63443, 123.21607],
+        pointim: [13.63454, 123.21566],
+        pointin: [13.63499, 123.21571],
+        pointio: [13.63459, 123.21512],
+        pointip: [13.63456, 123.21412],
+        pointiq: [13.63504, 123.21513],
+        pointir: [13.63611, 123.21531],
+        pointis: [13.63512, 123.21449],
+        pointit: [13.63388, 123.21549],
+        pointiu: [13.63354, 123.21546],
+        pointiv: [13.63304, 123.21575],
+        pointiw: [13.63324, 123.21597],
+        pointix: [13.63324, 123.21686],
+        pointiy: [13.63342, 123.21690],
+        pointiz: [13.63341, 123.21598],
+        pointja: [13.63341, 123.21598],
+        pointjb: [13.63362, 123.21619],
+        pointjc: [13.63362, 123.21635],
+        pointjd: [13.63362, 123.21656],
+        pointje: [13.63388, 123.21656],
+        pointjf: [13.63393, 123.21637],
+        pointjg: [13.63398, 123.21620],
+        pointjh: [13.63406, 123.21602],
+        pointji: [13.63382, 123.21598],
+        pointjj: [13.63359, 123.21691],
+        pointjk: [13.63359, 123.21691],
+        pointjl: [13.63359, 123.21599],
+        pointjm: [13.63113, 123.23236],
+        pointjn: [13.63335, 123.23229],
+        pointjo: [13.63335, 123.23229],
+        pointjp: [13.63399, 123.23239],
+        pointjq: [13.63390, 123.23153],
+        pointjr: [13.63339, 123.23160],
+        pointjs: [13.63109, 123.23280],
+        pointjt: [13.63065, 123.23283],
+        pointju: [13.63065, 123.23283],
+        pointjv: [13.63108, 123.23402],
+        
+        pointjw: [13.62901, 123.24329],
+        pointjx: [13.62842, 123.24330],
+        pointjy: [13.62819, 123.24485],
+        pointjz: [13.62817, 123.24512],
+        pointka: [13.62955, 123.24577],
+        pointkb: [13.63058, 123.24563],
+        pointkc: [13.63043, 123.24697],
+        pointkd: [13.62784, 123.24721],
+        pointke: [13.62621, 123.24717],
+        pointkf: [13.62760, 123.24923],
+        
+
+
+
+
+
+
+        
+        
+
+
+
+
+
+
+    };
+
+    // 3. Add markers
+    for (const [name, coords] of Object.entries(nodeCoordinates)) {
+      L.marker(coords).addTo(map).bindPopup(name).openPopup();
+    }
+
+    // 4. Haversine distance function
+    function getDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371; // km
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(lat1 * Math.PI / 180) *
+        Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) ** 2;
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
+
+    // 5. Build weighted graph
+    const graph = {
+      brix: {
+        pointA: getDistance(...nodeCoordinates['brix'], ...nodeCoordinates['pointA'])
+      },
+      pointA: {
+        brix: getDistance(...nodeCoordinates['pointA'], ...nodeCoordinates['brix']),
+        pointB: getDistance(...nodeCoordinates['pointA'], ...nodeCoordinates['pointB'])
+      },
+      pointB: {
+        pointA: getDistance(...nodeCoordinates['pointB'], ...nodeCoordinates['pointA']),
+        pointC: getDistance(...nodeCoordinates['pointB'], ...nodeCoordinates['pointC'])
+      },
+      pointC: {
+        pointB: getDistance(...nodeCoordinates['pointC'], ...nodeCoordinates['pointB'])
+      }
+    };
+
+    // 6. Dijkstra algorithm
+    function dijkstra(graph, start, end) {
+      const distances = {};
+      const previous = {};
+      const visited = new Set();
+      const nodes = new Set(Object.keys(graph));
+
+      for (const node of nodes) {
+        distances[node] = Infinity;
+        previous[node] = null;
+      }
+      distances[start] = 0;
+
+      while (nodes.size) {
+        const current = [...nodes].reduce((a, b) =>
+          distances[a] < distances[b] ? a : b
+        );
+
+        if (current === end) break;
+        nodes.delete(current);
+        visited.add(current);
+
+        for (const neighbor in graph[current]) {
+          if (!visited.has(neighbor)) {
+            const newDist = distances[current] + graph[current][neighbor];
+            if (newDist < distances[neighbor]) {
+              distances[neighbor] = newDist;
+              previous[neighbor] = current;
+            }
+          }
+        }
+      }
+
+      const path = [];
+      let curr = end;
+      while (curr) {
+        path.unshift(curr);
+        curr = previous[curr];
+      }
+
+      return { path, distance: distances[end] };
+    }
+
+    // 7. Find and draw the best route
+    const result = dijkstra(graph, 'brix', 'pointC');
+    console.log(result);
+
+    function drawRoute(path) {
+      const latlngs = path.map(name => nodeCoordinates[name]);
+      L.polyline(latlngs, { color: 'blue', weight: 5 }).addTo(map);
+    }
+
+    drawRoute(result.path);
+  </script>
+</body>
+</html>
