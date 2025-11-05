@@ -50,18 +50,8 @@ const SignupScreen = ({ navigation }) => {
     }
 
     setIsLoading(true);
-    // immediately navigate back to Login screen after pressing signup (request runs in background)
+
     try {
-      // navigate to the Auth stack's Login screen to be robust when nested
-      if (navigation?.navigate) {
-        // If this navigator is nested, target the parent 'Auth' stack explicitly
-        try {
-          navigation.navigate('Auth', { screen: 'Login', params: { signupSuccess: true } });
-        } catch (e) {
-          // fallback to direct navigate
-          navigation.navigate('Login');
-        }
-      }
       // Use admin registration on web, regular user registration on mobile
       const endpoint = Platform.OS === 'web'
         ? `${API_BASE}/api/admin/register` // web admin signup
@@ -79,11 +69,52 @@ const SignupScreen = ({ navigation }) => {
       // request completed; log server response
       const data = resp.data;
       console.log('Signup response:', data);
+
+      // Only navigate after successful signup
+      if (navigation?.navigate) {
+        // If this navigator is nested, target the parent 'Auth' stack explicitly
+        try {
+          navigation.navigate('Auth', { screen: 'Login', params: { signupSuccess: true } });
+        } catch (e) {
+          // fallback to direct navigate
+          navigation.navigate('Login');
+        }
+      }
     } catch (err) {
       console.error('Signup error:', err?.response?.data || err.message || err);
-      const msg = err?.response?.data?.message || 'Failed to create account. Please try again.';
-      // show error alert even if we already navigated away
-      Alert.alert('Error', msg);
+
+      // Provide specific error messages based on error type
+      let errorMessage = 'Failed to create account. Please try again.';
+
+      if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
+        errorMessage = 'Request timed out. Please check your internet connection and try again.';
+      } else if (err.code === 'ERR_NETWORK' || err.message?.includes('Network Error')) {
+        errorMessage = 'Network error. Please check your internet connection and ensure the server is running.';
+      } else if (err.response) {
+        // Server responded with an error
+        const status = err.response.status;
+        const serverMessage = err.response.data?.message;
+
+        if (status === 400) {
+          errorMessage = serverMessage || 'Invalid information provided. Please check all fields and try again.';
+        } else if (status === 409) {
+          errorMessage = serverMessage || 'Username or email already exists. Please use different credentials.';
+        } else if (status === 422) {
+          errorMessage = serverMessage || 'Invalid data format. Please check your information and try again.';
+        } else if (status === 404) {
+          errorMessage = 'Registration service not found. Please contact support.';
+        } else if (status === 500) {
+          errorMessage = 'Server error occurred while creating your account. Please try again later.';
+        } else if (status >= 500) {
+          errorMessage = 'Server is currently unavailable. Please try again later.';
+        } else if (serverMessage) {
+          errorMessage = serverMessage;
+        }
+      } else if (err.request) {
+        errorMessage = 'No response from server. Please check your internet connection and ensure the server is running.';
+      }
+
+      Alert.alert('Signup Failed', errorMessage);
     } finally {
       setIsLoading(false);
     }

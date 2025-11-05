@@ -9,6 +9,7 @@ import {
   ImageBackground,
   Image,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -52,8 +53,37 @@ const LoginScreen = ({ navigation, route }) => {
       navigation.navigate('Main');
     } catch (err) {
       console.error('Login error:', err?.response?.data || err.message || err);
-      const msg = err?.response?.data?.message || 'Login failed';
-      Alert.alert('Error', msg);
+
+      // Provide specific error messages based on error type
+      let errorMessage = 'Login failed. Please try again.';
+
+      if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
+        errorMessage = 'Request timed out. Please check your internet connection and try again.';
+      } else if (err.code === 'ERR_NETWORK' || err.message?.includes('Network Error')) {
+        errorMessage = 'Network error. Please check your internet connection and ensure the server is running.';
+      } else if (err.response) {
+        // Server responded with an error
+        const status = err.response.status;
+        const serverMessage = err.response.data?.message;
+
+        if (status === 400) {
+          errorMessage = serverMessage || 'Invalid request. Please check your username and password.';
+        } else if (status === 401 || status === 403) {
+          errorMessage = serverMessage || 'Invalid username or password. Please try again.';
+        } else if (status === 404) {
+          errorMessage = 'Login service not found. Please contact support.';
+        } else if (status === 500) {
+          errorMessage = 'Server error. Please try again later.';
+        } else if (status >= 500) {
+          errorMessage = 'Server is currently unavailable. Please try again later.';
+        } else if (serverMessage) {
+          errorMessage = serverMessage;
+        }
+      } else if (err.request) {
+        errorMessage = 'No response from server. Please check your internet connection and ensure the server is running.';
+      }
+
+      Alert.alert('Login Failed', errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -100,8 +130,16 @@ const LoginScreen = ({ navigation, route }) => {
         <View style={styles.signupText}>
           <Text>Don't have an account? <TouchableOpacity style={styles.signupLink} onPress={() => navigation.navigate('Sign Up')}><Text style={styles.signupText} >Sign Up</Text></TouchableOpacity></Text>
         </View>
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Login</Text>
+        <TouchableOpacity
+          style={[styles.button, isLoading && styles.buttonDisabled]}
+          onPress={handleLogin}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.buttonText}>Login</Text>
+          )}
         </TouchableOpacity>
       </View>
     </ImageBackground>
@@ -171,6 +209,9 @@ const styles = StyleSheet.create({
   signupLink:{
     color: '#181818ff',
     fontWeight: 'bold',
+  },
+  buttonDisabled: {
+    backgroundColor: 'rgba(193, 1, 193, 0.5)',
   }
 });
 
