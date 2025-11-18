@@ -5,12 +5,13 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   ImageBackground,
   Image,
   ActivityIndicator,
   Platform,
+  ScrollView,
 } from 'react-native';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import Logo from '../images/resqyou.png'; // Import the logo image
 import axios from 'axios';
 import API_BASE from '../config/api';
@@ -24,28 +25,38 @@ const SignupScreen = ({ navigation }) => {
   const [department, setDepartment] = useState('');
   const [contactNumber, setContactNumber] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [toast, setToast] = useState({ visible: false, message: '', type: 'success' });
+  const [hoveredButton, setHoveredButton] = useState(null);
+
+  // Toast notification helper
+  const showToast = (message, type = 'success') => {
+    setToast({ visible: true, message, type });
+    setTimeout(() => {
+      setToast({ visible: false, message: '', type: 'success' });
+    }, 3000);
+  };
 
   const handleSignup = async () => {
     // Validate form fields
     if (fullname === '' || username === '' || email === '' || password === '' || confirmPassword === '') {
-      Alert.alert('Error', 'Please fill in all required fields');
+      showToast('Please fill in all required fields', 'error');
       return;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
+      showToast('Passwords do not match', 'error');
       return;
     }
 
     // Email validation with regex
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      Alert.alert('Error', 'Please enter a valid email address');
+      showToast('Please enter a valid email address', 'error');
       return;
     }
 
     if (password.length < 6) {
-      Alert.alert('Error', 'Password must be at least 6 characters');
+      showToast('Password must be at least 6 characters', 'error');
       return;
     }
 
@@ -70,16 +81,22 @@ const SignupScreen = ({ navigation }) => {
       const data = resp.data;
       console.log('Signup response:', data);
 
-      // Only navigate after successful signup
-      if (navigation?.navigate) {
-        // If this navigator is nested, target the parent 'Auth' stack explicitly
-        try {
-          navigation.navigate('Auth', { screen: 'Login', params: { signupSuccess: true } });
-        } catch (e) {
-          // fallback to direct navigate
-          navigation.navigate('Login');
+      // Show success message
+      showToast('Account created successfully!', 'success');
+
+      // Navigate after a short delay to let user see the success message
+      setTimeout(() => {
+        // Only navigate after successful signup
+        if (navigation?.navigate) {
+          // If this navigator is nested, target the parent 'Auth' stack explicitly
+          try {
+            navigation.navigate('Auth', { screen: 'Login', params: { signupSuccess: true } });
+          } catch (e) {
+            // fallback to direct navigate
+            navigation.navigate('Login');
+          }
         }
-      }
+      }, 1500);
     } catch (err) {
       console.error('Signup error:', err?.response?.data || err.message || err);
 
@@ -114,7 +131,7 @@ const SignupScreen = ({ navigation }) => {
         errorMessage = 'No response from server. Please check your internet connection and ensure the server is running.';
       }
 
-      Alert.alert('Signup Failed', errorMessage);
+      showToast(errorMessage, 'error');
     } finally {
       setIsLoading(false);
     }
@@ -124,173 +141,281 @@ const SignupScreen = ({ navigation }) => {
     <ImageBackground
       style={styles.background}
     >
-      <View style={styles.glassContainer}>
-        <Image source={Logo} style={styles.logo} />
-        <Text style={styles.headerText}>Create Admin Account</Text>
-
-        <TextInput
-          style={styles.input}
-          placeholder="Full Name *"
-          placeholderTextColor="#999"
-          value={fullname}
-          onChangeText={setFullname}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Username *"
-          placeholderTextColor="#999"
-          autoCapitalize="none"
-          value={username}
-          onChangeText={setUsername}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Email *"
-          placeholderTextColor="#999"
-          keyboardType="email-address"
-          autoCapitalize="none"
-          value={email}
-          onChangeText={setEmail}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Department (optional)"
-          placeholderTextColor="#999"
-          value={department}
-          onChangeText={setDepartment}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Contact Number (optional)"
-          placeholderTextColor="#999"
-          keyboardType="phone-pad"
-          value={contactNumber}
-          onChangeText={setContactNumber}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Password *"
-          placeholderTextColor="#999"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Confirm Password *"
-          placeholderTextColor="#999"
-          secureTextEntry
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-        />
-        
-        <TouchableOpacity 
-          style={[styles.button, isLoading && styles.buttonDisabled]} 
-          onPress={handleSignup} 
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.buttonText}>Sign Up</Text>
-          )}
-        </TouchableOpacity>
-        
-        <View style={styles.loginTextContainer}>
-          <Text style={styles.loginText}>Already have an account? </Text>
-          <TouchableOpacity onPress={() => {
-            try {
-              navigation.navigate('Auth', { screen: 'Login' });
-            } catch (e) {
-              navigation.navigate('Login');
-            }
-          }}>
-            <Text style={styles.loginLink}>Login</Text>
-          </TouchableOpacity>
+      {/* Toast Notification */}
+      {toast.visible && (
+        <View style={[
+          styles.toast,
+          toast.type === 'success' ? styles.toastSuccess : styles.toastError
+        ]}>
+          <MaterialIcon
+            name={toast.type === 'success' ? 'check-circle' : 'error'}
+            size={20}
+            color="#ffffff"
+          />
+          <Text style={styles.toastText}>{toast.message}</Text>
         </View>
-      </View>
+      )}
+
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.glassContainer}>
+          <Image source={Logo} style={styles.logo} />
+          <Text style={styles.headerText}>Create Admin Account</Text>
+
+          <TextInput
+            style={styles.input}
+            placeholder="Full Name *"
+            placeholderTextColor="#6b7280"
+            value={fullname}
+            onChangeText={setFullname}
+            accessibilityLabel="Full name input field"
+            accessibilityHint="Enter your full name"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Username *"
+            placeholderTextColor="#6b7280"
+            autoCapitalize="none"
+            value={username}
+            onChangeText={setUsername}
+            accessibilityLabel="Username input field"
+            accessibilityHint="Choose a unique username"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Email *"
+            placeholderTextColor="#6b7280"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            value={email}
+            onChangeText={setEmail}
+            accessibilityLabel="Email input field"
+            accessibilityHint="Enter your email address"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Department (optional)"
+            placeholderTextColor="#6b7280"
+            value={department}
+            onChangeText={setDepartment}
+            accessibilityLabel="Department input field"
+            accessibilityHint="Enter your department name (optional)"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Contact Number (optional)"
+            placeholderTextColor="#6b7280"
+            keyboardType="phone-pad"
+            value={contactNumber}
+            onChangeText={setContactNumber}
+            accessibilityLabel="Contact number input field"
+            accessibilityHint="Enter your contact number (optional)"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Password *"
+            placeholderTextColor="#6b7280"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+            accessibilityLabel="Password input field"
+            accessibilityHint="Create a password with at least 6 characters"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Confirm Password *"
+            placeholderTextColor="#6b7280"
+            secureTextEntry
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            accessibilityLabel="Confirm password input field"
+            accessibilityHint="Re-enter your password to confirm"
+          />
+
+          <TouchableOpacity
+            style={[
+              styles.button,
+              isLoading && styles.buttonDisabled,
+              Platform.OS === 'web' && hoveredButton === 'signup' && !isLoading && styles.buttonHover
+            ]}
+            onPress={handleSignup}
+            disabled={isLoading}
+            onMouseEnter={() => Platform.OS === 'web' && !isLoading && setHoveredButton('signup')}
+            onMouseLeave={() => Platform.OS === 'web' && setHoveredButton(null)}
+            accessibilityLabel={isLoading ? 'Creating account' : 'Sign up button'}
+            accessibilityRole="button"
+            accessibilityHint="Press to create your admin account"
+            accessibilityState={{ disabled: isLoading, busy: isLoading }}
+          >
+            {isLoading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>Sign Up</Text>
+            )}
+          </TouchableOpacity>
+
+          <View style={styles.loginTextContainer}>
+            <Text style={styles.loginText}>Already have an account? </Text>
+            <TouchableOpacity
+              onPress={() => {
+                try {
+                  navigation.navigate('Auth', { screen: 'Login' });
+                } catch (e) {
+                  navigation.navigate('Login');
+                }
+              }}
+              accessibilityLabel="Go to Login"
+              accessibilityRole="button"
+            >
+              <Text style={styles.loginLink}>Login</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
     </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
   background: {
-    backgroundColor: '#fff3f0', // Fixed: Light pink background color (was #fff30)
+    backgroundColor: '#f9fafb', // Mobile gray50 (60% - primary background)
     flex: 1,
     resizeMode: 'cover',
+  },
+  scrollContainer: {
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingVertical: 40,
   },
   glassContainer: {
-    width: '40%', // Adjusted width for web (smaller for larger screens)
-    maxWidth: 500, // Set a maximum width for larger screens
-    padding: 30, // Increased padding for better spacing
+    width: '40%',
+    maxWidth: 500,
+    padding: 40,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)', // Border for the frosted effect
-    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Added semi-transparent background
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-    elevation: 10, // Shadow for Android
-    alignItems: 'center', // Center-align content inside the container
+    borderColor: '#e5e7eb', // Mobile gray200
+    backgroundColor: '#ffffff', // Mobile white (30% - secondary)
+    ...(Platform.OS === 'web' ? {
+      boxShadow: '0 10px 20px rgba(0, 0, 0, 0.1)',
+    } : {
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 10 },
+      shadowOpacity: 0.1,
+      shadowRadius: 20,
+      elevation: 10,
+    }),
+    alignItems: 'center',
   },
   logo: {
-    width: 120, // Slightly smaller logo than login screen
+    width: 120,
     height: 120,
-    marginBottom: 10,
+    marginBottom: 16,
     resizeMode: 'contain',
   },
   headerText: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 20,
+    fontWeight: '600', // Consistent weight
+    color: '#1f2937', // Mobile gray800 - primary text
+    marginBottom: 24,
   },
   input: {
-    width: '100%', // Full width inside the container
-    height: 55, // Slightly smaller than login for more compact form with more fields
-    borderColor: 'rgba(255, 255, 255, 0.5)',
+    width: '100%',
+    height: 52,
+    borderColor: '#e5e7eb', // Mobile gray200
     borderWidth: 1,
-    borderRadius: 15,
-    paddingHorizontal: 20,
-    marginBottom: 15, // Slightly less margin than login
-    backgroundColor: 'rgba(255, 255, 255, 0.3)', // Semi-transparent white
-    color: '#333',
-    textAlign: 'left', // Changed from 'start' to 'left' for better compatibility
-    fontSize: 16,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    marginBottom: 12,
+    backgroundColor: '#f9fafb', // Mobile gray50
+    color: '#1f2937', // Mobile gray800 - primary text
+    fontSize: 15,
+    outlineStyle: 'none', // Remove outline on web
   },
   button: {
     width: '100%',
-    height: 55,
-    backgroundColor: 'rgba(193, 1, 193, 0.8)', // Same as login for consistency
+    height: 52,
+    backgroundColor: '#14b8a6', // Mobile primary teal (10% - accent)
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 15,
-    marginTop: 15, // Slightly less margin than login
+    borderRadius: 12,
+    marginTop: 12,
+    ...(Platform.OS === 'web' ? {
+      boxShadow: '0 4px 8px rgba(20, 184, 166, 0.3)',
+    } : {
+      shadowColor: '#14b8a6',
+      shadowOpacity: 0.3,
+      shadowOffset: { width: 0, height: 4 },
+      shadowRadius: 8,
+      elevation: 4,
+    }),
+  },
+  buttonHover: {
+    backgroundColor: '#0d9488', // Mobile teal dark - hover state
+    transform: [{ scale: 1.02 }],
   },
   buttonText: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
+    color: '#ffffff', // Mobile white
+    fontSize: 17,
+    fontWeight: '600', // Consistent weight
+  },
+  buttonDisabled: {
+    backgroundColor: '#14b8a680', // Semi-transparent teal
+    opacity: 0.6,
   },
   loginTextContainer: {
-    flexDirection: 'row', // Fixed: Proper layout for text and link
-    marginTop: 15,
+    flexDirection: 'row',
+    marginTop: 16,
     alignItems: 'center',
   },
   loginText: {
-    color: '#141414',
+    color: '#6b7280', // Mobile gray500 - secondary text
+    fontSize: 14,
   },
   loginLink: {
-    color: '#181818',
-    fontWeight: 'bold',
-  }
-  ,
-  buttonDisabled: {
-    backgroundColor: 'rgba(193, 1, 193, 0.5)',
-  }
+    color: '#14b8a6', // Mobile primary teal
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  // Toast notification styles
+  toast: {
+    position: 'absolute',
+    top: 20,
+    left: '50%',
+    transform: Platform.OS === 'web' ? [{ translateX: '-50%' }] : [],
+    marginLeft: Platform.OS !== 'web' ? -150 : 0,
+    width: 300,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    ...(Platform.OS === 'web' ? {
+      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.15)',
+    } : {
+      shadowColor: '#000',
+      shadowOpacity: 0.15,
+      shadowOffset: { width: 0, height: 4 },
+      shadowRadius: 8,
+      elevation: 8,
+    }),
+    zIndex: 9999,
+  },
+  toastSuccess: {
+    backgroundColor: '#10b981', // Mobile green
+  },
+  toastError: {
+    backgroundColor: '#ef4444', // Mobile red
+  },
+  toastText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '600',
+    marginLeft: 8,
+    flex: 1,
+  },
 });
 
 export default SignupScreen;

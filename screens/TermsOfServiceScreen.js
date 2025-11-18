@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const TermsOfServiceScreen = ({ navigation }) => {
@@ -10,8 +10,11 @@ const TermsOfServiceScreen = ({ navigation }) => {
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.navigate('Settings')}
+          accessibilityLabel="Go back to Settings"
+          accessibilityRole="button"
+          accessibilityHint="Returns to the Settings screen"
         >
-          <Icon name="arrow-back" size={24} color="#333" />
+          <Icon name="arrow-back" size={24} color="#1f2937" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Terms of Service</Text>
         <View style={styles.placeholder} />
@@ -71,7 +74,7 @@ const TermsOfServiceScreen = ({ navigation }) => {
 
           <Text style={styles.sectionTitle}>6. Emergency Services Disclaimer</Text>
           <Text style={styles.warningBox}>
-            <Icon name="warning" size={20} color="#FF6B6B" />
+            <Icon name="warning" size={20} color="#ef4444" />
             <Text style={styles.warningText}>
               {' '}IMPORTANT: ResqYOU is a supplementary emergency tool and should NOT replace traditional emergency
               services (911, 112, or local emergency numbers). In life-threatening situations, always contact local
@@ -196,7 +199,7 @@ const TermsOfServiceScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#f9fafb', // Mobile gray50 (60% - primary background)
   },
   header: {
     flexDirection: 'row',
@@ -204,14 +207,18 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#ffffff', // Mobile white (30% - secondary)
     borderBottomWidth: 1,
-    borderBottomColor: '#E1E8ED',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    borderBottomColor: '#e5e7eb', // Mobile gray200
+    ...(Platform.OS === 'web' ? {
+      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+    } : {
+      elevation: 2,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+    }),
   },
   backButton: {
     padding: 8,
@@ -219,7 +226,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#333',
+    color: '#1f2937', // Mobile gray800 - primary text
   },
   placeholder: {
     width: 40,
@@ -229,77 +236,77 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   section: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#ffffff', // Mobile white
     borderRadius: 12,
     padding: 20,
     marginBottom: 20,
   },
   lastUpdated: {
     fontSize: 12,
-    color: '#666',
+    color: '#6b7280', // Mobile gray500 - secondary text
     fontStyle: 'italic',
     marginBottom: 15,
   },
   intro: {
     fontSize: 15,
-    color: '#444',
+    color: '#374151', // Mobile gray700
     lineHeight: 22,
     marginBottom: 20,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333',
+    color: '#1f2937', // Mobile gray800 - primary text
     marginTop: 20,
     marginBottom: 12,
   },
   paragraph: {
     fontSize: 14,
-    color: '#555',
+    color: '#4b5563', // Mobile gray600 - tertiary text
     lineHeight: 20,
     marginBottom: 12,
   },
   bulletPoint: {
     fontSize: 14,
-    color: '#555',
+    color: '#4b5563', // Mobile gray600 - tertiary text
     lineHeight: 20,
     marginBottom: 8,
     paddingLeft: 10,
   },
   warningBox: {
     flexDirection: 'row',
-    backgroundColor: '#FFF5F5',
+    backgroundColor: '#fef2f2', // Mobile red50
     padding: 15,
     borderRadius: 8,
     borderLeftWidth: 4,
-    borderLeftColor: '#FF6B6B',
+    borderLeftColor: '#ef4444', // Mobile red
     marginBottom: 15,
     alignItems: 'flex-start',
   },
   warningText: {
     flex: 1,
     fontSize: 14,
-    color: '#C92A2A',
+    color: '#dc2626', // Mobile red700
     fontWeight: '500',
     lineHeight: 20,
   },
   contactInfo: {
     fontSize: 14,
-    color: '#4ECDC4',
+    color: '#14b8a6', // Mobile primary teal
     lineHeight: 20,
     marginBottom: 6,
   },
   footer: {
     marginTop: 30,
     padding: 15,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#f9fafb', // Mobile gray50
     borderRadius: 8,
     borderLeftWidth: 4,
-    borderLeftColor: '#4ECDC4',
+    borderLeftColor: '#14b8a6', // Mobile primary teal
   },
   footerText: {
     fontSize: 13,
-    color: '#666',
+    color: '#6b7280', // Mobile gray500 - secondary text
     lineHeight: 20,
     fontStyle: 'italic',
   },

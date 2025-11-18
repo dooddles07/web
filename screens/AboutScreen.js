@@ -1,8 +1,10 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const AboutScreen = ({ navigation }) => {
+  const [hoveredButton, setHoveredButton] = useState(null);
+
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -10,8 +12,11 @@ const AboutScreen = ({ navigation }) => {
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.navigate('Settings')}
+          accessibilityLabel="Go back to Settings"
+          accessibilityRole="button"
+          accessibilityHint="Returns to the Settings screen"
         >
-          <Icon name="arrow-back" size={24} color="#333" />
+          <Icon name="arrow-back" size={24} color="#1f2937" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>About</Text>
         <View style={styles.placeholder} />
@@ -21,7 +26,7 @@ const AboutScreen = ({ navigation }) => {
         {/* App Logo Section */}
         <View style={styles.logoSection}>
           <View style={styles.logoContainer}>
-            <Icon name="emergency" size={80} color="#4ECDC4" />
+            <Icon name="emergency" size={80} color="#14b8a6" />
           </View>
           <Text style={styles.appName}>ResqYOU</Text>
           <Text style={styles.tagline}>Emergency Response & Locator System</Text>
@@ -57,7 +62,7 @@ const AboutScreen = ({ navigation }) => {
 
           <View style={styles.featureItem}>
             <View style={styles.featureIcon}>
-              <Icon name="emergency" size={24} color="#FF6B6B" />
+              <Icon name="emergency" size={24} color="#ef4444" />
             </View>
             <View style={styles.featureContent}>
               <Text style={styles.featureTitle}>One-Touch SOS</Text>
@@ -69,7 +74,7 @@ const AboutScreen = ({ navigation }) => {
 
           <View style={styles.featureItem}>
             <View style={styles.featureIcon}>
-              <Icon name="location-on" size={24} color="#4ECDC4" />
+              <Icon name="location-on" size={24} color="#14b8a6" />
             </View>
             <View style={styles.featureContent}>
               <Text style={styles.featureTitle}>Real-Time Tracking</Text>
@@ -81,7 +86,7 @@ const AboutScreen = ({ navigation }) => {
 
           <View style={styles.featureItem}>
             <View style={styles.featureIcon}>
-              <Icon name="route" size={24} color="#51CF66" />
+              <Icon name="route" size={24} color="#10b981" />
             </View>
             <View style={styles.featureContent}>
               <Text style={styles.featureTitle}>Smart Routing</Text>
@@ -93,7 +98,7 @@ const AboutScreen = ({ navigation }) => {
 
           <View style={styles.featureItem}>
             <View style={styles.featureIcon}>
-              <Icon name="history" size={24} color="#FFB84D" />
+              <Icon name="history" size={24} color="#f59e0b" />
             </View>
             <View style={styles.featureContent}>
               <Text style={styles.featureTitle}>Emergency History</Text>
@@ -105,7 +110,7 @@ const AboutScreen = ({ navigation }) => {
 
           <View style={styles.featureItem}>
             <View style={styles.featureIcon}>
-              <Icon name="contacts" size={24} color="#9775FA" />
+              <Icon name="contacts" size={24} color="#8b5cf6" />
             </View>
             <View style={styles.featureContent}>
               <Text style={styles.featureTitle}>Emergency Contacts</Text>
@@ -117,7 +122,7 @@ const AboutScreen = ({ navigation }) => {
 
           <View style={styles.featureItem}>
             <View style={styles.featureIcon}>
-              <Icon name="security" size={24} color="#FF6B6B" />
+              <Icon name="security" size={24} color="#ef4444" />
             </View>
             <View style={styles.featureContent}>
               <Text style={styles.featureTitle}>Secure & Private</Text>
@@ -261,15 +266,42 @@ const AboutScreen = ({ navigation }) => {
         <View style={styles.socialSection}>
           <Text style={styles.sectionTitle}>Follow Us</Text>
           <View style={styles.socialLinks}>
-            <TouchableOpacity style={styles.socialButton}>
+            <TouchableOpacity
+              style={[
+                styles.socialButton,
+                Platform.OS === 'web' && hoveredButton === 'facebook' && styles.socialButtonHover
+              ]}
+              onMouseEnter={() => Platform.OS === 'web' && setHoveredButton('facebook')}
+              onMouseLeave={() => Platform.OS === 'web' && setHoveredButton(null)}
+              accessibilityLabel="Visit our Facebook page"
+              accessibilityRole="button"
+            >
               <Icon name="facebook" size={24} color="#4267B2" />
               <Text style={styles.socialLabel}>Facebook</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.socialButton}>
+            <TouchableOpacity
+              style={[
+                styles.socialButton,
+                Platform.OS === 'web' && hoveredButton === 'twitter' && styles.socialButtonHover
+              ]}
+              onMouseEnter={() => Platform.OS === 'web' && setHoveredButton('twitter')}
+              onMouseLeave={() => Platform.OS === 'web' && setHoveredButton(null)}
+              accessibilityLabel="Visit our Twitter page"
+              accessibilityRole="button"
+            >
               <Icon name="chat" size={24} color="#1DA1F2" />
               <Text style={styles.socialLabel}>Twitter</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.socialButton}>
+            <TouchableOpacity
+              style={[
+                styles.socialButton,
+                Platform.OS === 'web' && hoveredButton === 'instagram' && styles.socialButtonHover
+              ]}
+              onMouseEnter={() => Platform.OS === 'web' && setHoveredButton('instagram')}
+              onMouseLeave={() => Platform.OS === 'web' && setHoveredButton(null)}
+              accessibilityLabel="Visit our Instagram page"
+              accessibilityRole="button"
+            >
               <Icon name="photo-camera" size={24} color="#E4405F" />
               <Text style={styles.socialLabel}>Instagram</Text>
             </TouchableOpacity>
@@ -290,7 +322,7 @@ const AboutScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#f9fafb', // Mobile gray50 (60% - primary background)
   },
   header: {
     flexDirection: 'row',
@@ -298,14 +330,18 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#ffffff', // Mobile white (30% - secondary)
     borderBottomWidth: 1,
-    borderBottomColor: '#E1E8ED',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    borderBottomColor: '#e5e7eb', // Mobile gray200
+    ...(Platform.OS === 'web' ? {
+      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+    } : {
+      elevation: 2,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+    }),
   },
   backButton: {
     padding: 8,
@@ -313,7 +349,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#333',
+    color: '#1f2937', // Mobile gray800 - primary text
   },
   placeholder: {
     width: 40,
@@ -322,17 +358,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   logoSection: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#ffffff', // Mobile white
     alignItems: 'center',
     paddingVertical: 40,
     borderBottomWidth: 1,
-    borderBottomColor: '#E1E8ED',
+    borderBottomColor: '#e5e7eb', // Mobile gray200
   },
   logoContainer: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: '#4ECDC420',
+    backgroundColor: '#f0fdfa', // Mobile teal background light
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 20,
@@ -340,38 +376,38 @@ const styles = StyleSheet.create({
   appName: {
     fontSize: 32,
     fontWeight: '700',
-    color: '#333',
+    color: '#1f2937', // Mobile gray800 - primary text
     marginBottom: 5,
   },
   tagline: {
     fontSize: 16,
-    color: '#666',
+    color: '#6b7280', // Mobile gray500 - secondary text
     marginBottom: 10,
   },
   version: {
     fontSize: 14,
-    color: '#999',
+    color: '#9ca3af', // Mobile gray400
   },
   section: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#ffffff', // Mobile white
     padding: 20,
     marginTop: 10,
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#333',
+    color: '#1f2937', // Mobile gray800 - primary text
     marginBottom: 15,
   },
   paragraph: {
     fontSize: 14,
-    color: '#555',
+    color: '#4b5563', // Mobile gray600 - tertiary text
     lineHeight: 22,
     marginBottom: 12,
   },
   bold: {
     fontWeight: '600',
-    color: '#333',
+    color: '#1f2937', // Mobile gray800 - primary text
   },
   featureItem: {
     flexDirection: 'row',
@@ -381,7 +417,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#f9fafb', // Mobile gray50
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 15,
@@ -392,12 +428,12 @@ const styles = StyleSheet.create({
   featureTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: '#1f2937', // Mobile gray800 - primary text
     marginBottom: 5,
   },
   featureDescription: {
     fontSize: 14,
-    color: '#666',
+    color: '#6b7280', // Mobile gray500 - secondary text
     lineHeight: 20,
   },
   stepItem: {
@@ -408,7 +444,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#4ECDC4',
+    backgroundColor: '#14b8a6', // Mobile primary teal (10% - accent)
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 15,
@@ -416,7 +452,7 @@ const styles = StyleSheet.create({
   stepNumberText: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#ffffff',
   },
   stepContent: {
     flex: 1,
@@ -424,12 +460,12 @@ const styles = StyleSheet.create({
   stepTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: '#1f2937', // Mobile gray800 - primary text
     marginBottom: 5,
   },
   stepDescription: {
     fontSize: 14,
-    color: '#666',
+    color: '#6b7280', // Mobile gray500 - secondary text
     lineHeight: 20,
   },
   commitmentList: {
@@ -437,12 +473,12 @@ const styles = StyleSheet.create({
   },
   commitmentItem: {
     fontSize: 14,
-    color: '#51CF66',
+    color: '#10b981', // Mobile green
     fontWeight: '500',
     marginBottom: 8,
   },
   statsSection: {
-    backgroundColor: '#4ECDC4',
+    backgroundColor: '#14b8a6', // Mobile primary teal
     padding: 20,
     marginTop: 10,
   },
@@ -453,7 +489,7 @@ const styles = StyleSheet.create({
   },
   statCard: {
     width: '48%',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#ffffff', // Mobile white
     borderRadius: 12,
     padding: 20,
     alignItems: 'center',
@@ -462,21 +498,21 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#4ECDC4',
+    color: '#14b8a6', // Mobile primary teal
     marginBottom: 5,
   },
   statLabel: {
     fontSize: 12,
-    color: '#666',
+    color: '#6b7280', // Mobile gray500 - secondary text
     textAlign: 'center',
   },
   contactInfo: {
     fontSize: 14,
-    color: '#4ECDC4',
+    color: '#14b8a6', // Mobile primary teal
     marginBottom: 6,
   },
   socialSection: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#ffffff', // Mobile white
     padding: 20,
     marginTop: 10,
     alignItems: 'center',
@@ -488,21 +524,27 @@ const styles = StyleSheet.create({
   },
   socialButton: {
     alignItems: 'center',
+    padding: 10,
+    borderRadius: 8,
+  },
+  socialButtonHover: {
+    backgroundColor: '#f9fafb', // Mobile gray50
+    transform: [{ scale: 1.05 }],
   },
   socialLabel: {
     fontSize: 12,
-    color: '#666',
+    color: '#6b7280', // Mobile gray500 - secondary text
     marginTop: 5,
   },
   footer: {
     alignItems: 'center',
     paddingVertical: 30,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#ffffff', // Mobile white
     marginTop: 10,
   },
   footerText: {
     fontSize: 12,
-    color: '#999',
+    color: '#9ca3af', // Mobile gray400
     marginBottom: 5,
   },
 });

@@ -9,13 +9,14 @@ import {
   ScrollView,
   ActivityIndicator,
   Image,
+  Platform,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import API_BASE from '../config/api';
 
-const MessagesScreen = ({ navigation }) => {
+const MessagesScreen = ({ navigation, route }) => {
   // State
   const [conversations, setConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
@@ -25,9 +26,19 @@ const MessagesScreen = ({ navigation }) => {
   const [sending, setSending] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [adminData, setAdminData] = useState(null);
+  const [toast, setToast] = useState({ visible: false, message: '', type: 'success' });
+  const [hoveredButton, setHoveredButton] = useState(null);
 
   const scrollViewRef = useRef(null);
   const pollingInterval = useRef(null);
+
+  // Toast notification helper
+  const showToast = (message, type = 'success') => {
+    setToast({ visible: true, message, type });
+    setTimeout(() => {
+      setToast({ visible: false, message: '', type: 'success' });
+    }, 3000);
+  };
 
   // ============================================
   // INITIALIZATION
@@ -59,6 +70,21 @@ const MessagesScreen = ({ navigation }) => {
     }
   }, [selectedConversation]);
 
+  // Handle navigation params from dashboard (auto-select conversation)
+  useEffect(() => {
+    if (route?.params?.username && conversations.length > 0) {
+      const targetUsername = route.params.username;
+      const conversation = conversations.find(
+        conv => conv.userName === targetUsername || conv.userId?.username === targetUsername
+      );
+      if (conversation) {
+        setSelectedConversation(conversation);
+        const displayName = getDisplayName(conversation);
+        showToast(`Opened conversation with ${displayName}`, 'success');
+      }
+    }
+  }, [conversations, route?.params]);
+
   // ============================================
   // API CALLS
   // ============================================
@@ -77,9 +103,18 @@ const MessagesScreen = ({ navigation }) => {
   const fetchConversations = async () => {
     try {
       const token = await AsyncStorage.getItem('authToken');
+
       if (!token) {
-        window.alert('Error: Authentication required');
-        navigation.navigate('Auth');
+        console.error('No auth token found in Messages screen');
+        showToast('Please log in to view messages', 'error');
+
+        // Delay navigation slightly to show the error
+        setTimeout(() => {
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'Auth' }],
+          });
+        }, 1500);
         return;
       }
 
@@ -87,14 +122,27 @@ const MessagesScreen = ({ navigation }) => {
         headers: { 'Authorization': `Bearer ${token}` },
       });
 
-      setConversations(response.data);
+      // Handle nested data structure - conversations may be in response.data.data
+      const conversationsData = response.data.data || response.data;
+
+      // Ensure it's an array
+      const conversationsArray = Array.isArray(conversationsData) ? conversationsData : [];
+
+      setConversations(conversationsArray);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching conversations:', error);
       setLoading(false);
       if (error.response?.status === 401) {
-        window.alert('Error: Session expired. Please login again.');
-        navigation.navigate('Auth');
+        showToast('Session expired. Please login again.', 'error');
+        setTimeout(() => {
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'Auth' }],
+          });
+        }, 1500);
+      } else {
+        showToast('Failed to load conversations', 'error');
       }
     }
   };
@@ -103,11 +151,10 @@ const MessagesScreen = ({ navigation }) => {
     try {
       const token = await AsyncStorage.getItem('authToken');
       if (!token) {
-        window.alert('Error: Authentication required');
+        showToast('Authentication required', 'error');
         return;
       }
 
-      console.log('Fetching messages for conversation:', conversationId);
       const response = await axios.get(
         `${API_BASE}/api/messages/conversation/${conversationId}?limit=100`,
         {
@@ -115,8 +162,13 @@ const MessagesScreen = ({ navigation }) => {
         }
       );
 
-      console.log('Messages loaded successfully:', response.data.length);
-      setChatMessages(response.data);
+      // Handle nested data structure - messages may be in response.data.data
+      const messagesData = response.data.data || response.data;
+
+      // Ensure it's an array
+      const messagesArray = Array.isArray(messagesData) ? messagesData : [];
+
+      setChatMessages(messagesArray);
 
       // Scroll to bottom after messages load
       setTimeout(() => {
@@ -129,11 +181,11 @@ const MessagesScreen = ({ navigation }) => {
 
       if (error.response?.status === 401) {
         const errorMsg = error.response?.data?.message || 'Authentication failed';
-        window.alert(`Error: ${errorMsg}. Please log out and log back in to refresh your session.`);
+        showToast(`${errorMsg}. Please log out and log back in.`, 'error');
         // Optionally redirect to login
         // navigation.navigate('Auth');
       } else {
-        window.alert('Error: Failed to load messages. Check console for details.');
+        showToast('Failed to load messages. Please try again.', 'error');
       }
     }
   };
@@ -177,11 +229,11 @@ const MessagesScreen = ({ navigation }) => {
         }
       );
 
-      window.alert('Success: You have been assigned to this conversation');
+      showToast('You have been assigned to this conversation', 'success');
       fetchConversations();
     } catch (error) {
       console.error('Error assigning to conversation:', error);
-      window.alert('Error: Failed to assign to conversation');
+      showToast('Failed to assign to conversation', 'error');
     }
   };
 
@@ -192,7 +244,7 @@ const MessagesScreen = ({ navigation }) => {
     try {
       const token = await AsyncStorage.getItem('authToken');
       if (!token) {
-        window.alert('Error: Authentication required');
+        showToast('Authentication required', 'error');
         return;
       }
 
@@ -221,7 +273,7 @@ const MessagesScreen = ({ navigation }) => {
       fetchConversations();
     } catch (error) {
       console.error('Error sending message:', error);
-      window.alert('Error: Failed to send message');
+      showToast('Failed to send message', 'error');
     } finally {
       setSending(false);
     }
@@ -270,9 +322,42 @@ const MessagesScreen = ({ navigation }) => {
     return name ? name.charAt(0).toUpperCase() : '?';
   };
 
-  const filteredConversations = conversations.filter((conv) =>
-    conv.userName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Helper to get display name from conversation
+  const getDisplayName = (conversation) => {
+    // Try multiple possible paths for fullname
+    const fullname =
+      conversation.userId?.fullname ||
+      conversation.userId?.fullName ||
+      conversation.userFullname ||
+      conversation.fullname ||
+      conversation.userName ||
+      conversation.username ||
+      'Unknown User';
+
+    return fullname;
+  };
+
+  // Helper to get avatar URL from conversation
+  const getAvatarUrl = (conversation) => {
+    // Check multiple possible avatar paths
+    const avatar =
+      conversation.userId?.avatar ||
+      conversation.userId?.profilePicture ||
+      conversation.userId?.profilePic ||
+      conversation.userAvatar ||
+      conversation.avatar ||
+      null;
+
+    return avatar;
+  };
+
+  // Ensure conversations is an array before filtering
+  const filteredConversations = Array.isArray(conversations)
+    ? conversations.filter((conv) => {
+        const displayName = getDisplayName(conv);
+        return displayName.toLowerCase().includes(searchQuery.toLowerCase());
+      })
+    : [];
 
   const handleBackPress = () => {
     navigation.goBack();
@@ -282,31 +367,47 @@ const MessagesScreen = ({ navigation }) => {
   // RENDER HELPERS
   // ============================================
 
-  const renderConversationItem = ({ item }) => (
-    <TouchableOpacity
-      style={[
-        styles.conversationItem,
-        item.unreadCountAdmin > 0 && styles.unreadItem,
-        selectedConversation?._id === item._id && styles.selectedItem,
-      ]}
-      onPress={() => setSelectedConversation(item)}
-      activeOpacity={0.7}
-    >
-      <View style={styles.avatarContainer}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>{getInitial(item.userName)}</Text>
+  const renderConversationItem = ({ item }) => {
+    // Get display name and avatar using helper functions
+    const displayName = getDisplayName(item);
+    const userAvatar = getAvatarUrl(item);
+
+    return (
+      <TouchableOpacity
+        style={[
+          styles.conversationItem,
+          item.unreadCountAdmin > 0 && styles.unreadItem,
+          selectedConversation?._id === item._id && styles.selectedItem,
+        ]}
+        onPress={() => setSelectedConversation(item)}
+        activeOpacity={0.7}
+      >
+        <View style={styles.avatarContainer}>
+          {userAvatar ? (
+            <Image
+              source={{ uri: userAvatar }}
+              style={styles.avatar}
+              {...(Platform.OS === 'web' && {
+                referrerPolicy: 'no-referrer',
+                crossOrigin: 'anonymous',
+              })}
+            />
+          ) : (
+            <View style={[styles.avatar, styles.avatarPlaceholder]}>
+              <Text style={styles.avatarText}>{getInitial(displayName)}</Text>
+            </View>
+          )}
+          {item.unreadCountAdmin > 0 && (
+            <View style={styles.unreadBadge}>
+              <Text style={styles.unreadBadgeText}>{item.unreadCountAdmin}</Text>
+            </View>
+          )}
         </View>
-        {item.unreadCountAdmin > 0 && (
-          <View style={styles.unreadBadge}>
-            <Text style={styles.unreadBadgeText}>{item.unreadCountAdmin}</Text>
-          </View>
-        )}
-      </View>
 
       <View style={styles.conversationContent}>
         <View style={styles.conversationHeader}>
           <Text style={styles.conversationName} numberOfLines={1}>
-            {item.userName}
+            {displayName}
           </Text>
           <Text style={styles.conversationTime}>
             {formatTime(item.lastMessageTime)}
@@ -323,6 +424,7 @@ const MessagesScreen = ({ navigation }) => {
       </View>
     </TouchableOpacity>
   );
+};
 
   // ============================================
   // RENDER
@@ -331,7 +433,7 @@ const MessagesScreen = ({ navigation }) => {
   if (loading) {
     return (
       <View style={[styles.container, styles.centerContent]}>
-        <ActivityIndicator size="large" color="#4ECDC4" />
+        <ActivityIndicator size="large" color="#14b8a6" />
         <Text style={styles.loadingText}>Loading conversations...</Text>
       </View>
     );
@@ -339,6 +441,21 @@ const MessagesScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      {/* Toast Notification */}
+      {toast.visible && (
+        <View style={[
+          styles.toast,
+          toast.type === 'success' ? styles.toastSuccess : styles.toastError
+        ]}>
+          <Icon
+            name={toast.type === 'success' ? 'check-circle' : 'error'}
+            size={20}
+            color="#ffffff"
+          />
+          <Text style={styles.toastText}>{toast.message}</Text>
+        </View>
+      )}
+
       {/* Left Sidebar: Conversations List */}
       <View style={styles.sidebar}>
         <View style={styles.sidebarHeader}>
@@ -347,8 +464,10 @@ const MessagesScreen = ({ navigation }) => {
               style={styles.backButton}
               onPress={handleBackPress}
               activeOpacity={0.7}
+              accessibilityLabel="Go back to previous screen"
+              accessibilityRole="button"
             >
-              <Icon name="arrow-back" size={24} color="#4ECDC4" />
+              <Icon name="arrow-back" size={24} color="#14b8a6" />
             </TouchableOpacity>
             <Text style={styles.sidebarTitle}>Messages</Text>
           </View>
@@ -391,14 +510,25 @@ const MessagesScreen = ({ navigation }) => {
             {/* Chat Header */}
             <View style={styles.chatHeader}>
               <View style={styles.chatHeaderLeft}>
-                <View style={styles.chatAvatar}>
-                  <Text style={styles.chatAvatarText}>
-                    {getInitial(selectedConversation.userName)}
-                  </Text>
-                </View>
+                {getAvatarUrl(selectedConversation) ? (
+                  <Image
+                    source={{ uri: getAvatarUrl(selectedConversation) }}
+                    style={styles.chatAvatar}
+                    {...(Platform.OS === 'web' && {
+                      referrerPolicy: 'no-referrer',
+                      crossOrigin: 'anonymous',
+                    })}
+                  />
+                ) : (
+                  <View style={[styles.chatAvatar, styles.chatAvatarPlaceholder]}>
+                    <Text style={styles.chatAvatarText}>
+                      {getInitial(getDisplayName(selectedConversation))}
+                    </Text>
+                  </View>
+                )}
                 <View>
                   <Text style={styles.chatHeaderName}>
-                    {selectedConversation.userName}
+                    {getDisplayName(selectedConversation)}
                   </Text>
                   <Text style={styles.chatHeaderStatus}>
                     {selectedConversation.status === 'active' ? 'Active' : 'Archived'}
@@ -414,7 +544,7 @@ const MessagesScreen = ({ navigation }) => {
               contentContainerStyle={styles.messagesContent}
               onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
             >
-              {chatMessages.length === 0 ? (
+              {!Array.isArray(chatMessages) || chatMessages.length === 0 ? (
                 <View style={styles.emptyMessagesContainer}>
                   <Icon name="chat" size={48} color="#d1d5db" />
                   <Text style={styles.emptyMessagesText}>No messages yet</Text>
@@ -439,6 +569,10 @@ const MessagesScreen = ({ navigation }) => {
                           source={{ uri: message.mediaUrl }}
                           style={styles.messageImage}
                           resizeMode="cover"
+                          {...(Platform.OS === 'web' && {
+                            referrerPolicy: 'no-referrer',
+                            crossOrigin: 'anonymous',
+                          })}
                         />
                       )}
 
@@ -450,6 +584,10 @@ const MessagesScreen = ({ navigation }) => {
                               source={{ uri: message.thumbnailUrl }}
                               style={styles.messageImage}
                               resizeMode="cover"
+                              {...(Platform.OS === 'web' && {
+                                referrerPolicy: 'no-referrer',
+                                crossOrigin: 'anonymous',
+                              })}
                             />
                           ) : (
                             <View style={[styles.messageImage, styles.videoPlaceholder]}>
@@ -471,7 +609,7 @@ const MessagesScreen = ({ navigation }) => {
                               style={styles.mediaLink}
                               onPress={() => window.open(message.mediaUrl, '_blank')}
                             >
-                              <Icon name="open-in-new" size={16} color="#4ECDC4" />
+                              <Icon name="open-in-new" size={16} color="#14b8a6" />
                               <Text style={styles.mediaLinkText}>Open video</Text>
                             </TouchableOpacity>
                           )}
@@ -481,7 +619,7 @@ const MessagesScreen = ({ navigation }) => {
                       {/* Audio Message */}
                       {message.messageType === 'audio' && (
                         <View style={styles.audioContainer}>
-                          <Icon name="mic" size={24} color={isSentByAdmin ? "#fff" : "#4ECDC4"} />
+                          <Icon name="mic" size={24} color={isSentByAdmin ? "#fff" : "#14b8a6"} />
                           <View style={styles.audioInfo}>
                             <Text style={[styles.audioLabel, isSentByAdmin && styles.sentMessageText]}>
                               Voice message
@@ -497,7 +635,7 @@ const MessagesScreen = ({ navigation }) => {
                               onPress={() => window.open(message.mediaUrl, '_blank')}
                               style={styles.audioPlayButton}
                             >
-                              <Icon name="play-arrow" size={20} color={isSentByAdmin ? "#fff" : "#4ECDC4"} />
+                              <Icon name="play-arrow" size={20} color={isSentByAdmin ? "#fff" : "#14b8a6"} />
                             </TouchableOpacity>
                           )}
                         </View>
@@ -657,7 +795,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#4ECDC4',
+    backgroundColor: '#14b8a6', // Mobile primary teal
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -709,7 +847,7 @@ const styles = StyleSheet.create({
   },
   assignedAdmin: {
     fontSize: 12,
-    color: '#4ECDC4',
+    color: '#14b8a6', // Mobile primary teal
     marginTop: 4,
     fontStyle: 'italic',
   },
@@ -756,7 +894,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#4ECDC4',
+    backgroundColor: '#14b8a6', // Mobile primary teal
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -784,13 +922,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 15,
     paddingVertical: 8,
-    backgroundColor: '#e0f2f1',
+    backgroundColor: '#f0fdfa', // Mobile teal background light
     borderRadius: 8,
   },
   assignButtonText: {
     fontSize: 14,
-    fontWeight: '500',
-    color: '#4ECDC4',
+    fontWeight: '600', // Consistent weight
+    color: '#14b8a6', // Mobile primary teal
     marginLeft: 6,
   },
 
@@ -829,18 +967,22 @@ const styles = StyleSheet.create({
   },
   sentMessage: {
     alignSelf: 'flex-end',
-    backgroundColor: '#4ECDC4',
+    backgroundColor: '#14b8a6', // Mobile primary teal
     borderBottomRightRadius: 4,
   },
   receivedMessage: {
     alignSelf: 'flex-start',
     backgroundColor: '#ffffff',
     borderBottomLeftRadius: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
+    ...(Platform.OS === 'web' ? {
+      boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+    } : {
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.05,
+      shadowRadius: 2,
+      elevation: 1,
+    }),
   },
   messageText: {
     fontSize: 15,
@@ -910,7 +1052,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   mediaLinkText: {
-    color: '#4ECDC4',
+    color: '#14b8a6', // Mobile primary teal
     fontSize: 13,
     marginLeft: 4,
     textDecorationLine: 'underline',
@@ -964,7 +1106,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#4ECDC4',
+    backgroundColor: '#14b8a6', // Mobile primary teal
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -992,6 +1134,42 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#9ca3af',
     textAlign: 'center',
+  },
+  // Toast notification styles
+  toast: {
+    position: 'absolute',
+    top: 20,
+    left: '50%',
+    transform: [{ translateX: '-50%' }],
+    width: 300,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    ...(Platform.OS === 'web' ? {
+      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.15)',
+    } : {
+      shadowColor: '#000',
+      shadowOpacity: 0.15,
+      shadowOffset: { width: 0, height: 4 },
+      shadowRadius: 8,
+      elevation: 8,
+    }),
+    zIndex: 9999,
+  },
+  toastSuccess: {
+    backgroundColor: '#10b981', // Mobile green
+  },
+  toastError: {
+    backgroundColor: '#ef4444', // Mobile red
+  },
+  toastText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '600',
+    marginLeft: 8,
+    flex: 1,
   },
 });
 

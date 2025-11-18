@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const PrivacyPolicyScreen = ({ navigation }) => {
@@ -10,8 +10,11 @@ const PrivacyPolicyScreen = ({ navigation }) => {
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.navigate('Settings')}
+          accessibilityLabel="Go back to Settings"
+          accessibilityRole="button"
+          accessibilityHint="Returns to the Settings screen"
         >
-          <Icon name="arrow-back" size={24} color="#333" />
+          <Icon name="arrow-back" size={24} color="#1f2937" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Privacy Policy</Text>
         <View style={styles.placeholder} />
@@ -123,7 +126,7 @@ const PrivacyPolicyScreen = ({ navigation }) => {
           </Text>
           <Text style={styles.contactInfo}>Email: privacy@resqyou.com</Text>
           <Text style={styles.contactInfo}>Phone: +1 (555) 123-4567</Text>
-          <Text style={styles.contactInfo}>Address: ResqYOU Emergency Services, 123 Safety Blvd, Protection City</Text>
+          <Text style={styles.contactInfo}>Address: 123 Safety Blvd, Protection City</Text>
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>
@@ -140,7 +143,7 @@ const PrivacyPolicyScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#f9fafb', // Mobile gray50 (60% - primary background)
   },
   header: {
     flexDirection: 'row',
@@ -148,14 +151,18 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#ffffff', // Mobile white (30% - secondary)
     borderBottomWidth: 1,
-    borderBottomColor: '#E1E8ED',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    borderBottomColor: '#e5e7eb', // Mobile gray200
+    ...(Platform.OS === 'web' ? {
+      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+    } : {
+      elevation: 2,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+    }),
   },
   backButton: {
     padding: 8,
@@ -163,7 +170,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#333',
+    color: '#1f2937', // Mobile gray800 - primary text
   },
   placeholder: {
     width: 40,
@@ -173,64 +180,64 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   section: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#ffffff', // Mobile white
     borderRadius: 12,
     padding: 20,
     marginBottom: 20,
   },
   lastUpdated: {
     fontSize: 12,
-    color: '#666',
+    color: '#6b7280', // Mobile gray500 - secondary text
     fontStyle: 'italic',
     marginBottom: 15,
   },
   intro: {
     fontSize: 15,
-    color: '#444',
+    color: '#374151', // Mobile gray700
     lineHeight: 22,
     marginBottom: 20,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333',
+    color: '#1f2937', // Mobile gray800 - primary text
     marginTop: 20,
     marginBottom: 12,
   },
   paragraph: {
     fontSize: 14,
-    color: '#555',
+    color: '#4b5563', // Mobile gray600 - tertiary text
     lineHeight: 20,
     marginBottom: 12,
   },
   bold: {
     fontWeight: '600',
-    color: '#333',
+    color: '#1f2937', // Mobile gray800 - primary text
   },
   bulletPoint: {
     fontSize: 14,
-    color: '#555',
+    color: '#4b5563', // Mobile gray600 - tertiary text
     lineHeight: 20,
     marginBottom: 8,
     paddingLeft: 10,
   },
   contactInfo: {
     fontSize: 14,
-    color: '#4ECDC4',
+    color: '#14b8a6', // Mobile primary teal
     lineHeight: 20,
     marginBottom: 6,
   },
   footer: {
     marginTop: 30,
     padding: 15,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#f9fafb', // Mobile gray50
     borderRadius: 8,
     borderLeftWidth: 4,
-    borderLeftColor: '#4ECDC4',
+    borderLeftColor: '#14b8a6', // Mobile primary teal
   },
   footerText: {
     fontSize: 13,
-    color: '#666',
+    color: '#6b7280', // Mobile gray500 - secondary text
     lineHeight: 20,
     fontStyle: 'italic',
   },

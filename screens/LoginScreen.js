@@ -5,7 +5,6 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   ImageBackground,
   Image,
   Platform,
@@ -13,6 +12,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import API_BASE from '../config/api';
 import Logo from '../images/resqyou.png'; // Correctly import the logo image
 
@@ -22,10 +22,20 @@ const LoginScreen = ({ navigation, route }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  
+  const [toast, setToast] = useState({ visible: false, message: '', type: 'success' });
+  const [hoveredButton, setHoveredButton] = useState(null);
+
+  // Toast notification helper
+  const showToast = (message, type = 'success') => {
+    setToast({ visible: true, message, type });
+    setTimeout(() => {
+      setToast({ visible: false, message: '', type: 'success' });
+    }, 3000);
+  };
+
   const handleLogin = async () => {
     if (username === '' || password === '') {
-      Alert.alert('Error', 'Please fill in all fields');
+      showToast('Please fill in all fields', 'error');
       return;
     }
 
@@ -37,20 +47,48 @@ const LoginScreen = ({ navigation, route }) => {
         : `${API_BASE}/api/auth/login`;
 
       const resp = await axios.post(endpoint, { username, password }, { timeout: 10000 });
-      const data = resp.data;
+      const responseData = resp.data;
+
+      // Handle nested data structure - token/admin/user may be in responseData.data
+      const data = responseData.data || responseData;
 
       // Store auth token and admin/user data
       if (data.token) {
         await AsyncStorage.setItem('authToken', data.token);
+
         if (data.admin) {
           await AsyncStorage.setItem('adminData', JSON.stringify(data.admin));
         } else if (data.user) {
           await AsyncStorage.setItem('userData', JSON.stringify(data.user));
         }
-      }
 
-      // On success navigate to main app (Drawer Navigator)
-      navigation.navigate('Main');
+        // Verify token was saved
+        const savedToken = await AsyncStorage.getItem('authToken');
+        if (!savedToken) {
+          console.error('❌ CRITICAL: Token was not saved to AsyncStorage!');
+          showToast('Login failed: Could not save authentication', 'error');
+          return;
+        }
+
+        showToast('Login successful!', 'success');
+
+        // Wait a bit to ensure storage is committed
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Trigger navigation by reloading the page (for web) or using CommonActions (for mobile)
+        if (Platform.OS === 'web') {
+          window.location.reload();
+        } else {
+          // For mobile, navigate to Main
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'Main' }],
+          });
+        }
+      } else {
+        console.error('❌ No token in response');
+        showToast('Login failed: No token received from server', 'error');
+      }
     } catch (err) {
       console.error('Login error:', err?.response?.data || err.message || err);
 
@@ -83,7 +121,7 @@ const LoginScreen = ({ navigation, route }) => {
         errorMessage = 'No response from server. Please check your internet connection and ensure the server is running.';
       }
 
-      Alert.alert('Login Failed', errorMessage);
+      showToast(errorMessage, 'error');
     } finally {
       setIsLoading(false);
     }
@@ -93,7 +131,7 @@ const LoginScreen = ({ navigation, route }) => {
     const flag = route?.params?.signupSuccess;
     if (flag) {
       // show a confirmation when coming from signup
-      Alert.alert('Success', 'Account created successfully. Please login.');
+      showToast('Account created successfully. Please login.', 'success');
       // clear the flag so it doesn't show again on re-render
       try {
         if (route && route.params) {
@@ -108,32 +146,69 @@ const LoginScreen = ({ navigation, route }) => {
   return (
     <ImageBackground
       style={styles.background}
+      resizeMode="cover"
     >
+      {/* Toast Notification */}
+      {toast.visible && (
+        <View style={[
+          styles.toast,
+          toast.type === 'success' ? styles.toastSuccess : styles.toastError
+        ]}>
+          <MaterialIcon
+            name={toast.type === 'success' ? 'check-circle' : 'error'}
+            size={20}
+            color="#ffffff"
+          />
+          <Text style={styles.toastText}>{toast.message}</Text>
+        </View>
+      )}
+
       <View style={styles.glassContainer}>
         {/* Correctly use the imported logo */}
-        <Image source={Logo} style={styles.logo} />
+        <Image source={Logo} style={styles.logo} resizeMode="contain" />
         <TextInput
           style={styles.input}
           placeholder="Username"
-          placeholderTextColor="#999"
+          placeholderTextColor="#6b7280"
           value={username}
           onChangeText={setUsername}
+          accessibilityLabel="Username input field"
+          accessibilityHint="Enter your username to login"
         />
         <TextInput
           style={styles.input}
           placeholder="Password"
-          placeholderTextColor="#999"
+          placeholderTextColor="#6b7280"
           secureTextEntry
           value={password}
           onChangeText={setPassword}
+          accessibilityLabel="Password input field"
+          accessibilityHint="Enter your password to login"
         />
-        <View style={styles.signupText}>
-          <Text>Don't have an account? <TouchableOpacity style={styles.signupLink} onPress={() => navigation.navigate('Sign Up')}><Text style={styles.signupText} >Sign Up</Text></TouchableOpacity></Text>
+        <View style={styles.signupTextContainer}>
+          <Text style={styles.signupText}>Don't have an account? </Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Sign Up')}
+            accessibilityLabel="Go to Sign Up"
+            accessibilityRole="button"
+          >
+            <Text style={styles.signupLink}>Sign Up</Text>
+          </TouchableOpacity>
         </View>
         <TouchableOpacity
-          style={[styles.button, isLoading && styles.buttonDisabled]}
+          style={[
+            styles.button,
+            isLoading && styles.buttonDisabled,
+            Platform.OS === 'web' && hoveredButton === 'login' && !isLoading && styles.buttonHover
+          ]}
           onPress={handleLogin}
           disabled={isLoading}
+          onMouseEnter={() => Platform.OS === 'web' && !isLoading && setHoveredButton('login')}
+          onMouseLeave={() => Platform.OS === 'web' && setHoveredButton(null)}
+          accessibilityLabel={isLoading ? 'Logging in' : 'Login button'}
+          accessibilityRole="button"
+          accessibilityHint="Press to login to your account"
+          accessibilityState={{ disabled: isLoading, busy: isLoading }}
         >
           {isLoading ? (
             <ActivityIndicator color="#fff" />
@@ -148,71 +223,130 @@ const LoginScreen = ({ navigation, route }) => {
 
 const styles = StyleSheet.create({
   background: {
-    backgroundColor: '#fff30', // Light pink background color
+    backgroundColor: '#f9fafb', // Mobile gray50 (60% - primary background)
     flex: 1,
-    resizeMode: 'cover',
     justifyContent: 'center',
     alignItems: 'center',
   },
   glassContainer: {
     width: '40%', // Adjusted width for web (smaller for larger screens)
     maxWidth: 500, // Set a maximum width for larger screens
-    padding: 30, // Increased padding for better spacing
+    padding: 40, // Increased padding for better spacing
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)', // Border for the frosted effect
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-    elevation: 10, // Shadow for Android
-    backdropFilter: 'blur(10px)', // Frosted glass effect (for web)
-    alignItems: 'center', // Center-align content inside the container
+    borderColor: '#e5e7eb', // Mobile gray200
+    backgroundColor: '#ffffff', // Mobile white (30% - secondary)
+    ...(Platform.OS === 'web' ? {
+      boxShadow: '0 10px 20px rgba(0, 0, 0, 0.1)',
+    } : {
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 10 },
+      shadowOpacity: 0.1,
+      shadowRadius: 20,
+      elevation: 10,
+    }),
+    alignItems: 'center',
   },
   logo: {
-    width: 150, // Adjust the width of the logo
-    height: 150, // Adjust the height of the logo
-    marginBottom: 20, // Add spacing below the logo
-    resizeMode: 'contain', // Ensure the logo maintains its aspect ratio
+    width: 150,
+    height: 150,
+    marginBottom: 30,
   },
   input: {
-    width: '100%', // Full width inside the container
-    height: 60, // Increased height for better usability on web
-    borderColor: 'rgba(255, 255, 255, 0.5)',
+    width: '100%',
+    height: 56,
+    borderColor: '#e5e7eb', // Mobile gray200
     borderWidth: 1,
-    borderRadius: 15,
-    paddingHorizontal: 20, // Increased padding for better usability
-    marginBottom: 20, // Increased margin for better spacing
-    backgroundColor: 'rgba(255, 255, 255, 0.3)', // Semi-transparent white
-    color: '#333', // White text for input
-    textAlign: 'start', // Center-align text inside the input
-    fontSize: 16, // Increased font size for readability
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    marginBottom: 16,
+    backgroundColor: '#f9fafb', // Mobile gray50
+    color: '#1f2937', // Mobile gray800 - primary text
+    fontSize: 16,
+    outlineStyle: 'none', // Remove outline on web
   },
   button: {
-    width: '100%', // Full width inside the container
-    height: 55, // Increased height for better usability
-    backgroundColor: 'rgba(193, 1, 193, 0.8)', // Semi-transparent blue
+    width: '100%',
+    height: 56,
+    backgroundColor: '#14b8a6', // Mobile primary teal (10% - accent)
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 15,
-    marginTop: 20, // Increased spacing between the button and input fields
+    borderRadius: 12,
+    marginTop: 12,
+    ...(Platform.OS === 'web' ? {
+      boxShadow: '0 4px 8px rgba(20, 184, 166, 0.3)',
+    } : {
+      shadowColor: '#14b8a6',
+      shadowOpacity: 0.3,
+      shadowOffset: { width: 0, height: 4 },
+      shadowRadius: 8,
+      elevation: 4,
+    }),
+  },
+  buttonHover: {
+    backgroundColor: '#0d9488', // Mobile teal dark - hover state
+    transform: [{ scale: 1.02 }],
   },
   buttonText: {
-    color: '#fff',
-    fontSize: 20, // Increased font size for better readability
-    fontWeight: 'bold',
-  },
-  signupText: {
-    color: '#141414ff',
-    marginTop: 10,
-  },
-  signupLink:{
-    color: '#181818ff',
-    fontWeight: 'bold',
+    color: '#ffffff', // Mobile white
+    fontSize: 18,
+    fontWeight: '600', // Consistent weight
   },
   buttonDisabled: {
-    backgroundColor: 'rgba(193, 1, 193, 0.5)',
-  }
+    backgroundColor: '#14b8a680', // Semi-transparent teal
+    opacity: 0.6,
+  },
+  signupTextContainer: {
+    flexDirection: 'row',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  signupText: {
+    color: '#6b7280', // Mobile gray500 - secondary text
+    fontSize: 14,
+  },
+  signupLink: {
+    color: '#14b8a6', // Mobile primary teal
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  // Toast notification styles
+  toast: {
+    position: 'absolute',
+    top: 20,
+    left: '50%',
+    transform: Platform.OS === 'web' ? [{ translateX: '-50%' }] : [],
+    marginLeft: Platform.OS !== 'web' ? -150 : 0,
+    width: 300,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    ...(Platform.OS === 'web' ? {
+      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.15)',
+    } : {
+      shadowColor: '#000',
+      shadowOpacity: 0.15,
+      shadowOffset: { width: 0, height: 4 },
+      shadowRadius: 8,
+      elevation: 8,
+    }),
+    zIndex: 9999,
+  },
+  toastSuccess: {
+    backgroundColor: '#10b981', // Mobile green
+  },
+  toastError: {
+    backgroundColor: '#ef4444', // Mobile red
+  },
+  toastText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '600',
+    marginLeft: 8,
+    flex: 1,
+  },
 });
 
 export default LoginScreen;

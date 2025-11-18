@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const HelpCenterScreen = ({ navigation }) => {
   const [expandedIndex, setExpandedIndex] = useState(null);
+  const [hoveredIndex, setHoveredIndex] = useState(null);
 
   const faqs = [
     {
@@ -79,8 +80,11 @@ const HelpCenterScreen = ({ navigation }) => {
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.navigate('Settings')}
+          accessibilityLabel="Go back to Settings"
+          accessibilityRole="button"
+          accessibilityHint="Returns to the Settings screen"
         >
-          <Icon name="arrow-back" size={24} color="#333" />
+          <Icon name="arrow-back" size={24} color="#1f2937" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Help Center</Text>
         <View style={styles.placeholder} />
@@ -88,7 +92,7 @@ const HelpCenterScreen = ({ navigation }) => {
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.welcomeSection}>
-          <Icon name="help-outline" size={48} color="#4ECDC4" />
+          <Icon name="help-outline" size={48} color="#14b8a6" />
           <Text style={styles.welcomeTitle}>How can we help you?</Text>
           <Text style={styles.welcomeText}>
             Find answers to common questions about ResqYOU Emergency Response System
@@ -96,7 +100,7 @@ const HelpCenterScreen = ({ navigation }) => {
         </View>
 
         <View style={styles.emergencyCard}>
-          <Icon name="warning" size={24} color="#FF6B6B" />
+          <Icon name="warning" size={24} color="#ef4444" />
           <View style={styles.emergencyTextContainer}>
             <Text style={styles.emergencyTitle}>In Case of Emergency</Text>
             <Text style={styles.emergencyText}>
@@ -110,16 +114,25 @@ const HelpCenterScreen = ({ navigation }) => {
         {faqs.map((faq, index) => (
           <TouchableOpacity
             key={index}
-            style={styles.faqItem}
+            style={[
+              styles.faqItem,
+              Platform.OS === 'web' && hoveredIndex === index && styles.faqItemHover
+            ]}
             onPress={() => toggleFAQ(index)}
+            onMouseEnter={() => Platform.OS === 'web' && setHoveredIndex(index)}
+            onMouseLeave={() => Platform.OS === 'web' && setHoveredIndex(null)}
             activeOpacity={0.7}
+            accessibilityLabel={faq.question}
+            accessibilityRole="button"
+            accessibilityHint={expandedIndex === index ? "Collapse answer" : "Expand to view answer"}
+            accessibilityState={{ expanded: expandedIndex === index }}
           >
             <View style={styles.faqHeader}>
               <Text style={styles.faqQuestion}>{faq.question}</Text>
               <Icon
                 name={expandedIndex === index ? 'expand-less' : 'expand-more'}
                 size={24}
-                color="#4ECDC4"
+                color="#14b8a6"
               />
             </View>
             {expandedIndex === index && (
@@ -136,19 +149,19 @@ const HelpCenterScreen = ({ navigation }) => {
 
           <View style={styles.contactMethods}>
             <View style={styles.contactMethod}>
-              <Icon name="email" size={24} color="#4ECDC4" />
+              <Icon name="email" size={24} color="#14b8a6" />
               <Text style={styles.contactMethodLabel}>Email Support</Text>
               <Text style={styles.contactMethodValue}>support@resqyou.com</Text>
             </View>
 
             <View style={styles.contactMethod}>
-              <Icon name="phone" size={24} color="#4ECDC4" />
+              <Icon name="phone" size={24} color="#14b8a6" />
               <Text style={styles.contactMethodLabel}>Phone Support</Text>
               <Text style={styles.contactMethodValue}>+1 (555) 123-4567</Text>
             </View>
 
             <View style={styles.contactMethod}>
-              <Icon name="chat" size={24} color="#4ECDC4" />
+              <Icon name="chat" size={24} color="#14b8a6" />
               <Text style={styles.contactMethodLabel}>Live Chat</Text>
               <Text style={styles.contactMethodValue}>Available 24/7 in app</Text>
             </View>
@@ -167,7 +180,7 @@ const HelpCenterScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#f9fafb', // Mobile gray50 (60% - primary background)
   },
   header: {
     flexDirection: 'row',
@@ -175,14 +188,18 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#ffffff', // Mobile white (30% - secondary)
     borderBottomWidth: 1,
-    borderBottomColor: '#E1E8ED',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    borderBottomColor: '#e5e7eb', // Mobile gray200
+    ...(Platform.OS === 'web' ? {
+      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+    } : {
+      elevation: 2,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+    }),
   },
   backButton: {
     padding: 8,
@@ -190,7 +207,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#333',
+    color: '#1f2937', // Mobile gray800 - primary text
   },
   placeholder: {
     width: 40,
@@ -200,7 +217,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   welcomeSection: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#ffffff', // Mobile white
     borderRadius: 12,
     padding: 30,
     alignItems: 'center',
@@ -210,24 +227,24 @@ const styles = StyleSheet.create({
   welcomeTitle: {
     fontSize: 24,
     fontWeight: '600',
-    color: '#333',
+    color: '#1f2937', // Mobile gray800 - primary text
     marginTop: 15,
     marginBottom: 10,
   },
   welcomeText: {
     fontSize: 14,
-    color: '#666',
+    color: '#6b7280', // Mobile gray500 - secondary text
     textAlign: 'center',
     lineHeight: 20,
   },
   emergencyCard: {
     flexDirection: 'row',
-    backgroundColor: '#FFF5F5',
+    backgroundColor: '#fef2f2', // Mobile red50
     borderRadius: 12,
     padding: 15,
     marginBottom: 20,
     borderLeftWidth: 4,
-    borderLeftColor: '#FF6B6B',
+    borderLeftColor: '#ef4444', // Mobile red
   },
   emergencyTextContainer: {
     flex: 1,
@@ -236,26 +253,31 @@ const styles = StyleSheet.create({
   emergencyTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#C92A2A',
+    color: '#dc2626', // Mobile red700
     marginBottom: 5,
   },
   emergencyText: {
     fontSize: 14,
-    color: '#C92A2A',
+    color: '#dc2626', // Mobile red700
     lineHeight: 20,
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#333',
+    color: '#1f2937', // Mobile gray800 - primary text
     marginBottom: 15,
   },
   faqItem: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#ffffff', // Mobile white
     borderRadius: 12,
     padding: 15,
     marginBottom: 10,
     elevation: 1,
+  },
+  faqItemHover: {
+    backgroundColor: '#f9fafb', // Mobile gray50
+    transform: [{ scale: 1.01 }],
+    elevation: 2,
   },
   faqHeader: {
     flexDirection: 'row',
@@ -266,20 +288,20 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     fontWeight: '500',
-    color: '#333',
+    color: '#1f2937', // Mobile gray800 - primary text
     marginRight: 10,
   },
   faqAnswer: {
     fontSize: 14,
-    color: '#666',
+    color: '#4b5563', // Mobile gray600 - tertiary text
     lineHeight: 20,
     marginTop: 15,
     paddingTop: 15,
     borderTopWidth: 1,
-    borderTopColor: '#E1E8ED',
+    borderTopColor: '#e5e7eb', // Mobile gray200
   },
   contactSection: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#ffffff', // Mobile white
     borderRadius: 12,
     padding: 20,
     marginTop: 20,
@@ -288,13 +310,13 @@ const styles = StyleSheet.create({
   contactTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#333',
+    color: '#1f2937', // Mobile gray800 - primary text
     textAlign: 'center',
     marginBottom: 10,
   },
   contactText: {
     fontSize: 14,
-    color: '#666',
+    color: '#6b7280', // Mobile gray500 - secondary text
     textAlign: 'center',
     marginBottom: 20,
   },
@@ -304,19 +326,19 @@ const styles = StyleSheet.create({
   contactMethod: {
     alignItems: 'center',
     padding: 15,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#f9fafb', // Mobile gray50
     borderRadius: 8,
   },
   contactMethodLabel: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#333',
+    color: '#1f2937', // Mobile gray800 - primary text
     marginTop: 10,
     marginBottom: 5,
   },
   contactMethodValue: {
     fontSize: 14,
-    color: '#4ECDC4',
+    color: '#14b8a6', // Mobile primary teal
     fontWeight: '500',
   },
   footer: {
@@ -325,7 +347,7 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 12,
-    color: '#999',
+    color: '#9ca3af', // Mobile gray400
     marginBottom: 5,
   },
 });

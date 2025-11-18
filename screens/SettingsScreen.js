@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, TextInput, Modal, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, TextInput, Modal, ActivityIndicator, Platform } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -17,6 +17,16 @@ const SettingsScreen = ({ navigation }) => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [toast, setToast] = useState({ visible: false, message: '', type: 'success' });
+  const [hoveredButton, setHoveredButton] = useState(null);
+
+  // Toast notification helper
+  const showToast = (message, type = 'success') => {
+    setToast({ visible: true, message, type });
+    setTimeout(() => {
+      setToast({ visible: false, message: '', type: 'success' });
+    }, 3000);
+  };
 
   // Edit profile form state
   const [editForm, setEditForm] = useState({
@@ -62,7 +72,7 @@ const SettingsScreen = ({ navigation }) => {
     >
       <View style={styles.settingsItemLeft}>
         <View style={styles.iconContainer}>
-          <Icon name={icon} size={24} color="#4ECDC4" />
+          <Icon name={icon} size={24} color="#14b8a6" />
         </View>
         <View style={styles.textContainer}>
           <Text style={styles.settingsTitle}>{title}</Text>
@@ -90,7 +100,7 @@ const SettingsScreen = ({ navigation }) => {
 
   const handleSaveProfile = async () => {
     if (!editForm.fullname || !editForm.email) {
-      alert('Error\n\nPlease fill in all required fields');
+      showToast('Please fill in all required fields', 'error');
       return;
     }
 
@@ -114,10 +124,10 @@ const SettingsScreen = ({ navigation }) => {
       setAdminData(updatedAdmin);
 
       setShowEditModal(false);
-      alert('Success\n\nProfile updated successfully');
+      showToast('Profile updated successfully', 'success');
     } catch (error) {
       console.error('Update profile error:', error);
-      alert('Error\n\n' + (error?.response?.data?.message || 'Failed to update profile'));
+      showToast(error?.response?.data?.message || 'Failed to update profile', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -129,17 +139,17 @@ const SettingsScreen = ({ navigation }) => {
 
   const handleSavePassword = async () => {
     if (!passwordForm.currentPassword || !passwordForm.newPassword || !passwordForm.confirmPassword) {
-      alert('Error\n\nPlease fill in all fields');
+      showToast('Please fill in all fields', 'error');
       return;
     }
 
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      alert('Error\n\nNew passwords do not match');
+      showToast('New passwords do not match', 'error');
       return;
     }
 
     if (passwordForm.newPassword.length < 6) {
-      alert('Error\n\nNew password must be at least 6 characters long');
+      showToast('New password must be at least 6 characters long', 'error');
       return;
     }
 
@@ -161,10 +171,10 @@ const SettingsScreen = ({ navigation }) => {
 
       setShowChangePasswordModal(false);
       setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
-      alert('Success\n\nPassword changed successfully');
+      showToast('Password changed successfully', 'success');
     } catch (error) {
       console.error('Change password error:', error);
-      alert('Error\n\n' + (error?.response?.data?.message || 'Failed to change password'));
+      showToast(error?.response?.data?.message || 'Failed to change password', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -252,8 +262,8 @@ const SettingsScreen = ({ navigation }) => {
       // Clear all data
       await AsyncStorage.multiRemove(['authToken', 'adminData']);
 
-      // Use window.alert for web compatibility
-      alert('Account Deleted\n\nYour account has been permanently deleted.');
+      // Show success toast
+      showToast('Your account has been permanently deleted.', 'success');
 
       // Navigate to auth screen
       navigation.reset({
@@ -262,7 +272,7 @@ const SettingsScreen = ({ navigation }) => {
       });
     } catch (error) {
       console.error('Delete account error:', error);
-      alert('Error\n\n' + (error?.response?.data?.message || 'Failed to delete account'));
+      showToast(error?.response?.data?.message || 'Failed to delete account', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -270,6 +280,21 @@ const SettingsScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      {/* Toast Notification */}
+      {toast.visible && (
+        <View style={[
+          styles.toast,
+          toast.type === 'success' ? styles.toastSuccess : styles.toastError
+        ]}>
+          <Icon
+            name={toast.type === 'success' ? 'check-circle' : 'error'}
+            size={20}
+            color="#ffffff"
+          />
+          <Text style={styles.toastText}>{toast.message}</Text>
+        </View>
+      )}
+
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity 
@@ -310,7 +335,7 @@ const SettingsScreen = ({ navigation }) => {
               <Switch
                 value={notificationsEnabled}
                 onValueChange={setNotificationsEnabled}
-                trackColor={{ false: '#E0E0E0', true: '#4ECDC4' }}
+                trackColor={{ false: '#E0E0E0', true: '#14b8a6' }}
                 thumbColor={notificationsEnabled ? '#FFFFFF' : '#FFFFFF'}
               />
             }
@@ -341,7 +366,7 @@ const SettingsScreen = ({ navigation }) => {
               <Switch
                 value={locationServices}
                 onValueChange={setLocationServices}
-                trackColor={{ false: '#E0E0E0', true: '#4ECDC4' }}
+                trackColor={{ false: '#E0E0E0', true: '#14b8a6' }}
                 thumbColor={locationServices ? '#FFFFFF' : '#FFFFFF'}
               />
             }
@@ -371,7 +396,7 @@ const SettingsScreen = ({ navigation }) => {
               <Switch
                 value={darkMode}
                 onValueChange={setDarkMode}
-                trackColor={{ false: '#E0E0E0', true: '#4ECDC4' }}
+                trackColor={{ false: '#E0E0E0', true: '#14b8a6' }}
                 thumbColor={darkMode ? '#FFFFFF' : '#FFFFFF'}
               />
             }
@@ -390,7 +415,7 @@ const SettingsScreen = ({ navigation }) => {
               <Switch
                 value={autoBackup}
                 onValueChange={setAutoBackup}
-                trackColor={{ false: '#E0E0E0', true: '#4ECDC4' }}
+                trackColor={{ false: '#E0E0E0', true: '#14b8a6' }}
                 thumbColor={autoBackup ? '#FFFFFF' : '#FFFFFF'}
               />
             }
@@ -639,11 +664,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
     borderBottomColor: '#E1E8ED',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    ...(Platform.OS === 'web' ? {
+      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+    } : {
+      elevation: 2,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+    }),
   },
   backButton: {
     padding: 8,
@@ -673,11 +702,15 @@ const styles = StyleSheet.create({
   sectionContainer: {
     backgroundColor: 'white',
     borderRadius: 12,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
+    ...(Platform.OS === 'web' ? {
+      boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
+    } : {
+      elevation: 2,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.1,
+      shadowRadius: 2,
+    }),
   },
   settingsItem: {
     flexDirection: 'row',
@@ -700,7 +733,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#4ECDC420',
+    backgroundColor: '#f0fdfa', // Mobile teal background light
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 15,
@@ -744,11 +777,15 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 20,
     maxHeight: '80%',
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
+    ...(Platform.OS === 'web' ? {
+      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.25)',
+    } : {
+      elevation: 5,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+    }),
   },
   modalHeader: {
     flexDirection: 'row',
@@ -786,7 +823,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8F9FA',
   },
   saveButton: {
-    backgroundColor: '#4ECDC4',
+    backgroundColor: '#14b8a6', // Mobile primary teal
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: 'center',
@@ -813,6 +850,42 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     marginTop: 10,
+  },
+  // Toast notification styles
+  toast: {
+    position: 'absolute',
+    top: 20,
+    left: '50%',
+    transform: [{ translateX: '-50%' }],
+    width: 300,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    ...(Platform.OS === 'web' ? {
+      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.15)',
+    } : {
+      shadowColor: '#000',
+      shadowOpacity: 0.15,
+      shadowOffset: { width: 0, height: 4 },
+      shadowRadius: 8,
+      elevation: 8,
+    }),
+    zIndex: 9999,
+  },
+  toastSuccess: {
+    backgroundColor: '#10b981', // Mobile green
+  },
+  toastError: {
+    backgroundColor: '#ef4444', // Mobile red
+  },
+  toastText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '600',
+    marginLeft: 8,
+    flex: 1,
   },
 });
 

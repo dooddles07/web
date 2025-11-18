@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createStackNavigator } from '@react-navigation/stack';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Platform, ActivityIndicator } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import API_BASE from './config/api';
 
 // Import your screens
 import DashboardScreen from './screens/DashboardScreen';
@@ -147,6 +149,80 @@ const DrawerNavigator = () => {
 
 // Root Navigator (handles authentication flow)
 const RootNavigator = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(null);
+
+  useEffect(() => {
+    // Check auth on mount
+    checkAuth();
+
+    // Re-check auth when the window/tab becomes visible (for web)
+    if (Platform.OS === 'web') {
+      const handleVisibilityChange = () => {
+        if (document.visibilityState === 'visible') {
+          checkAuth();
+        }
+      };
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+    }
+  }, []);
+
+  const checkAuth = async () => {
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+
+      if (!token) {
+        setIsAuthenticated(false);
+        return;
+      }
+
+      // Validate token with backend
+      try {
+        const response = await fetch(`${API_BASE}/api/auth/verify`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.ok) {
+          setIsAuthenticated(true);
+        } else {
+          // Token is invalid (401, 403, etc.), clear it
+          console.log('Token validation failed: Invalid or expired token');
+          await AsyncStorage.removeItem('authToken');
+          await AsyncStorage.removeItem('adminData');
+          await AsyncStorage.removeItem('userData');
+          setIsAuthenticated(false);
+        }
+      } catch (fetchError) {
+        // If backend is unreachable, clear auth and show login
+        // This is safer than keeping potentially invalid tokens
+        if (fetchError.message === 'Failed to fetch') {
+          console.log('Backend server not reachable. Please start the backend server.');
+        }
+        await AsyncStorage.removeItem('authToken');
+        await AsyncStorage.removeItem('adminData');
+        await AsyncStorage.removeItem('userData');
+        setIsAuthenticated(false);
+      }
+    } catch (error) {
+      console.error('Error checking auth:', error);
+      setIsAuthenticated(false);
+    }
+  };
+
+  // Show loading screen while checking initial auth
+  if (isAuthenticated === null) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f9fafb' }}>
+        <ActivityIndicator size="large" color="#14b8a6" />
+        <Text style={{ marginTop: 10, color: '#6b7280' }}>Loading...</Text>
+      </View>
+    );
+  }
+
   return (
     <Stack.Navigator
       screenOptions={{
@@ -154,19 +230,197 @@ const RootNavigator = () => {
         animationEnabled: true,
       }}
     >
-      {/* Authentication Stack */}
-      <Stack.Screen name="Auth" component={AuthStackNavigator} />
-      
-      {/* Main App (Drawer Navigator) */}
-      <Stack.Screen name="Main" component={DrawerNavigator} />
+      {!isAuthenticated ? (
+        /* Show Auth Stack when not authenticated */
+        <Stack.Screen name="Auth" component={AuthStackNavigator} />
+      ) : (
+        /* Show Main App when authenticated */
+        <Stack.Screen name="Main" component={DrawerNavigator} />
+      )}
     </Stack.Navigator>
   );
 };
 
+// Linking configuration for web navigation
+const linking = {
+  prefixes: [],
+  config: {
+    screens: {
+      Auth: {
+        screens: {
+          Login: 'login',
+          'Sign Up': 'signup',
+        },
+      },
+      Main: {
+        screens: {
+          Dashboard: 'dashboard',
+          NavigationScreen: 'navigation',
+          Messages: 'messages',
+          Settings: 'settings',
+          Logout: 'logout',
+          PrivacyPolicy: 'privacy-policy',
+          TermsOfService: 'terms-of-service',
+          HelpCenter: 'help-center',
+          About: 'about',
+        },
+      },
+    },
+  },
+};
+
 // Root App Component
 const App = () => {
+  const navigationRef = React.useRef();
+
+  // Add global debugging function for browser console
+  useEffect(() => {
+    if (Platform.OS === 'web') {
+      window.checkAuth = async () => {
+        const token = await AsyncStorage.getItem('authToken');
+        const adminData = await AsyncStorage.getItem('adminData');
+        const userData = await AsyncStorage.getItem('userData');
+
+        console.log('=== AUTH STATUS ===');
+        console.log('Token:', token ? token.substring(0, 30) + '...' : 'NOT FOUND');
+        console.log('Admin Data:', adminData ? JSON.parse(adminData) : 'NOT FOUND');
+        console.log('User Data:', userData ? JSON.parse(userData) : 'NOT FOUND');
+        console.log('==================');
+
+        return {
+          hasToken: !!token,
+          hasAdmin: !!adminData,
+          hasUser: !!userData,
+          token: token ? token.substring(0, 30) + '...' : null,
+        };
+      };
+
+      window.clearAuth = async () => {
+        await AsyncStorage.removeItem('authToken');
+        await AsyncStorage.removeItem('adminData');
+        await AsyncStorage.removeItem('userData');
+        console.log('✓ Auth data cleared');
+        // Force reload to apply auth changes
+        window.location.reload();
+      };
+
+      console.log('Debug functions available:');
+      console.log('  checkAuth() - Check authentication status');
+      console.log('  clearAuth() - Clear all auth data');
+
+      // Intercept browser navigation for protected routes
+      const handleUrlChange = async () => {
+        const path = window.location.pathname;
+        const token = await AsyncStorage.getItem('authToken');
+        const isAuthenticated = !!token;
+
+        const protectedPaths = [
+          '/dashboard',
+          '/navigation',
+          '/messages',
+          '/settings',
+          '/logout',
+          '/privacy-policy',
+          '/terms-of-service',
+          '/help-center',
+          '/about',
+        ];
+
+        const isProtectedPath = protectedPaths.some(p => path.toLowerCase().startsWith(p));
+
+        // If accessing protected path without auth, redirect to login
+        if (isProtectedPath && !isAuthenticated) {
+          console.log('🔒 URL access denied: Not authenticated');
+          window.history.replaceState({}, '', '/login');
+        }
+      };
+
+      // Check on initial load
+      handleUrlChange();
+
+      // Listen for URL changes
+      window.addEventListener('popstate', handleUrlChange);
+
+      return () => {
+        window.removeEventListener('popstate', handleUrlChange);
+      };
+    }
+  }, []);
+
+  // Monitor navigation state changes and enforce auth
+  const onNavigationReady = async () => {
+    // Check auth on initial load
+    await enforceAuthentication();
+  };
+
+  const onNavigationStateChange = async (state) => {
+    if (!state) return;
+    await enforceAuthentication();
+  };
+
+  const enforceAuthentication = async () => {
+    if (!navigationRef.current) return;
+
+    const token = await AsyncStorage.getItem('authToken');
+    const isAuthenticated = !!token;
+
+    // Get current navigation state
+    const navState = navigationRef.current.getRootState();
+    if (!navState) return;
+
+    // Get current route name
+    const getCurrentRoute = (state) => {
+      if (!state) return null;
+      const route = state.routes[state.index];
+      if (route.state) {
+        return getCurrentRoute(route.state);
+      }
+      return route.name;
+    };
+
+    const currentRoute = getCurrentRoute(navState);
+    const topLevelRoute = navState.routes[navState.index]?.name;
+
+    // Protected routes
+    const protectedRoutes = [
+      'Dashboard',
+      'NavigationScreen',
+      'Messages',
+      'Settings',
+      'Logout',
+      'PrivacyPolicy',
+      'TermsOfService',
+      'HelpCenter',
+      'About',
+    ];
+
+    // If not authenticated and trying to access Main or any protected route
+    if (!isAuthenticated && (topLevelRoute === 'Main' || protectedRoutes.includes(currentRoute))) {
+      console.log('🔒 Access denied: Not authenticated. Redirecting to login...');
+      navigationRef.current.reset({
+        index: 0,
+        routes: [{ name: 'Auth' }],
+      });
+    }
+
+    // If authenticated and trying to access auth screens, redirect to dashboard
+    if (isAuthenticated && topLevelRoute === 'Auth') {
+      console.log('✓ Already authenticated. Redirecting to dashboard...');
+      navigationRef.current.reset({
+        index: 0,
+        routes: [{ name: 'Main' }],
+      });
+    }
+  };
+
   return (
-    <NavigationContainer>
+    <NavigationContainer
+      ref={navigationRef}
+      linking={linking}
+      fallback={<View><Text>Loading...</Text></View>}
+      onReady={onNavigationReady}
+      onStateChange={onNavigationStateChange}
+    >
       <RootNavigator />
     </NavigationContainer>
   );
@@ -254,11 +508,15 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 25,
-    elevation: 3,
-    shadowColor: '#FF4757',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
+    ...(Platform.OS === 'web' ? {
+      boxShadow: '0 2px 4px rgba(255, 71, 87, 0.3)',
+    } : {
+      elevation: 3,
+      shadowColor: '#FF4757',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.3,
+      shadowRadius: 4,
+    }),
   },
   emergencyButtonText: {
     color: 'white',
