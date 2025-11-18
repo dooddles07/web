@@ -108,12 +108,11 @@ const MessagesScreen = ({ navigation, route }) => {
         console.error('No auth token found in Messages screen');
         showToast('Please log in to view messages', 'error');
 
-        // Delay navigation slightly to show the error
+        // For web, redirect to login page
         setTimeout(() => {
-          navigation.reset({
-            index: 0,
-            routes: [{ name: 'Auth' }],
-          });
+          if (Platform.OS === 'web') {
+            window.location.href = '/login';
+          }
         }, 1500);
         return;
       }
@@ -136,10 +135,9 @@ const MessagesScreen = ({ navigation, route }) => {
       if (error.response?.status === 401) {
         showToast('Session expired. Please login again.', 'error');
         setTimeout(() => {
-          navigation.reset({
-            index: 0,
-            routes: [{ name: 'Auth' }],
-          });
+          if (Platform.OS === 'web') {
+            window.location.href = '/login';
+          }
         }, 1500);
       } else {
         showToast('Failed to load conversations', 'error');

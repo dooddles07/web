@@ -75,6 +75,12 @@ const LoginScreen = ({ navigation, route }) => {
         // Wait a bit to ensure storage is committed
         await new Promise(resolve => setTimeout(resolve, 500));
 
+        // For web: Set session flag to indicate successful login
+        if (Platform.OS === 'web') {
+          sessionStorage.setItem('hasLoggedIn', 'true');
+          console.log('✓ Session flag set - user logged in');
+        }
+
         // Trigger navigation by reloading the page (for web) or using CommonActions (for mobile)
         if (Platform.OS === 'web') {
           window.location.reload();

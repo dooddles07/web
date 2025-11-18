@@ -19,6 +19,7 @@ import PrivacyPolicyScreen from './screens/PrivacyPolicyScreen';
 import TermsOfServiceScreen from './screens/TermsOfServiceScreen';
 import HelpCenterScreen from './screens/HelpCenterScreen';
 import AboutScreen from './screens/AboutScreen';
+import ReportsScreen from './screens/ReportsScreen';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -119,6 +120,7 @@ const DrawerNavigator = () => {
       <Drawer.Screen name="Dashboard" component={DashboardScreen} />
       <Drawer.Screen name="NavigationScreen" component={NavigationScreen} />
       <Drawer.Screen name="Messages" component={MessagesScreen} />
+      <Drawer.Screen name="Reports" component={ReportsScreen} />
       <Drawer.Screen name="Settings" component={SettingsScreen} />
       <Drawer.Screen name="Logout" component={LogoutScreen} />
 
@@ -169,6 +171,26 @@ const RootNavigator = () => {
 
   const checkAuth = async () => {
     try {
+      // For web platform: Check if this is a fresh session or a reload after login
+      // sessionStorage persists during browser session but clears when tab/window closes
+      if (Platform.OS === 'web') {
+        const hasLoggedInThisSession = sessionStorage.getItem('hasLoggedIn');
+
+        // If no session flag, this is a fresh app load - clear auth and show login
+        if (!hasLoggedInThisSession) {
+          console.log('Fresh web session detected - clearing auth to show login screen');
+          await AsyncStorage.removeItem('authToken');
+          await AsyncStorage.removeItem('adminData');
+          await AsyncStorage.removeItem('userData');
+          setIsAuthenticated(false);
+          return;
+        }
+
+        // If session flag exists, user has logged in - proceed to validate token
+        console.log('Existing session detected - validating token');
+      }
+
+      // Check for existing token
       const token = await AsyncStorage.getItem('authToken');
 
       if (!token) {
@@ -188,12 +210,19 @@ const RootNavigator = () => {
 
         if (response.ok) {
           setIsAuthenticated(true);
+        } else if (response.status === 429) {
+          // Rate limited - keep user logged in, don't clear token
+          console.log('Rate limit reached for token verification. Keeping user logged in.');
+          setIsAuthenticated(true); // Keep authenticated
         } else {
           // Token is invalid (401, 403, etc.), clear it
           console.log('Token validation failed: Invalid or expired token');
           await AsyncStorage.removeItem('authToken');
           await AsyncStorage.removeItem('adminData');
           await AsyncStorage.removeItem('userData');
+          if (Platform.OS === 'web') {
+            sessionStorage.removeItem('hasLoggedIn');
+          }
           setIsAuthenticated(false);
         }
       } catch (fetchError) {
@@ -205,6 +234,9 @@ const RootNavigator = () => {
         await AsyncStorage.removeItem('authToken');
         await AsyncStorage.removeItem('adminData');
         await AsyncStorage.removeItem('userData');
+        if (Platform.OS === 'web') {
+          sessionStorage.removeItem('hasLoggedIn');
+        }
         setIsAuthenticated(false);
       }
     } catch (error) {
@@ -257,6 +289,7 @@ const linking = {
           Dashboard: 'dashboard',
           NavigationScreen: 'navigation',
           Messages: 'messages',
+          Reports: 'reports',
           Settings: 'settings',
           Logout: 'logout',
           PrivacyPolicy: 'privacy-policy',
@@ -272,6 +305,13 @@ const linking = {
 // Root App Component
 const App = () => {
   const navigationRef = React.useRef();
+
+  // Set initial document title
+  useEffect(() => {
+    if (Platform.OS === 'web') {
+      document.title = 'VAWC Prevention';
+    }
+  }, []);
 
   // Add global debugging function for browser console
   useEffect(() => {
@@ -299,7 +339,8 @@ const App = () => {
         await AsyncStorage.removeItem('authToken');
         await AsyncStorage.removeItem('adminData');
         await AsyncStorage.removeItem('userData');
-        console.log('✓ Auth data cleared');
+        sessionStorage.removeItem('hasLoggedIn');
+        console.log('✓ Auth data and session cleared');
         // Force reload to apply auth changes
         window.location.reload();
       };
@@ -318,6 +359,7 @@ const App = () => {
           '/dashboard',
           '/navigation',
           '/messages',
+          '/reports',
           '/settings',
           '/logout',
           '/privacy-policy',
@@ -351,11 +393,58 @@ const App = () => {
   const onNavigationReady = async () => {
     // Check auth on initial load
     await enforceAuthentication();
+
+    // Set initial document title
+    if (Platform.OS === 'web') {
+      updateDocumentTitle();
+    }
   };
 
   const onNavigationStateChange = async (state) => {
     if (!state) return;
     await enforceAuthentication();
+
+    // Update document title on navigation change
+    if (Platform.OS === 'web') {
+      updateDocumentTitle();
+    }
+  };
+
+  const updateDocumentTitle = () => {
+    if (!navigationRef.current) return;
+
+    const state = navigationRef.current.getRootState();
+    if (!state) return;
+
+    // Get current route name
+    const getCurrentRoute = (navState) => {
+      if (!navState) return null;
+      const route = navState.routes[navState.index];
+      if (route.state) {
+        return getCurrentRoute(route.state);
+      }
+      return route.name;
+    };
+
+    const currentRoute = getCurrentRoute(state);
+
+    // Set document title based on route
+    const titles = {
+      'Dashboard': 'Dashboard - VAWC Prevention',
+      'NavigationScreen': 'Map - VAWC Prevention',
+      'Messages': 'Messages - VAWC Prevention',
+      'Reports': 'Reports - VAWC Prevention',
+      'Settings': 'Settings - VAWC Prevention',
+      'Logout': 'Logout - VAWC Prevention',
+      'Login': 'Login - VAWC Prevention',
+      'Sign Up': 'Sign Up - VAWC Prevention',
+      'PrivacyPolicy': 'Privacy Policy - VAWC Prevention',
+      'TermsOfService': 'Terms of Service - VAWC Prevention',
+      'HelpCenter': 'Help Center - VAWC Prevention',
+      'About': 'About - VAWC Prevention',
+    };
+
+    document.title = titles[currentRoute] || 'VAWC Prevention';
   };
 
   const enforceAuthentication = async () => {
@@ -386,6 +475,7 @@ const App = () => {
       'Dashboard',
       'NavigationScreen',
       'Messages',
+      'Reports',
       'Settings',
       'Logout',
       'PrivacyPolicy',

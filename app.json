@@ -1,7 +1,10 @@
 {
   "expo": {
-    "name": "personal",
-    "slug": "personal",
-    "version": "1.0.0"
+    "name": "VAWC Prevention",
+    "slug": "vawc-prevention",
+    "version": "1.0.0",
+    "web": {
+      "title": "VAWC Prevention"
+    }
   }
 }

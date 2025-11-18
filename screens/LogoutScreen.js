@@ -56,21 +56,45 @@ const LogoutScreen = ({ navigation }) => {
       );
 
       // Clear admin storage
-      await AsyncStorage.multiRemove(['authToken', 'adminData']);
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await AsyncStorage.multiRemove(['authToken', 'adminData', 'userData']);
 
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Auth' }],
-      });
+      // For web, also clear session flag
+      if (Platform.OS === 'web') {
+        sessionStorage.removeItem('hasLoggedIn');
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // For web, reload app to show login screen
+      if (Platform.OS === 'web') {
+        window.location.reload();
+      } else {
+        // For mobile, navigate to Auth screen
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Auth' }],
+        });
+      }
     } catch (error) {
       console.error('Logout error:', error);
       // Even if API fails, clear local data and navigate
-      await AsyncStorage.multiRemove(['authToken', 'adminData']);
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Auth' }],
-      });
+      await AsyncStorage.multiRemove(['authToken', 'adminData', 'userData']);
+
+      // For web, also clear session flag
+      if (Platform.OS === 'web') {
+        sessionStorage.removeItem('hasLoggedIn');
+      }
+
+      // For web, reload app to show login screen
+      if (Platform.OS === 'web') {
+        window.location.reload();
+      } else {
+        // For mobile, navigate to Auth screen
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Auth' }],
+        });
+      }
     } finally {
       setIsLoggingOut(false);
     }
@@ -78,11 +102,23 @@ const LogoutScreen = ({ navigation }) => {
 
   const handleQuickLogout = async () => {
     try {
-      await AsyncStorage.multiRemove(['authToken', 'adminData']);
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Auth' }],
-      });
+      await AsyncStorage.multiRemove(['authToken', 'adminData', 'userData']);
+
+      // For web, also clear session flag
+      if (Platform.OS === 'web') {
+        sessionStorage.removeItem('hasLoggedIn');
+      }
+
+      // For web, reload app to show login screen
+      if (Platform.OS === 'web') {
+        window.location.reload();
+      } else {
+        // For mobile, navigate to Auth screen
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Auth' }],
+        });
+      }
     } catch (error) {
       console.error('Quick logout error:', error);
     }

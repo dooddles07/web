@@ -204,21 +204,31 @@ const SettingsScreen = ({ navigation }) => {
       );
 
       // Clear all stored data
-      await AsyncStorage.multiRemove(['authToken', 'adminData']);
+      await AsyncStorage.multiRemove(['authToken', 'adminData', 'userData']);
 
-      // Navigate to auth screen
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Auth' }],
-      });
+      // For web, also clear session flag
+      if (Platform.OS === 'web') {
+        sessionStorage.removeItem('hasLoggedIn');
+      }
+
+      // For web, reload app to show login screen
+      if (Platform.OS === 'web') {
+        window.location.reload();
+      }
     } catch (error) {
       console.error('Logout error:', error);
       // Even if logout fails, clear local data and navigate
-      await AsyncStorage.multiRemove(['authToken', 'adminData']);
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Auth' }],
-      });
+      await AsyncStorage.multiRemove(['authToken', 'adminData', 'userData']);
+
+      // For web, also clear session flag
+      if (Platform.OS === 'web') {
+        sessionStorage.removeItem('hasLoggedIn');
+      }
+
+      // For web, reload app to show login screen
+      if (Platform.OS === 'web') {
+        window.location.reload();
+      }
     } finally {
       setIsLoading(false);
     }
@@ -260,16 +270,22 @@ const SettingsScreen = ({ navigation }) => {
       );
 
       // Clear all data
-      await AsyncStorage.multiRemove(['authToken', 'adminData']);
+      await AsyncStorage.multiRemove(['authToken', 'adminData', 'userData']);
+
+      // For web, also clear session flag
+      if (Platform.OS === 'web') {
+        sessionStorage.removeItem('hasLoggedIn');
+      }
 
       // Show success toast
       showToast('Your account has been permanently deleted.', 'success');
 
-      // Navigate to auth screen
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Auth' }],
-      });
+      // For web, reload app to show login screen after a short delay
+      setTimeout(() => {
+        if (Platform.OS === 'web') {
+          window.location.reload();
+        }
+      }, 1500);
     } catch (error) {
       console.error('Delete account error:', error);
       showToast(error?.response?.data?.message || 'Failed to delete account', 'error');
