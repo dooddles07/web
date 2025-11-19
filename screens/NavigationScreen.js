@@ -80,8 +80,6 @@ const NavigationScreen = ({ navigation, route }) => {
   const clearNavigationFromMap = () => {
     const clearScript = `
       (function() {
-        console.log('🧹 Clearing navigation routes and markers...');
-
         // Clear route polylines
         if (window.currentRoutePolylines && Array.isArray(window.currentRoutePolylines)) {
           window.currentRoutePolylines.forEach(polyline => {
@@ -133,8 +131,6 @@ const NavigationScreen = ({ navigation, route }) => {
           }
           window.currentIncidentCircle = null;
         }
-
-        console.log('✅ Navigation cleared successfully');
       })();
       true;
     `;
@@ -144,14 +140,10 @@ const NavigationScreen = ({ navigation, route }) => {
       const iframe = document.querySelector('iframe[title="Map"]');
       if (iframe && iframe.contentWindow) {
         iframe.contentWindow.postMessage({ type: 'EXECUTE_SCRIPT', script: clearScript }, '*');
-      } else {
-        console.error('❌ [clearNavigationFromMap] iframe not found');
       }
     } else {
       if (webViewRef.current) {
         webViewRef.current.injectJavaScript(clearScript);
-      } else {
-        console.error('❌ [clearNavigationFromMap] WebView ref is null');
       }
     }
   };
@@ -162,7 +154,6 @@ const NavigationScreen = ({ navigation, route }) => {
     const updateScript = `
       (function() {
         if (typeof map === 'undefined' || typeof nodeCoordinates === 'undefined' || typeof graph === 'undefined') {
-          console.error('❌ [Map Script] Required globals not found');
           return;
         }
 
@@ -171,9 +162,7 @@ const NavigationScreen = ({ navigation, route }) => {
           window.incidentMarkers.forEach(marker => {
             try {
               map.removeLayer(marker);
-            } catch (e) {
-              console.error('Error removing marker:', e);
-            }
+            } catch (e) {}
           });
         }
         window.incidentMarkers = [];
@@ -303,8 +292,6 @@ const NavigationScreen = ({ navigation, route }) => {
             }
           });
         });
-
-        console.log('✅ [Map Script]', incidents.length, 'incident marker(s) added');
       })();
       true;
     `;
@@ -314,14 +301,10 @@ const NavigationScreen = ({ navigation, route }) => {
       const iframe = document.querySelector('iframe[title="Map"]');
       if (iframe && iframe.contentWindow) {
         iframe.contentWindow.postMessage({ type: 'EXECUTE_SCRIPT', script: updateScript }, '*');
-      } else {
-        console.error('❌ [updateMapIncidents] iframe not found');
       }
     } else {
       if (webViewRef.current) {
         webViewRef.current.injectJavaScript(updateScript);
-      } else {
-        console.error('❌ [updateMapIncidents] WebView ref is null');
       }
     }
   };
@@ -330,7 +313,6 @@ const NavigationScreen = ({ navigation, route }) => {
   useEffect(() => {
     if (Platform.OS === 'web') {
       const handleMapReady = (event) => {
-        console.log('✅ [NavigationScreen] Map ready');
         setMapReady(true);
       };
 
@@ -480,14 +462,13 @@ const NavigationScreen = ({ navigation, route }) => {
 
         await socketService.connect(adminId);
       } catch (error) {
-        console.error('❌ [NavigationScreen] Failed to connect to socket:', error);
+        console.error('Failed to connect to socket:', error);
         return null;
       }
     }
 
     // Define named event handlers for proper cleanup
     const handleSOSAlert = (data) => {
-      console.log(`🚨 [NavigationScreen] New SOS from ${data.username}`);
       showToast(`New emergency alert from ${data.fullname || data.username}!`, 'error');
 
       // Add new incident to state immediately
@@ -927,13 +908,6 @@ const NavigationScreen = ({ navigation, route }) => {
           // Find alternative routes using K shortest paths algorithm
           const alternativeRoutes = window.findKShortestPaths(graph, 'defaultStartNode', name, 3);
 
-          console.log('Found', alternativeRoutes.length, 'alternative route(s) to', name);
-          alternativeRoutes.forEach((route, index) => {
-            const routeLabels = ['Shortest Path', 'Alternative Path 1', 'Alternative Path 2'];
-            console.log(routeLabels[index] + ':', route.path.join(' → '));
-            console.log('  Distance:', route.distance.toFixed(3), 'km');
-          });
-
           // Draw all alternative routes
           if (alternativeRoutes.length > 0) {
             window.drawMultipleRoutes(alternativeRoutes);
@@ -967,7 +941,6 @@ const NavigationScreen = ({ navigation, route }) => {
 
       setTimeout(() => {
         map.invalidateSize();
-        console.log('✅ [Leaflet Map] Initialized');
 
         // Notify React that map is ready
         if (window.ReactNativeWebView) {
@@ -1115,7 +1088,6 @@ const NavigationScreen = ({ navigation, route }) => {
 
           function drawMultipleRoutes(routes) {
             if (!map || !map.addLayer) {
-              console.error('Map object not available');
               return;
             }
 
@@ -1165,7 +1137,6 @@ const NavigationScreen = ({ navigation, route }) => {
                     });
                   });
                   this.setStyle({ weight: 7, opacity: 1 });
-                  console.log('Selected route:', labels[index], '- Distance:', route.distance.toFixed(3), 'km');
                 });
 
                 window.currentRoutePolylines.push(polyline);
@@ -1239,13 +1210,6 @@ const NavigationScreen = ({ navigation, route }) => {
           });
 
           const alternativeRoutes = findKShortestPaths(graph, 'defaultStartNode', incidentNodeName, 3);
-
-          console.log('Found', alternativeRoutes.length, 'alternative route(s)');
-          alternativeRoutes.forEach((route, index) => {
-            const labels = ['Shortest Path', 'Alternative Path 1', 'Alternative Path 2'];
-            console.log(labels[index] + ':', route.path.join(' → '));
-            console.log('  Distance:', route.distance.toFixed(3), 'km');
-          });
 
           if (alternativeRoutes.length > 0) {
             drawMultipleRoutes(alternativeRoutes);

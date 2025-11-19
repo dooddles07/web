@@ -76,7 +76,6 @@ class SocketService {
         });
 
         this.socket.on('disconnect', (reason) => {
-          console.log('🔌 Socket disconnected:', reason);
           this.isJoinedAdminRoom = false; // Reset flag on disconnect
 
           // Auto-reconnect on certain disconnect reasons
@@ -86,8 +85,6 @@ class SocketService {
         });
 
         this.socket.on('reconnect', (attemptNumber) => {
-          console.log('🔄 Socket reconnected after', attemptNumber, 'attempts');
-
           // Re-join admin room after reconnection
           if (this.adminId) {
             this.joinAdminRoom().catch((err) => {
@@ -113,11 +110,9 @@ class SocketService {
         return;
       }
 
-      console.log('📡 Attempting to join admin room:', this.adminId);
-
       // Set timeout for join operation
       const joinTimeout = setTimeout(() => {
-        console.warn('⚠️ Join admin room timeout - proceeding anyway');
+        console.warn('Join admin room timeout - proceeding anyway');
         this.isJoinedAdminRoom = true; // Assume joined to not block
         resolve();
       }, 5000);
@@ -126,11 +121,10 @@ class SocketService {
         clearTimeout(joinTimeout);
 
         if (response && response.success) {
-          console.log('✅ Successfully joined admin room:', response.message);
           this.isJoinedAdminRoom = true;
           resolve();
         } else {
-          console.warn('⚠️ Join admin room failed:', response);
+          console.warn('Join admin room failed:', response);
           this.isJoinedAdminRoom = true; // Mark as joined anyway to not block
           resolve(); // Don't reject, just resolve to continue
         }
@@ -239,7 +233,6 @@ class SocketService {
 
       this.socket.disconnect();
       this.socket = null;
-      console.log('Socket disconnected and cleaned up');
     }
   }
 

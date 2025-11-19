@@ -44,7 +44,14 @@ const ReportsScreen = ({ navigation }) => {
       setLoading(true);
       const token = await AsyncStorage.getItem('authToken');
 
-      const [activeResponse, historyResponse] = await Promise.all([
+      const [statsResponse, activeResponse, historyResponse] = await Promise.all([
+        fetch(`${API_BASE}/api/sos/stats`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token && { 'Authorization': `Bearer ${token}` })
+          }
+        }),
         fetch(`${API_BASE}/api/sos/all-active`, {
           method: 'GET',
           headers: {
@@ -61,8 +68,9 @@ const ReportsScreen = ({ navigation }) => {
         })
       ]);
 
-      if (activeResponse.ok && historyResponse.ok) {
-        const [activeData, historyData] = await Promise.all([
+      if (statsResponse.ok && activeResponse.ok && historyResponse.ok) {
+        const [statsData, activeData, historyData] = await Promise.all([
+          statsResponse.json(),
           activeResponse.json(),
           historyResponse.json()
         ]);
@@ -90,15 +98,13 @@ const ReportsScreen = ({ navigation }) => {
 
         setIncidents(allIncidents);
 
-        // Calculate stats
-        const resolved = allIncidents.filter(i => i.status === 'resolved').length;
+        // Use stats from the dedicated endpoint (same as DashboardScreen)
         const cancelled = allIncidents.filter(i => i.status === 'cancelled').length;
-        const active = allIncidents.filter(i => i.status === 'active').length;
 
         setStats({
-          total: allIncidents.length,
-          active,
-          resolved,
+          total: statsData.data?.totalIncidents || 0,
+          active: statsData.data?.activeIncidents || 0,
+          resolved: statsData.data?.resolvedIncidents || 0,
           cancelled
         });
       }

@@ -13,7 +13,8 @@ const DashboardScreen = ({ navigation }) => {
     criticalIncidents: 0
   });
 
-  const [activeIncidents, setActiveIncidents] = useState([]);
+  const [allActiveIncidents, setAllActiveIncidents] = useState([]); // Store ALL active incidents
+  const [activeIncidents, setActiveIncidents] = useState([]); // Display top 3
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [toast, setToast] = useState({ visible: false, message: '', type: 'success' });
@@ -82,14 +83,22 @@ const DashboardScreen = ({ navigation }) => {
       }
 
       const admin = JSON.parse(adminData);
+      const adminId = admin._id || admin.id || 'web-admin';
 
       // Wait for socket to connect and join admin room
-      await socketService.connect(admin._id);
+      await socketService.connect(adminId);
 
       // Define event handlers (these need to be stored for cleanup)
       const handleSOSAlert = (data) => {
-        console.log('🚨 Received SOS alert:', data);
-        // Add new incident to state immediately
+        // Filter out test users (same as NavigationScreen)
+        const testUsernames = ['test', 'placeholder', 'example', 'demo', 'admin'];
+        const username = (data.username || '').toLowerCase().trim();
+
+        if (testUsernames.includes(username) || !data.id || !data.username) {
+          return;
+        }
+
+        // Add new incident to FULL list immediately
         const newIncident = {
           _id: data.id,
           id: data.id,
@@ -100,15 +109,15 @@ const DashboardScreen = ({ navigation }) => {
           longitude: data.longitude,
           address: data.address,
           timestamp: data.timestamp,
-          status: 'critical',
-          type: 'Emergency Alert',
-          location: data.address || 'Location unavailable',
-          reportedBy: data.fullname || data.username,
-          time: 'Just now',
-          distance: formatCoordinates(data.latitude, data.longitude),
         };
 
-        setActiveIncidents(prev => [newIncident, ...prev].slice(0, 3));
+        // Update full list
+        setAllActiveIncidents(prev => {
+          // Check if incident already exists
+          const exists = prev.some(inc => inc._id === data.id || inc.username === data.username);
+          if (exists) return prev;
+          return [newIncident, ...prev];
+        });
 
         setStats(prev => ({
           ...prev,
@@ -121,18 +130,15 @@ const DashboardScreen = ({ navigation }) => {
       };
 
       const handleSOSUpdate = (data) => {
-        console.log('📍 Received SOS update:', data);
-        // Update the specific incident in state immediately
-        setActiveIncidents(prev => prev.map(incident => {
+        // Update the specific incident in FULL list immediately
+        setAllActiveIncidents(prev => prev.map(incident => {
           if (incident.id === data.id || incident._id === data.id || incident.username === data.username) {
             return {
               ...incident,
               latitude: data.latitude,
               longitude: data.longitude,
               address: data.address,
-              location: data.address || 'Location unavailable',
-              time: formatTimeAgo(data.timestamp),
-              distance: formatCoordinates(data.latitude, data.longitude),
+              timestamp: data.timestamp,
             };
           }
           return incident;
@@ -142,29 +148,19 @@ const DashboardScreen = ({ navigation }) => {
       };
 
       const handleSOSCancelled = (data) => {
-        console.log('❌ Received SOS cancelled:', data);
-        console.log('   Current active incidents:', activeIncidents.map(i => ({ id: i.id, _id: i._id, username: i.username })));
-
-        // Remove from state immediately - convert IDs to strings for comparison
+        // Remove from FULL list immediately - convert IDs to strings for comparison
         const dataId = String(data.id);
         const dataUsername = String(data.username);
 
-        setActiveIncidents(prev => {
+        setAllActiveIncidents(prev => {
           const filtered = prev.filter(incident => {
             const incidentId = String(incident.id || incident._id);
             const incidentUsername = String(incident.username);
 
             // Keep incident if NONE of these match
-            const shouldKeep = incidentId !== dataId && incidentUsername !== dataUsername;
-
-            if (!shouldKeep) {
-              console.log(`   🗑️ Removing incident: ${incidentUsername} (${incidentId})`);
-            }
-
-            return shouldKeep;
+            return incidentId !== dataId && incidentUsername !== dataUsername;
           });
 
-          console.log(`   📊 Filtered ${prev.length} → ${filtered.length} incidents`);
           return filtered;
         });
 
@@ -178,29 +174,19 @@ const DashboardScreen = ({ navigation }) => {
       };
 
       const handleSOSResolved = (data) => {
-        console.log('✅ Received SOS resolved:', data);
-        console.log('   Current active incidents:', activeIncidents.map(i => ({ id: i.id, _id: i._id, username: i.username })));
-
-        // Remove from active incidents and update stats immediately - convert IDs to strings for comparison
+        // Remove from FULL list and update stats immediately - convert IDs to strings for comparison
         const dataId = String(data.id);
         const dataUsername = String(data.username);
 
-        setActiveIncidents(prev => {
+        setAllActiveIncidents(prev => {
           const filtered = prev.filter(incident => {
             const incidentId = String(incident.id || incident._id);
             const incidentUsername = String(incident.username);
 
             // Keep incident if NONE of these match
-            const shouldKeep = incidentId !== dataId && incidentUsername !== dataUsername;
-
-            if (!shouldKeep) {
-              console.log(`   🗑️ Removing incident: ${incidentUsername} (${incidentId})`);
-            }
-
-            return shouldKeep;
+            return incidentId !== dataId && incidentUsername !== dataUsername;
           });
 
-          console.log(`   📊 Filtered ${prev.length} → ${filtered.length} incidents`);
           return filtered;
         });
 
@@ -215,7 +201,6 @@ const DashboardScreen = ({ navigation }) => {
       };
 
       const handleNewMessage = (data) => {
-        console.log('💬 Received new message:', data);
         // Only show notification if message is from a user
         if (data.senderType === 'user') {
           showToast(`New message from ${data.senderName}`, 'success');
@@ -240,18 +225,30 @@ const DashboardScreen = ({ navigation }) => {
       const checkConnection = async () => {
         const isConnected = socketService.isConnected();
         if (!isConnected) {
-          console.log('🔄 Reconnecting socket...');
           try {
-            await socketService.connect(admin._id);
+            await socketService.connect(adminId);
+
+            // Re-register event listeners after reconnection
+            socketService.off('sos-alert', handleSOSAlert);
+            socketService.off('sos-updated', handleSOSUpdate);
+            socketService.off('sos-cancelled', handleSOSCancelled);
+            socketService.off('sos-resolved', handleSOSResolved);
+            socketService.off('new-message', handleNewMessage);
+
+            socketService.on('sos-alert', handleSOSAlert);
+            socketService.on('sos-updated', handleSOSUpdate);
+            socketService.on('sos-cancelled', handleSOSCancelled);
+            socketService.on('sos-resolved', handleSOSResolved);
+            socketService.on('new-message', handleNewMessage);
           } catch (err) {
-            console.error('Failed to reconnect:', err);
+            console.error('Failed to reconnect socket:', err);
           }
         }
       };
 
-      // Check connection less frequently
+      // Check connection more frequently for better real-time performance
       setTimeout(checkConnection, 3000);
-      const connectionCheckInterval = setInterval(checkConnection, 30000);
+      const connectionCheckInterval = setInterval(checkConnection, 10000); // Check every 10 seconds
 
       // Return cleanup function
       return () => {
@@ -262,7 +259,6 @@ const DashboardScreen = ({ navigation }) => {
         socketService.off('sos-cancelled', handleSOSCancelled);
         socketService.off('sos-resolved', handleSOSResolved);
         socketService.off('new-message', handleNewMessage);
-        console.log('🧹 Socket event listeners cleaned up');
       };
     } catch (error) {
       console.error('Error setting up Socket.IO:', error);
@@ -274,16 +270,16 @@ const DashboardScreen = ({ navigation }) => {
     try {
       const token = await AsyncStorage.getItem('authToken');
 
-      // Fetch both active and history in parallel for better performance
-      const [activeResponse, historyResponse] = await Promise.all([
-        fetch(`${API_BASE}/api/sos/all-active`, {
+      // Fetch stats and active incidents in parallel for better performance
+      const [statsResponse, activeResponse] = await Promise.all([
+        fetch(`${API_BASE}/api/sos/stats`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
             ...(token && { 'Authorization': `Bearer ${token}` })
           }
         }),
-        fetch(`${API_BASE}/api/sos/all-history`, {
+        fetch(`${API_BASE}/api/sos/all-active`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -292,13 +288,13 @@ const DashboardScreen = ({ navigation }) => {
         })
       ]);
 
-      if (activeResponse.ok && historyResponse.ok) {
-        const [activeData, historyData] = await Promise.all([
-          activeResponse.json(),
-          historyResponse.json()
+      if (statsResponse.ok && activeResponse.ok) {
+        const [statsData, activeData] = await Promise.all([
+          statsResponse.json(),
+          activeResponse.json()
         ]);
 
-        // Optimized filtering - only filter truly invalid data
+        // Optimized filtering - only filter truly invalid data (same as NavigationScreen)
         const testUsernames = ['test', 'placeholder', 'example', 'demo', 'admin'];
         const validIncidents = (activeData.data?.alerts || []).filter(item => {
           if (!item._id || !item.username) return false;
@@ -307,42 +303,32 @@ const DashboardScreen = ({ navigation }) => {
         });
 
         const active = validIncidents;
-        const history = historyData.data?.history || [];
-        const resolved = history.filter(item => item.status === 'resolved');
 
-        // Calculate stats efficiently
+        // Store ALL active incidents (synced with NavigationScreen)
+        setAllActiveIncidents(active);
+
+        // Calculate critical threshold for display
         const now = new Date();
         const criticalThreshold = 30 * 60 * 1000; // 30 minutes
-        const criticalCount = active.filter(item =>
-          now - new Date(item.timestamp) < criticalThreshold
-        ).length;
 
-        setStats({
-          totalIncidents: active.length + history.length,
-          activeIncidents: active.length,
-          resolvedIncidents: resolved.length,
-          criticalIncidents: criticalCount
-        });
-
-        // Format active incidents for display (show top 3) - optimized
-        const formattedIncidents = active.slice(0, 3).map(incident => {
+        // Count critical incidents (those within 30 minutes)
+        const criticalCount = active.filter(incident => {
           const timeSinceReport = now - new Date(incident.timestamp);
-          return {
-            ...incident,
-            id: incident._id,
-            type: 'Emergency Alert',
-            location: incident.address || 'Location unavailable',
-            reportedBy: incident.userId?.fullname || incident.fullname || incident.username,
-            time: formatTimeAgo(incident.timestamp),
-            status: timeSinceReport < criticalThreshold ? 'critical' : 'active',
-            distance: formatCoordinates(incident.latitude, incident.longitude),
-          };
+          return timeSinceReport < criticalThreshold;
+        }).length;
+
+        // Use stats from the dedicated endpoint for total and resolved
+        // But use actual filtered incidents count for active and critical (synced with NavigationScreen)
+        setStats({
+          totalIncidents: statsData.data?.totalIncidents || 0,
+          activeIncidents: active.length, // Use filtered count (same as NavigationScreen)
+          resolvedIncidents: statsData.data?.resolvedIncidents || 0,
+          criticalIncidents: criticalCount // Use calculated count from filtered incidents
         });
 
-        setActiveIncidents(formattedIncidents);
         setError(null);
       } else {
-        const errorMsg = `Failed to fetch data: Active=${activeResponse.status} History=${historyResponse.status}`;
+        const errorMsg = `Failed to fetch data: Stats=${statsResponse.status} Active=${activeResponse.status}`;
         setError(errorMsg);
       }
     } catch (error) {
@@ -368,6 +354,28 @@ const DashboardScreen = ({ navigation }) => {
     if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
     return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
   };
+
+  // Auto-format top 3 incidents for display whenever the full list changes
+  useEffect(() => {
+    const now = new Date();
+    const criticalThreshold = 30 * 60 * 1000; // 30 minutes
+
+    const formattedIncidents = allActiveIncidents.slice(0, 3).map(incident => {
+      const timeSinceReport = now - new Date(incident.timestamp);
+      return {
+        ...incident,
+        id: incident._id,
+        type: 'Emergency Alert',
+        location: incident.address || 'Location unavailable',
+        reportedBy: incident.userId?.fullname || incident.fullname || incident.username,
+        time: formatTimeAgo(incident.timestamp),
+        status: timeSinceReport < criticalThreshold ? 'critical' : 'active',
+        distance: formatCoordinates(incident.latitude, incident.longitude),
+      };
+    });
+
+    setActiveIncidents(formattedIncidents);
+  }, [allActiveIncidents, formatCoordinates]);
 
   const showToast = (message, type = 'success') => {
     setToast({ visible: true, message, type });
@@ -547,10 +555,18 @@ const DashboardScreen = ({ navigation }) => {
         <Text style={styles.headerTitle}>Dashboard</Text>
         <View style={styles.headerRight}>
           {/* Socket Connection Status Indicator */}
-          <View style={[
-            styles.connectionIndicator,
-            socketService.isConnected() ? styles.connected : styles.disconnected
-          ]}>
+          <TouchableOpacity
+            style={[
+              styles.connectionIndicator,
+              socketService.isConnected() ? styles.connected : styles.disconnected
+            ]}
+            onPress={() => {
+              showToast(
+                `Socket ${socketService.isConnected() ? 'Connected' : 'Disconnected'}`,
+                socketService.isConnected() ? 'success' : 'error'
+              );
+            }}
+          >
             <View style={[
               styles.connectionDot,
               socketService.isConnected() ? styles.connectedDot : styles.disconnectedDot
@@ -558,7 +574,7 @@ const DashboardScreen = ({ navigation }) => {
             <Text style={styles.connectionText}>
               {socketService.isConnected() ? 'Live' : 'Offline'}
             </Text>
-          </View>
+          </TouchableOpacity>
           <TouchableOpacity
             style={styles.notificationButton}
             accessibilityLabel="Notifications"
