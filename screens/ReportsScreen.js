@@ -75,7 +75,15 @@ const ReportsScreen = ({ navigation }) => {
           historyResponse.json()
         ]);
 
-        const activeIncidents = (activeData.data?.alerts || []).map(item => ({
+        // Filter out test users (same as DashboardScreen)
+        const testUsernames = ['test', 'placeholder', 'example', 'demo', 'admin'];
+        const validActiveIncidents = (activeData.data?.alerts || []).filter(item => {
+          if (!item._id || !item.username) return false;
+          const username = (item.username || '').toLowerCase().trim();
+          return !testUsernames.includes(username);
+        });
+
+        const activeIncidents = validActiveIncidents.map(item => ({
           ...item,
           id: item._id,
           status: 'active',
@@ -98,12 +106,12 @@ const ReportsScreen = ({ navigation }) => {
 
         setIncidents(allIncidents);
 
-        // Use stats from the dedicated endpoint (same as DashboardScreen)
+        // Calculate stats using filtered active incidents count (same as DashboardScreen)
         const cancelled = allIncidents.filter(i => i.status === 'cancelled').length;
 
         setStats({
           total: statsData.data?.totalIncidents || 0,
-          active: statsData.data?.activeIncidents || 0,
+          active: activeIncidents.length, // Use filtered count, not stats endpoint
           resolved: statsData.data?.resolvedIncidents || 0,
           cancelled
         });
@@ -565,7 +573,7 @@ const ReportsScreen = ({ navigation }) => {
 
         {/* Tabs */}
         <View style={styles.tabsContainer}>
-          <TabButton title="All" tabKey="all" count={incidents.length} />
+          <TabButton title="All" tabKey="all" count={stats.total} />
           <TabButton title="Active" tabKey="active" count={stats.active} />
           <TabButton title="Resolved" tabKey="resolved" count={stats.resolved} />
         </View>

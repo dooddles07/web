@@ -144,7 +144,7 @@ const DashboardScreen = ({ navigation }) => {
           return incident;
         }));
 
-        showToast(`Location updated for ${data.fullname || data.username}`, 'success');
+        // Notification removed to prevent overwhelming the web interface with too many updates
       };
 
       const handleSOSCancelled = (data) => {
@@ -170,7 +170,7 @@ const DashboardScreen = ({ navigation }) => {
           criticalIncidents: Math.max(0, prev.criticalIncidents - 1)
         }));
 
-        showToast(`Emergency cancelled by ${data.username}`, 'success');
+        // Notification removed to prevent overwhelming the web interface with too many updates
       };
 
       const handleSOSResolved = (data) => {
@@ -197,14 +197,12 @@ const DashboardScreen = ({ navigation }) => {
           resolvedIncidents: prev.resolvedIncidents + 1
         }));
 
-        showToast(`Emergency resolved for ${data.username}`, 'success');
+        // Notification removed to prevent overwhelming the web interface with too many updates
       };
 
       const handleNewMessage = (data) => {
-        // Only show notification if message is from a user
-        if (data.senderType === 'user') {
-          showToast(`New message from ${data.senderName}`, 'success');
-        }
+        // Notification removed to prevent overwhelming the web interface with too many updates
+        // Messages are still received and displayed in the Messages screen
       };
 
       // Remove any existing listeners first to prevent duplicates
@@ -466,6 +464,12 @@ const DashboardScreen = ({ navigation }) => {
         <View style={styles.incidentDetailRow}>
           <Icon name="person" size={16} color="#6b7280" />
           <Text style={styles.incidentDetailText}>{incident.reportedBy}</Text>
+        </View>
+        <View style={styles.incidentDetailRow}>
+          <Icon name="phone" size={16} color="#6b7280" />
+          <Text style={styles.incidentDetailText}>
+            {incident.userId?.contactNumber || 'No contact number'}
+          </Text>
         </View>
         <View style={styles.incidentDetailRow}>
           <Icon name="access-time" size={16} color="#6b7280" />

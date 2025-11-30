@@ -45,8 +45,6 @@ const NavigationScreen = ({ navigation, route }) => {
   const [mapReady, setMapReady] = useState(false);
   const webViewRef = useRef(null);
 
-  const selectedIncident = route?.params?.selectedIncident;
-
   // Navigation handlers
   const handleBackPress = () => {
     if (navigation && navigation.goBack) {
@@ -413,13 +411,6 @@ const NavigationScreen = ({ navigation, route }) => {
 
       // Setup Socket.IO for real-time updates
       socketCleanup = await setupSocketIO();
-
-      // Navigate to selected incident from Dashboard
-      if (selectedIncident && selectedIncident.latitude && selectedIncident.longitude) {
-        setTimeout(() => {
-          handleNavigateToIncident(selectedIncident);
-        }, 1000);
-      }
     };
 
     init();
@@ -449,6 +440,21 @@ const NavigationScreen = ({ navigation, route }) => {
       return () => clearTimeout(retryTimer);
     }
   }, [incidents, mapReady]);
+
+  // Handle navigation when selectedIncident is passed from Dashboard
+  useEffect(() => {
+    const selectedIncident = route?.params?.selectedIncident;
+
+    if (selectedIncident && selectedIncident.latitude && selectedIncident.longitude && mapReady) {
+      // Small delay to ensure map is fully ready
+      const timer = setTimeout(() => {
+        handleNavigateToIncident(selectedIncident);
+        showToast(`Navigating to ${selectedIncident.fullname || selectedIncident.username}'s location`, 'success');
+      }, 500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [route?.params?.selectedIncident, mapReady]);
 
   // Setup Socket.IO for real-time SOS updates
   const setupSocketIO = async () => {
@@ -512,7 +518,7 @@ const NavigationScreen = ({ navigation, route }) => {
         return updated;
       });
 
-      showToast(`Location updated for ${data.fullname || data.username}`, 'success');
+      // Notification removed to prevent overwhelming the web interface with too many updates
     };
 
     const handleSOSCancelled = (data) => {
@@ -532,7 +538,7 @@ const NavigationScreen = ({ navigation, route }) => {
         return updated;
       });
 
-      showToast(`Emergency cancelled by ${data.username}`, 'success');
+      // Notification removed to prevent overwhelming the web interface with too many updates
     };
 
     const handleSOSResolved = (data) => {
@@ -552,7 +558,7 @@ const NavigationScreen = ({ navigation, route }) => {
         return updated;
       });
 
-      showToast(`Emergency resolved for ${data.username}`, 'success');
+      // Notification removed to prevent overwhelming the web interface with too many updates
     };
 
     // Remove any existing listeners first to prevent duplicates
@@ -837,7 +843,7 @@ const NavigationScreen = ({ navigation, route }) => {
         const labels = ['Shortest Path', 'Alternative Path 1', 'Alternative Path 2'];
         const opacities = [0.9, 0.7, 0.6];
         const weights = [5, 4, 4];
-        const dashArrays = ['', '10, 5', '5, 10'];
+        const dashArrays = ['', '', ''];
 
         routes.forEach((route, index) => {
           try {
@@ -867,22 +873,36 @@ const NavigationScreen = ({ navigation, route }) => {
 
             window.currentRoutePolylines.push(polyline);
 
-            const midIndex = Math.floor(coordinates.length / 2);
-            const midPoint = coordinates[midIndex];
+            // Position labels at different points to prevent overlap
+            const labelPositions = [0.5, 0.35, 0.65]; // 50%, 35%, 65% along the route
+            const labelIndex = Math.floor(coordinates.length * labelPositions[index]);
+            const labelPoint = coordinates[Math.min(labelIndex, coordinates.length - 1)];
 
             const labelHtml = '<div style="background-color:' + colors[index] + ';color:white;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600;white-space:nowrap;box-shadow:0 2px 4px rgba(0,0,0,0.3);border:2px solid white;">' +
               '<div>' + labels[index] + '</div>' +
               '<div style="font-size:10px;opacity:0.9;">' + route.distance.toFixed(2) + ' km</div>' +
               '</div>';
 
-            const label = L.marker(midPoint, {
+            const label = L.marker(labelPoint, {
               icon: L.divIcon({
                 className: 'route-label',
                 html: labelHtml,
                 iconSize: [120, 40],
                 iconAnchor: [60, 20]
               }),
-              interactive: false
+              interactive: true
+            });
+
+            // Make label clickable to highlight its corresponding route
+            label.on('click', function() {
+              window.currentRoutePolylines.forEach((p, i) => {
+                p.setStyle({
+                  weight: weights[i] || 3,
+                  opacity: opacities[i] || 0.5
+                });
+              });
+              polyline.setStyle({ weight: 7, opacity: 1 });
+              console.log('Selected route via label:', labels[index], '- Distance:', route.distance.toFixed(3), 'km');
             });
 
             map.addLayer(label);
@@ -1112,7 +1132,7 @@ const NavigationScreen = ({ navigation, route }) => {
             const labels = ['Shortest Path', 'Alternative Path 1', 'Alternative Path 2'];
             const opacities = [0.9, 0.7, 0.6];
             const weights = [5, 4, 4];
-            const dashArrays = ['', '10, 5', '5, 10'];
+            const dashArrays = ['', '', ''];
 
             routes.forEach((route, index) => {
               try {
@@ -1141,22 +1161,36 @@ const NavigationScreen = ({ navigation, route }) => {
 
                 window.currentRoutePolylines.push(polyline);
 
-                const midIndex = Math.floor(coordinates.length / 2);
-                const midPoint = coordinates[midIndex];
+                // Position labels at different points to prevent overlap
+                const labelPositions = [0.5, 0.35, 0.65]; // 50%, 35%, 65% along the route
+                const labelIndex = Math.floor(coordinates.length * labelPositions[index]);
+                const labelPoint = coordinates[Math.min(labelIndex, coordinates.length - 1)];
 
                 const labelHtml = '<div style="background-color:' + colors[index] + ';color:white;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600;white-space:nowrap;box-shadow:0 2px 4px rgba(0,0,0,0.3);border:2px solid white;">' +
                   '<div>' + labels[index] + '</div>' +
                   '<div style="font-size:10px;opacity:0.9;">' + route.distance.toFixed(2) + ' km</div>' +
                   '</div>';
 
-                const label = L.marker(midPoint, {
+                const label = L.marker(labelPoint, {
                   icon: L.divIcon({
                     className: 'route-label',
                     html: labelHtml,
                     iconSize: [120, 40],
                     iconAnchor: [60, 20]
                   }),
-                  interactive: false
+                  interactive: true
+                });
+
+                // Make label clickable to highlight its corresponding route
+                label.on('click', function() {
+                  window.currentRoutePolylines.forEach((p, i) => {
+                    p.setStyle({
+                      weight: weights[i] || 3,
+                      opacity: opacities[i] || 0.5
+                    });
+                  });
+                  polyline.setStyle({ weight: 7, opacity: 1 });
+                  console.log('Selected route via label:', labels[index], '- Distance:', route.distance.toFixed(3), 'km');
                 });
 
                 map.addLayer(label);
@@ -1306,7 +1340,7 @@ const NavigationScreen = ({ navigation, route }) => {
       // Clear navigation routes and markers from the map
       clearNavigationFromMap();
 
-      showToast(`Emergency resolved for ${username}`, 'success');
+      // Notification removed to prevent overwhelming the web interface with too many updates
     } catch (error) {
       console.error('Error resolving incident:', error);
       showToast('Failed to resolve emergency. Please try again.', 'error');
@@ -1365,6 +1399,17 @@ const NavigationScreen = ({ navigation, route }) => {
               </View>
             </View>
             <Text style={styles.detailText}>@{incident.username || 'unknown'}</Text>
+          </View>
+
+          <View style={styles.incidentDetail}>
+            <View style={styles.iconContainer}>
+              <View style={styles.detailIcon}>
+                <MaterialIcon name="phone" size={20} color="#22c55e" />
+              </View>
+            </View>
+            <Text style={styles.detailText}>
+              {incident.userId?.contactNumber || 'No contact number'}
+            </Text>
           </View>
 
           <View style={styles.incidentDetail}>

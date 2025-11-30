@@ -28,9 +28,27 @@ const MessagesScreen = ({ navigation, route }) => {
   const [adminData, setAdminData] = useState(null);
   const [toast, setToast] = useState({ visible: false, message: '', type: 'success' });
   const [hoveredButton, setHoveredButton] = useState(null);
+  const [imageModal, setImageModal] = useState({ visible: false, url: '' });
 
   const scrollViewRef = useRef(null);
   const pollingInterval = useRef(null);
+
+  // Function to stop all playing media
+  const stopAllMedia = () => {
+    // Stop all audio elements
+    const audioElements = document.querySelectorAll('audio');
+    audioElements.forEach(audio => {
+      audio.pause();
+      audio.currentTime = 0;
+    });
+
+    // Stop all video elements
+    const videoElements = document.querySelectorAll('video');
+    videoElements.forEach(video => {
+      video.pause();
+      video.currentTime = 0;
+    });
+  };
 
   // Toast notification helper
   const showToast = (message, type = 'success') => {
@@ -60,10 +78,14 @@ const MessagesScreen = ({ navigation, route }) => {
       if (pollingInterval.current) {
         clearInterval(pollingInterval.current);
       }
+      stopAllMedia();
     };
   }, []);
 
   useEffect(() => {
+    // Stop all media when conversation changes
+    stopAllMedia();
+
     if (selectedConversation) {
       fetchMessages(selectedConversation._id);
       markMessagesAsRead(selectedConversation._id);
@@ -358,6 +380,7 @@ const MessagesScreen = ({ navigation, route }) => {
     : [];
 
   const handleBackPress = () => {
+    stopAllMedia();
     navigation.goBack();
   };
 
@@ -563,38 +586,43 @@ const MessagesScreen = ({ navigation, route }) => {
                     >
                       {/* Image Message */}
                       {message.messageType === 'image' && message.mediaUrl && (
-                        <Image
-                          source={{ uri: message.mediaUrl }}
-                          style={styles.messageImage}
-                          resizeMode="cover"
-                          {...(Platform.OS === 'web' && {
-                            referrerPolicy: 'no-referrer',
-                            crossOrigin: 'anonymous',
-                          })}
-                        />
+                        <TouchableOpacity
+                          onPress={() => setImageModal({ visible: true, url: message.mediaUrl })}
+                          activeOpacity={0.9}
+                        >
+                          <Image
+                            source={{ uri: message.mediaUrl }}
+                            style={styles.messageImage}
+                            resizeMode="cover"
+                            {...(Platform.OS === 'web' && {
+                              referrerPolicy: 'no-referrer',
+                              crossOrigin: 'anonymous',
+                            })}
+                          />
+                          <View style={styles.imageOverlay}>
+                            <Icon name="zoom-in" size={24} color="#fff" />
+                          </View>
+                        </TouchableOpacity>
                       )}
 
                       {/* Video Message */}
-                      {message.messageType === 'video' && (
+                      {message.messageType === 'video' && message.mediaUrl && (
                         <View style={styles.videoContainer}>
-                          {message.thumbnailUrl ? (
-                            <Image
-                              source={{ uri: message.thumbnailUrl }}
-                              style={styles.messageImage}
-                              resizeMode="cover"
-                              {...(Platform.OS === 'web' && {
-                                referrerPolicy: 'no-referrer',
-                                crossOrigin: 'anonymous',
-                              })}
-                            />
-                          ) : (
-                            <View style={[styles.messageImage, styles.videoPlaceholder]}>
-                              <Icon name="videocam" size={48} color="#fff" />
-                            </View>
-                          )}
-                          <View style={styles.videoOverlay}>
-                            <Icon name="play-circle" size={48} color="#fff" />
-                          </View>
+                          <video
+                            controls
+                            style={{
+                              width: '100%',
+                              maxWidth: 350,
+                              height: 'auto',
+                              borderRadius: 12,
+                              outline: 'none',
+                            }}
+                            preload="metadata"
+                          >
+                            <source src={message.mediaUrl} type="video/mp4" />
+                            <source src={message.mediaUrl} type="video/webm" />
+                            Your browser does not support the video element.
+                          </video>
                           {message.mediaDuration && (
                             <View style={styles.durationBadge}>
                               <Text style={styles.durationText}>
@@ -602,20 +630,11 @@ const MessagesScreen = ({ navigation, route }) => {
                               </Text>
                             </View>
                           )}
-                          {message.mediaUrl && (
-                            <TouchableOpacity
-                              style={styles.mediaLink}
-                              onPress={() => window.open(message.mediaUrl, '_blank')}
-                            >
-                              <Icon name="open-in-new" size={16} color="#14b8a6" />
-                              <Text style={styles.mediaLinkText}>Open video</Text>
-                            </TouchableOpacity>
-                          )}
                         </View>
                       )}
 
                       {/* Audio Message */}
-                      {message.messageType === 'audio' && (
+                      {message.messageType === 'audio' && message.mediaUrl && (
                         <View style={styles.audioContainer}>
                           <Icon name="mic" size={24} color={isSentByAdmin ? "#fff" : "#14b8a6"} />
                           <View style={styles.audioInfo}>
@@ -628,14 +647,20 @@ const MessagesScreen = ({ navigation, route }) => {
                               </Text>
                             )}
                           </View>
-                          {message.mediaUrl && (
-                            <TouchableOpacity
-                              onPress={() => window.open(message.mediaUrl, '_blank')}
-                              style={styles.audioPlayButton}
-                            >
-                              <Icon name="play-arrow" size={20} color={isSentByAdmin ? "#fff" : "#14b8a6"} />
-                            </TouchableOpacity>
-                          )}
+                          <audio
+                            controls
+                            style={{
+                              height: 32,
+                              maxWidth: 180,
+                              outline: 'none',
+                            }}
+                            preload="metadata"
+                          >
+                            <source src={message.mediaUrl} type="audio/m4a" />
+                            <source src={message.mediaUrl} type="audio/mp4" />
+                            <source src={message.mediaUrl} type="audio/mpeg" />
+                            Your browser does not support the audio element.
+                          </audio>
                         </View>
                       )}
 
@@ -704,6 +729,35 @@ const MessagesScreen = ({ navigation, route }) => {
           </View>
         )}
       </View>
+
+      {/* Image Modal */}
+      {imageModal.visible && (
+        <View style={styles.modalOverlay}>
+          <TouchableOpacity
+            style={styles.modalCloseArea}
+            onPress={() => setImageModal({ visible: false, url: '' })}
+            activeOpacity={1}
+          >
+            <View style={styles.modalContent}>
+              <TouchableOpacity
+                style={styles.modalCloseButton}
+                onPress={() => setImageModal({ visible: false, url: '' })}
+              >
+                <Icon name="close" size={30} color="#fff" />
+              </TouchableOpacity>
+              <Image
+                source={{ uri: imageModal.url }}
+                style={styles.modalImage}
+                resizeMode="contain"
+                {...(Platform.OS === 'web' && {
+                  referrerPolicy: 'no-referrer',
+                  crossOrigin: 'anonymous',
+                })}
+              />
+            </View>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 };
@@ -1009,61 +1063,39 @@ const styles = StyleSheet.create({
     height: 250,
     borderRadius: 12,
     marginBottom: 4,
+    ...(Platform.OS === 'web' && {
+      cursor: 'pointer',
+    }),
   },
   videoContainer: {
     position: 'relative',
-  },
-  videoPlaceholder: {
-    backgroundColor: '#333',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  videoOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 4,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-    borderRadius: 12,
+    marginBottom: 4,
   },
   durationBadge: {
     position: 'absolute',
-    bottom: 12,
+    top: 8,
     right: 8,
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,
+    zIndex: 1,
   },
   durationText: {
     color: '#fff',
     fontSize: 12,
     fontWeight: '600',
   },
-  mediaLink: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 8,
-    paddingVertical: 4,
-  },
-  mediaLinkText: {
-    color: '#14b8a6', // Mobile primary teal
-    fontSize: 13,
-    marginLeft: 4,
-    textDecorationLine: 'underline',
-  },
   audioContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 8,
-    minWidth: 200,
+    minWidth: 250,
+    gap: 8,
   },
   audioInfo: {
     flex: 1,
-    marginLeft: 12,
+    marginLeft: 4,
   },
   audioLabel: {
     fontSize: 14,
@@ -1074,9 +1106,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#6b7280',
     marginTop: 2,
-  },
-  audioPlayButton: {
-    marginLeft: 12,
   },
 
   // Input Area
@@ -1168,6 +1197,53 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginLeft: 8,
     flex: 1,
+  },
+
+  // Image Modal Styles
+  modalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10000,
+  },
+  modalCloseArea: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: '90%',
+    height: '90%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  modalCloseButton: {
+    position: 'absolute',
+    top: 20,
+    right: 20,
+    zIndex: 10001,
+    padding: 10,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    borderRadius: 25,
+  },
+  modalImage: {
+    width: '100%',
+    height: '100%',
+  },
+  imageOverlay: {
+    position: 'absolute',
+    bottom: 8,
+    right: 8,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    borderRadius: 20,
+    padding: 8,
   },
 });
 
