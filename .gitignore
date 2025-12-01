@@ -15,12 +15,18 @@ web-build/
 *.mobileprovision
 *.orig.*
 
-# Environment variables
+# Environment variables - CRITICAL: Never commit these!
 .env
 .env.local
+.env.development
 .env.development.local
 .env.test.local
+.env.production
 .env.production.local
+*.env
+
+# Exception: Allow .env.example (template without sensitive data)
+!.env.example
 
 # Logs
 npm-debug.log*

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -18,7 +18,7 @@ import Logo from '../images/resqyou.png'; // Correctly import the logo image
 
 
 
-const LoginScreen = ({ navigation, route }) => {
+const LoginScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -133,22 +133,6 @@ const LoginScreen = ({ navigation, route }) => {
     }
   };
 
-  useEffect(() => {
-    const flag = route?.params?.signupSuccess;
-    if (flag) {
-      // show a confirmation when coming from signup
-      showToast('Account created successfully. Please login.', 'success');
-      // clear the flag so it doesn't show again on re-render
-      try {
-        if (route && route.params) {
-          route.params.signupSuccess = false;
-        }
-      } catch (e) {
-        // ignore
-      }
-    }
-  }, [route]);
-
   return (
     <ImageBackground
       style={styles.background}
@@ -191,16 +175,6 @@ const LoginScreen = ({ navigation, route }) => {
           accessibilityLabel="Password input field"
           accessibilityHint="Enter your password to login"
         />
-        <View style={styles.signupTextContainer}>
-          <Text style={styles.signupText}>Don't have an account? </Text>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('Sign Up')}
-            accessibilityLabel="Go to Sign Up"
-            accessibilityRole="button"
-          >
-            <Text style={styles.signupLink}>Sign Up</Text>
-          </TouchableOpacity>
-        </View>
         <TouchableOpacity
           style={[
             styles.button,
@@ -301,20 +275,6 @@ const styles = StyleSheet.create({
   buttonDisabled: {
     backgroundColor: '#14b8a680', // Semi-transparent teal
     opacity: 0.6,
-  },
-  signupTextContainer: {
-    flexDirection: 'row',
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  signupText: {
-    color: '#6b7280', // Mobile gray500 - secondary text
-    fontSize: 14,
-  },
-  signupLink: {
-    color: '#14b8a6', // Mobile primary teal
-    fontWeight: '600',
-    fontSize: 14,
   },
   // Toast notification styles
   toast: {

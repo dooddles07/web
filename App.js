@@ -14,7 +14,6 @@ import MessagesScreen from './screens/MessagesScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import LogoutScreen from './screens/LogoutScreen';
 import LoginScreen from './screens/LoginScreen';
-import SignupScreen from './screens/SignupScreen';
 import PrivacyPolicyScreen from './screens/PrivacyPolicyScreen';
 import TermsOfServiceScreen from './screens/TermsOfServiceScreen';
 import HelpCenterScreen from './screens/HelpCenterScreen';
@@ -85,7 +84,7 @@ const CustomDrawerContent = ({ navigation, state }) => {
   );
 };
 
-// Authentication Stack Navigator (Login & Signup)
+// Authentication Stack Navigator (Login only)
 const AuthStackNavigator = () => {
   return (
     <Stack.Navigator
@@ -96,7 +95,6 @@ const AuthStackNavigator = () => {
       }}
     >
       <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen name="Sign Up" component={SignupScreen} />
     </Stack.Navigator>
   );
 };
@@ -281,7 +279,6 @@ const linking = {
       Auth: {
         screens: {
           Login: 'login',
-          'Sign Up': 'signup',
         },
       },
       Main: {
@@ -437,7 +434,6 @@ const App = () => {
       'Settings': 'Settings - VAWC Prevention',
       'Logout': 'Logout - VAWC Prevention',
       'Login': 'Login - VAWC Prevention',
-      'Sign Up': 'Sign Up - VAWC Prevention',
       'PrivacyPolicy': 'Privacy Policy - VAWC Prevention',
       'TermsOfService': 'Terms of Service - VAWC Prevention',
       'HelpCenter': 'Help Center - VAWC Prevention',

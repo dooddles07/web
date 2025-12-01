@@ -12,18 +12,28 @@ class SocketService {
     this.socket = null;
     this.listeners = new Map();
     this.adminId = null;
+    this.token = null; // 🔒 Store auth token for reconnections
     this.isJoinedAdminRoom = false;
   }
 
   /**
    * Connect to Socket.IO server
    * @param {string} adminId - Admin user ID for room joining
+   * @param {string} token - JWT token for authentication (REQUIRED)
    * @returns {Promise} Promise that resolves when connected and joined admin room
    */
-  connect(adminId) {
-    // Store admin ID for reconnections
+  connect(adminId, token) {
+    // 🔒 SECURITY: Require authentication token
+    if (!token) {
+      return Promise.reject(new Error('Authentication token required'));
+    }
+
+    // Store admin ID and token for reconnections
     if (adminId) {
       this.adminId = adminId;
+    }
+    if (token) {
+      this.token = token;
     }
 
     // If socket exists and is connected, check if we need to join admin room
@@ -38,8 +48,11 @@ class SocketService {
 
     return new Promise((resolve, reject) => {
       try {
-        // Create socket connection to backend
+        // 🔒 Create socket connection with authentication
         this.socket = io(API_BASE, {
+          auth: {
+            token: this.token // Pass JWT token for authentication
+          },
           transports: ['websocket', 'polling'],
           reconnection: true,
           reconnectionAttempts: 5,

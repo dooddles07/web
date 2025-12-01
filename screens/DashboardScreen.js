@@ -76,17 +76,23 @@ const DashboardScreen = ({ navigation }) => {
   const setupSocketIO = async () => {
     try {
       const adminData = await AsyncStorage.getItem('adminData');
+      const token = await AsyncStorage.getItem('authToken');
 
       if (!adminData) {
         console.warn('No admin data found, skipping socket setup');
         return null;
       }
 
+      if (!token) {
+        console.warn('No auth token found, skipping socket setup');
+        return null;
+      }
+
       const admin = JSON.parse(adminData);
       const adminId = admin._id || admin.id || 'web-admin';
 
-      // Wait for socket to connect and join admin room
-      await socketService.connect(adminId);
+      // Wait for socket to connect and join admin room (with authentication)
+      await socketService.connect(adminId, token);
 
       // Define event handlers (these need to be stored for cleanup)
       const handleSOSAlert = (data) => {
@@ -224,7 +230,12 @@ const DashboardScreen = ({ navigation }) => {
         const isConnected = socketService.isConnected();
         if (!isConnected) {
           try {
-            await socketService.connect(adminId);
+            const reconnectToken = await AsyncStorage.getItem('authToken');
+            if (!reconnectToken) {
+              console.error('No auth token for reconnection');
+              return;
+            }
+            await socketService.connect(adminId, reconnectToken);
 
             // Re-register event listeners after reconnection
             socketService.off('sos-alert', handleSOSAlert);

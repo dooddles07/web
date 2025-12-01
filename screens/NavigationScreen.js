@@ -461,12 +461,18 @@ const NavigationScreen = ({ navigation, route }) => {
     // Connect to socket if not already connected
     if (!socketService.isConnected()) {
       try {
-        // Get admin ID from storage
+        // Get admin ID and token from storage
         const adminDataStr = await AsyncStorage.getItem('adminData');
+        const token = await AsyncStorage.getItem('authToken');
         const adminData = adminDataStr ? JSON.parse(adminDataStr) : null;
         const adminId = adminData?._id || adminData?.id || 'web-admin';
 
-        await socketService.connect(adminId);
+        if (!token) {
+          console.error('No auth token found for socket connection');
+          return null;
+        }
+
+        await socketService.connect(adminId, token);
       } catch (error) {
         console.error('Failed to connect to socket:', error);
         return null;
@@ -648,7 +654,9 @@ const NavigationScreen = ({ navigation, route }) => {
           radius: 5,
           color: '#3388ff',
           fillColor: '#3388ff',
-          fillOpacity: 0.8
+          fillOpacity: 0.3,
+          opacity: 0.3,
+          weight: 1
         })
           .bindTooltip(nodeName, { permanent: false, direction: 'top' })
           .addTo(map);
@@ -919,7 +927,9 @@ const NavigationScreen = ({ navigation, route }) => {
           radius: 5,
           color: 'red',
           fillColor: 'red',
-          fillOpacity: 0.8
+          fillOpacity: 0.3,
+          opacity: 0.3,
+          weight: 1
         }).addTo(map).bindPopup(label);
 
         marker.on('click', () => {

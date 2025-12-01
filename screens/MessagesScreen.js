@@ -101,8 +101,6 @@ const MessagesScreen = ({ navigation, route }) => {
       );
       if (conversation) {
         setSelectedConversation(conversation);
-        const displayName = getDisplayName(conversation);
-        showToast(`Opened conversation with ${displayName}`, 'success');
       }
     }
   }, [conversations, route?.params]);
