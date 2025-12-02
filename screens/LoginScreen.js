@@ -15,6 +15,7 @@ import axios from 'axios';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import API_BASE from '../config/api';
 import Logo from '../images/resqyou.png'; // Correctly import the logo image
+import Colors from '../constants/colors';
 
 
 
@@ -159,7 +160,7 @@ const LoginScreen = ({ navigation }) => {
         <TextInput
           style={styles.input}
           placeholder="Username"
-          placeholderTextColor="#6b7280"
+          placeholderTextColor={Colors.text.secondary}
           value={username}
           onChangeText={setUsername}
           accessibilityLabel="Username input field"
@@ -168,7 +169,7 @@ const LoginScreen = ({ navigation }) => {
         <TextInput
           style={styles.input}
           placeholder="Password"
-          placeholderTextColor="#6b7280"
+          placeholderTextColor={Colors.text.secondary}
           secureTextEntry
           value={password}
           onChangeText={setPassword}
@@ -203,7 +204,7 @@ const LoginScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   background: {
-    backgroundColor: '#f9fafb', // Mobile gray50 (60% - primary background)
+    backgroundColor: Colors.neutral.gray50, // Mobile gray50 (60% - primary background)
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
@@ -214,8 +215,8 @@ const styles = StyleSheet.create({
     padding: 40, // Increased padding for better spacing
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#e5e7eb', // Mobile gray200
-    backgroundColor: '#ffffff', // Mobile white (30% - secondary)
+    borderColor: Colors.border.light, // Mobile gray200
+    backgroundColor: Colors.neutral.white, // Mobile white (30% - secondary)
     ...(Platform.OS === 'web' ? {
       boxShadow: '0 10px 20px rgba(0, 0, 0, 0.1)',
     } : {
@@ -235,28 +236,28 @@ const styles = StyleSheet.create({
   input: {
     width: '100%',
     height: 56,
-    borderColor: '#e5e7eb', // Mobile gray200
+    borderColor: Colors.border.light, // Mobile gray200
     borderWidth: 1,
     borderRadius: 12,
     paddingHorizontal: 16,
     marginBottom: 16,
-    backgroundColor: '#f9fafb', // Mobile gray50
-    color: '#1f2937', // Mobile gray800 - primary text
+    backgroundColor: Colors.neutral.gray50, // Mobile gray50
+    color: Colors.text.primary, // Mobile gray800 - primary text
     fontSize: 16,
     outlineStyle: 'none', // Remove outline on web
   },
   button: {
     width: '100%',
     height: 56,
-    backgroundColor: '#14b8a6', // Mobile primary teal (10% - accent)
+    backgroundColor: Colors.secondary.orange, // Mobile action orange (10% - accent)
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 12,
     marginTop: 12,
     ...(Platform.OS === 'web' ? {
-      boxShadow: '0 4px 8px rgba(20, 184, 166, 0.3)',
+      boxShadow: `0 4px 8px ${Colors.secondary.orange}50`,
     } : {
-      shadowColor: '#14b8a6',
+      shadowColor: Colors.secondary.orange,
       shadowOpacity: 0.3,
       shadowOffset: { width: 0, height: 4 },
       shadowRadius: 8,
@@ -264,16 +265,16 @@ const styles = StyleSheet.create({
     }),
   },
   buttonHover: {
-    backgroundColor: '#0d9488', // Mobile teal dark - hover state
+    backgroundColor: Colors.secondary.orangeDark, // Mobile orange dark - hover state
     transform: [{ scale: 1.02 }],
   },
   buttonText: {
-    color: '#ffffff', // Mobile white
+    color: Colors.text.inverse, // Mobile white
     fontSize: 18,
     fontWeight: '600', // Consistent weight
   },
   buttonDisabled: {
-    backgroundColor: '#14b8a680', // Semi-transparent teal
+    backgroundColor: `${Colors.secondary.orange}80`, // Semi-transparent orange
     opacity: 0.6,
   },
   // Toast notification styles
@@ -301,10 +302,10 @@ const styles = StyleSheet.create({
     zIndex: 9999,
   },
   toastSuccess: {
-    backgroundColor: '#10b981', // Mobile green
+    backgroundColor: Colors.alert.success, // Mobile green
   },
   toastError: {
-    backgroundColor: '#ef4444', // Mobile red
+    backgroundColor: Colors.primary.red, // Mobile emergency red
   },
   toastText: {
     color: '#ffffff',

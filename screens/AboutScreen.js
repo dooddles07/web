@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import Colors from '../constants/colors';
 
 const AboutScreen = ({ navigation }) => {
   const [hoveredButton, setHoveredButton] = useState(null);
@@ -16,7 +17,7 @@ const AboutScreen = ({ navigation }) => {
           accessibilityRole="button"
           accessibilityHint="Returns to the Settings screen"
         >
-          <Icon name="arrow-back" size={24} color="#1f2937" />
+          <Icon name="arrow-back" size={24} color={Colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>About</Text>
         <View style={styles.placeholder} />
@@ -26,7 +27,7 @@ const AboutScreen = ({ navigation }) => {
         {/* App Logo Section */}
         <View style={styles.logoSection}>
           <View style={styles.logoContainer}>
-            <Icon name="emergency" size={80} color="#14b8a6" />
+            <Icon name="emergency" size={80} color={Colors.secondary.orange} />
           </View>
           <Text style={styles.appName}>ResqYOU</Text>
           <Text style={styles.tagline}>Emergency Response & Locator System</Text>
@@ -62,7 +63,7 @@ const AboutScreen = ({ navigation }) => {
 
           <View style={styles.featureItem}>
             <View style={styles.featureIcon}>
-              <Icon name="emergency" size={24} color="#ef4444" />
+              <Icon name="emergency" size={24} color={Colors.primary.red} />
             </View>
             <View style={styles.featureContent}>
               <Text style={styles.featureTitle}>One-Touch SOS</Text>
@@ -74,7 +75,7 @@ const AboutScreen = ({ navigation }) => {
 
           <View style={styles.featureItem}>
             <View style={styles.featureIcon}>
-              <Icon name="location-on" size={24} color="#14b8a6" />
+              <Icon name="location-on" size={24} color={Colors.secondary.orange} />
             </View>
             <View style={styles.featureContent}>
               <Text style={styles.featureTitle}>Real-Time Tracking</Text>
@@ -86,7 +87,7 @@ const AboutScreen = ({ navigation }) => {
 
           <View style={styles.featureItem}>
             <View style={styles.featureIcon}>
-              <Icon name="route" size={24} color="#10b981" />
+              <Icon name="route" size={24} color={Colors.alert.success} />
             </View>
             <View style={styles.featureContent}>
               <Text style={styles.featureTitle}>Smart Routing</Text>
@@ -98,7 +99,7 @@ const AboutScreen = ({ navigation }) => {
 
           <View style={styles.featureItem}>
             <View style={styles.featureIcon}>
-              <Icon name="history" size={24} color="#f59e0b" />
+              <Icon name="history" size={24} color={Colors.alert.warning} />
             </View>
             <View style={styles.featureContent}>
               <Text style={styles.featureTitle}>Emergency History</Text>
@@ -110,7 +111,7 @@ const AboutScreen = ({ navigation }) => {
 
           <View style={styles.featureItem}>
             <View style={styles.featureIcon}>
-              <Icon name="contacts" size={24} color="#8b5cf6" />
+              <Icon name="contacts" size={24} color={Colors.alert.info} />
             </View>
             <View style={styles.featureContent}>
               <Text style={styles.featureTitle}>Emergency Contacts</Text>
@@ -122,7 +123,7 @@ const AboutScreen = ({ navigation }) => {
 
           <View style={styles.featureItem}>
             <View style={styles.featureIcon}>
-              <Icon name="security" size={24} color="#ef4444" />
+              <Icon name="security" size={24} color={Colors.primary.red} />
             </View>
             <View style={styles.featureContent}>
               <Text style={styles.featureTitle}>Secure & Private</Text>
@@ -322,7 +323,7 @@ const AboutScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafb', // Mobile gray50 (60% - primary background)
+    backgroundColor: Colors.neutral.gray50,
   },
   header: {
     flexDirection: 'row',
@@ -330,14 +331,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: '#ffffff', // Mobile white (30% - secondary)
+    backgroundColor: Colors.neutral.white,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb', // Mobile gray200
+    borderBottomColor: Colors.border.light,
     ...(Platform.OS === 'web' ? {
       boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
     } : {
       elevation: 2,
-      shadowColor: '#000',
+      shadowColor: Colors.neutral.black,
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.1,
       shadowRadius: 4,
@@ -349,7 +350,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#1f2937', // Mobile gray800 - primary text
+    color: Colors.text.primary,
   },
   placeholder: {
     width: 40,
@@ -358,17 +359,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   logoSection: {
-    backgroundColor: '#ffffff', // Mobile white
+    backgroundColor: Colors.neutral.white,
     alignItems: 'center',
     paddingVertical: 40,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb', // Mobile gray200
+    borderBottomColor: Colors.border.light,
   },
   logoContainer: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: '#f0fdfa', // Mobile teal background light
+    backgroundColor: Colors.secondary.background,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 20,
@@ -376,38 +377,38 @@ const styles = StyleSheet.create({
   appName: {
     fontSize: 32,
     fontWeight: '700',
-    color: '#1f2937', // Mobile gray800 - primary text
+    color: Colors.text.primary,
     marginBottom: 5,
   },
   tagline: {
     fontSize: 16,
-    color: '#6b7280', // Mobile gray500 - secondary text
+    color: Colors.text.secondary,
     marginBottom: 10,
   },
   version: {
     fontSize: 14,
-    color: '#9ca3af', // Mobile gray400
+    color: Colors.neutral.gray400,
   },
   section: {
-    backgroundColor: '#ffffff', // Mobile white
+    backgroundColor: Colors.neutral.white,
     padding: 20,
     marginTop: 10,
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#1f2937', // Mobile gray800 - primary text
+    color: Colors.text.primary,
     marginBottom: 15,
   },
   paragraph: {
     fontSize: 14,
-    color: '#4b5563', // Mobile gray600 - tertiary text
+    color: Colors.neutral.gray600,
     lineHeight: 22,
     marginBottom: 12,
   },
   bold: {
     fontWeight: '600',
-    color: '#1f2937', // Mobile gray800 - primary text
+    color: Colors.text.primary,
   },
   featureItem: {
     flexDirection: 'row',
@@ -417,7 +418,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#f9fafb', // Mobile gray50
+    backgroundColor: Colors.neutral.gray50,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 15,
@@ -428,12 +429,12 @@ const styles = StyleSheet.create({
   featureTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1f2937', // Mobile gray800 - primary text
+    color: Colors.text.primary,
     marginBottom: 5,
   },
   featureDescription: {
     fontSize: 14,
-    color: '#6b7280', // Mobile gray500 - secondary text
+    color: Colors.text.secondary,
     lineHeight: 20,
   },
   stepItem: {
@@ -444,7 +445,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#14b8a6', // Mobile primary teal (10% - accent)
+    backgroundColor: Colors.secondary.orange,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 15,
@@ -452,7 +453,7 @@ const styles = StyleSheet.create({
   stepNumberText: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#ffffff',
+    color: Colors.neutral.white,
   },
   stepContent: {
     flex: 1,
@@ -460,12 +461,12 @@ const styles = StyleSheet.create({
   stepTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1f2937', // Mobile gray800 - primary text
+    color: Colors.text.primary,
     marginBottom: 5,
   },
   stepDescription: {
     fontSize: 14,
-    color: '#6b7280', // Mobile gray500 - secondary text
+    color: Colors.text.secondary,
     lineHeight: 20,
   },
   commitmentList: {
@@ -473,12 +474,12 @@ const styles = StyleSheet.create({
   },
   commitmentItem: {
     fontSize: 14,
-    color: '#10b981', // Mobile green
+    color: Colors.alert.success,
     fontWeight: '500',
     marginBottom: 8,
   },
   statsSection: {
-    backgroundColor: '#14b8a6', // Mobile primary teal
+    backgroundColor: Colors.secondary.orange,
     padding: 20,
     marginTop: 10,
   },
@@ -489,7 +490,7 @@ const styles = StyleSheet.create({
   },
   statCard: {
     width: '48%',
-    backgroundColor: '#ffffff', // Mobile white
+    backgroundColor: Colors.neutral.white,
     borderRadius: 12,
     padding: 20,
     alignItems: 'center',
@@ -498,21 +499,21 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#14b8a6', // Mobile primary teal
+    color: Colors.secondary.orange,
     marginBottom: 5,
   },
   statLabel: {
     fontSize: 12,
-    color: '#6b7280', // Mobile gray500 - secondary text
+    color: Colors.text.secondary,
     textAlign: 'center',
   },
   contactInfo: {
     fontSize: 14,
-    color: '#14b8a6', // Mobile primary teal
+    color: Colors.secondary.orange,
     marginBottom: 6,
   },
   socialSection: {
-    backgroundColor: '#ffffff', // Mobile white
+    backgroundColor: Colors.neutral.white,
     padding: 20,
     marginTop: 10,
     alignItems: 'center',
@@ -528,23 +529,23 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   socialButtonHover: {
-    backgroundColor: '#f9fafb', // Mobile gray50
+    backgroundColor: Colors.neutral.gray50,
     transform: [{ scale: 1.05 }],
   },
   socialLabel: {
     fontSize: 12,
-    color: '#6b7280', // Mobile gray500 - secondary text
+    color: Colors.text.secondary,
     marginTop: 5,
   },
   footer: {
     alignItems: 'center',
     paddingVertical: 30,
-    backgroundColor: '#ffffff', // Mobile white
+    backgroundColor: Colors.neutral.white,
     marginTop: 10,
   },
   footerText: {
     fontSize: 12,
-    color: '#9ca3af', // Mobile gray400
+    color: Colors.neutral.gray400,
     marginBottom: 5,
   },
 });

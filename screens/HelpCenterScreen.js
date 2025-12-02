@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import Colors from '../constants/colors';
 
 const HelpCenterScreen = ({ navigation }) => {
   const [expandedIndex, setExpandedIndex] = useState(null);
@@ -84,7 +85,7 @@ const HelpCenterScreen = ({ navigation }) => {
           accessibilityRole="button"
           accessibilityHint="Returns to the Settings screen"
         >
-          <Icon name="arrow-back" size={24} color="#1f2937" />
+          <Icon name="arrow-back" size={24} color={Colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Help Center</Text>
         <View style={styles.placeholder} />
@@ -92,7 +93,7 @@ const HelpCenterScreen = ({ navigation }) => {
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.welcomeSection}>
-          <Icon name="help-outline" size={48} color="#14b8a6" />
+          <Icon name="help-outline" size={48} color={Colors.secondary.orange} />
           <Text style={styles.welcomeTitle}>How can we help you?</Text>
           <Text style={styles.welcomeText}>
             Find answers to common questions about ResqYOU Emergency Response System
@@ -100,7 +101,7 @@ const HelpCenterScreen = ({ navigation }) => {
         </View>
 
         <View style={styles.emergencyCard}>
-          <Icon name="warning" size={24} color="#ef4444" />
+          <Icon name="warning" size={24} color={Colors.primary.red} />
           <View style={styles.emergencyTextContainer}>
             <Text style={styles.emergencyTitle}>In Case of Emergency</Text>
             <Text style={styles.emergencyText}>
@@ -132,7 +133,7 @@ const HelpCenterScreen = ({ navigation }) => {
               <Icon
                 name={expandedIndex === index ? 'expand-less' : 'expand-more'}
                 size={24}
-                color="#14b8a6"
+                color={Colors.secondary.orange}
               />
             </View>
             {expandedIndex === index && (
@@ -149,19 +150,19 @@ const HelpCenterScreen = ({ navigation }) => {
 
           <View style={styles.contactMethods}>
             <View style={styles.contactMethod}>
-              <Icon name="email" size={24} color="#14b8a6" />
+              <Icon name="email" size={24} color={Colors.secondary.orange} />
               <Text style={styles.contactMethodLabel}>Email Support</Text>
               <Text style={styles.contactMethodValue}>support@resqyou.com</Text>
             </View>
 
             <View style={styles.contactMethod}>
-              <Icon name="phone" size={24} color="#14b8a6" />
+              <Icon name="phone" size={24} color={Colors.secondary.orange} />
               <Text style={styles.contactMethodLabel}>Phone Support</Text>
               <Text style={styles.contactMethodValue}>+1 (555) 123-4567</Text>
             </View>
 
             <View style={styles.contactMethod}>
-              <Icon name="chat" size={24} color="#14b8a6" />
+              <Icon name="chat" size={24} color={Colors.secondary.orange} />
               <Text style={styles.contactMethodLabel}>Live Chat</Text>
               <Text style={styles.contactMethodValue}>Available 24/7 in app</Text>
             </View>
@@ -180,7 +181,7 @@ const HelpCenterScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafb', // Mobile gray50 (60% - primary background)
+    backgroundColor: Colors.neutral.gray50,
   },
   header: {
     flexDirection: 'row',
@@ -188,14 +189,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: '#ffffff', // Mobile white (30% - secondary)
+    backgroundColor: Colors.neutral.white,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb', // Mobile gray200
+    borderBottomColor: Colors.border.light,
     ...(Platform.OS === 'web' ? {
       boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
     } : {
       elevation: 2,
-      shadowColor: '#000',
+      shadowColor: Colors.neutral.black,
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.1,
       shadowRadius: 4,
@@ -207,7 +208,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#1f2937', // Mobile gray800 - primary text
+    color: Colors.text.primary,
   },
   placeholder: {
     width: 40,
@@ -217,7 +218,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   welcomeSection: {
-    backgroundColor: '#ffffff', // Mobile white
+    backgroundColor: Colors.neutral.white,
     borderRadius: 12,
     padding: 30,
     alignItems: 'center',
@@ -227,24 +228,24 @@ const styles = StyleSheet.create({
   welcomeTitle: {
     fontSize: 24,
     fontWeight: '600',
-    color: '#1f2937', // Mobile gray800 - primary text
+    color: Colors.text.primary,
     marginTop: 15,
     marginBottom: 10,
   },
   welcomeText: {
     fontSize: 14,
-    color: '#6b7280', // Mobile gray500 - secondary text
+    color: Colors.text.secondary,
     textAlign: 'center',
     lineHeight: 20,
   },
   emergencyCard: {
     flexDirection: 'row',
-    backgroundColor: '#fef2f2', // Mobile red50
+    backgroundColor: Colors.primary.background,
     borderRadius: 12,
     padding: 15,
     marginBottom: 20,
     borderLeftWidth: 4,
-    borderLeftColor: '#ef4444', // Mobile red
+    borderLeftColor: Colors.primary.red,
   },
   emergencyTextContainer: {
     flex: 1,
@@ -253,29 +254,29 @@ const styles = StyleSheet.create({
   emergencyTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#dc2626', // Mobile red700
+    color: Colors.primary.red,
     marginBottom: 5,
   },
   emergencyText: {
     fontSize: 14,
-    color: '#dc2626', // Mobile red700
+    color: Colors.primary.red,
     lineHeight: 20,
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#1f2937', // Mobile gray800 - primary text
+    color: Colors.text.primary,
     marginBottom: 15,
   },
   faqItem: {
-    backgroundColor: '#ffffff', // Mobile white
+    backgroundColor: Colors.neutral.white,
     borderRadius: 12,
     padding: 15,
     marginBottom: 10,
     elevation: 1,
   },
   faqItemHover: {
-    backgroundColor: '#f9fafb', // Mobile gray50
+    backgroundColor: Colors.neutral.gray50,
     transform: [{ scale: 1.01 }],
     elevation: 2,
   },
@@ -288,20 +289,20 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     fontWeight: '500',
-    color: '#1f2937', // Mobile gray800 - primary text
+    color: Colors.text.primary,
     marginRight: 10,
   },
   faqAnswer: {
     fontSize: 14,
-    color: '#4b5563', // Mobile gray600 - tertiary text
+    color: Colors.neutral.gray600,
     lineHeight: 20,
     marginTop: 15,
     paddingTop: 15,
     borderTopWidth: 1,
-    borderTopColor: '#e5e7eb', // Mobile gray200
+    borderTopColor: Colors.border.light,
   },
   contactSection: {
-    backgroundColor: '#ffffff', // Mobile white
+    backgroundColor: Colors.neutral.white,
     borderRadius: 12,
     padding: 20,
     marginTop: 20,
@@ -310,13 +311,13 @@ const styles = StyleSheet.create({
   contactTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#1f2937', // Mobile gray800 - primary text
+    color: Colors.text.primary,
     textAlign: 'center',
     marginBottom: 10,
   },
   contactText: {
     fontSize: 14,
-    color: '#6b7280', // Mobile gray500 - secondary text
+    color: Colors.text.secondary,
     textAlign: 'center',
     marginBottom: 20,
   },
@@ -326,19 +327,19 @@ const styles = StyleSheet.create({
   contactMethod: {
     alignItems: 'center',
     padding: 15,
-    backgroundColor: '#f9fafb', // Mobile gray50
+    backgroundColor: Colors.neutral.gray50,
     borderRadius: 8,
   },
   contactMethodLabel: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#1f2937', // Mobile gray800 - primary text
+    color: Colors.text.primary,
     marginTop: 10,
     marginBottom: 5,
   },
   contactMethodValue: {
     fontSize: 14,
-    color: '#14b8a6', // Mobile primary teal
+    color: Colors.secondary.orange,
     fontWeight: '500',
   },
   footer: {
@@ -347,7 +348,7 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 12,
-    color: '#9ca3af', // Mobile gray400
+    color: Colors.neutral.gray400,
     marginBottom: 5,
   },
 });

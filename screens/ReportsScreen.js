@@ -13,6 +13,7 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import API_BASE from '../config/api';
+import Colors from '../constants/colors';
 
 const ReportsScreen = ({ navigation }) => {
   const [activeTab, setActiveTab] = useState('all'); // all, active, resolved
@@ -106,14 +107,12 @@ const ReportsScreen = ({ navigation }) => {
 
         setIncidents(allIncidents);
 
-        // Calculate stats using filtered active incidents count (same as DashboardScreen)
-        const cancelled = allIncidents.filter(i => i.status === 'cancelled').length;
-
+        // Use stats from backend for accurate counts (including cancelled incidents)
         setStats({
           total: statsData.data?.totalIncidents || 0,
           active: activeIncidents.length, // Use filtered count, not stats endpoint
           resolved: statsData.data?.resolvedIncidents || 0,
-          cancelled
+          cancelled: statsData.data?.cancelledIncidents || 0
         });
       }
     } catch (error) {
@@ -197,10 +196,10 @@ const ReportsScreen = ({ navigation }) => {
 
   const getStatusColor = (status) => {
     switch(status) {
-      case 'active': return '#f59e0b';
-      case 'resolved': return '#10b981';
-      case 'cancelled': return '#6b7280';
-      default: return '#6b7280';
+      case 'active': return Colors.alert.warning;
+      case 'resolved': return Colors.alert.success;
+      case 'cancelled': return Colors.text.secondary;
+      default: return Colors.text.secondary;
     }
   };
 
@@ -257,7 +256,7 @@ const ReportsScreen = ({ navigation }) => {
           <Text style={styles.incidentCardTitle}>{incident.reportedBy}</Text>
         </View>
         <View style={[styles.statusBadge, { backgroundColor: getStatusColor(incident.status) }]}>
-          <Icon name={getStatusIcon(incident.status)} size={12} color="#ffffff" />
+          <Icon name={getStatusIcon(incident.status)} size={12} color={Colors.neutral.white} />
           <Text style={styles.statusBadgeText}>
             {incident.status.toUpperCase()}
           </Text>
@@ -266,19 +265,19 @@ const ReportsScreen = ({ navigation }) => {
 
       <View style={styles.incidentCardBody}>
         <View style={styles.incidentDetailRow}>
-          <Icon name="location-on" size={16} color="#6b7280" />
+          <Icon name="location-on" size={16} color={Colors.text.secondary} />
           <Text style={styles.incidentDetailText} numberOfLines={1}>
             {incident.location}
           </Text>
         </View>
         <View style={styles.incidentDetailRow}>
-          <Icon name="access-time" size={16} color="#6b7280" />
+          <Icon name="access-time" size={16} color={Colors.text.secondary} />
           <Text style={styles.incidentDetailText}>
             {formatDate(incident.timestamp)}
           </Text>
         </View>
         <View style={styles.incidentDetailRow}>
-          <Icon name="my-location" size={16} color="#6b7280" />
+          <Icon name="my-location" size={16} color={Colors.text.secondary} />
           <Text style={styles.incidentDetailText} numberOfLines={1}>
             {incident.coordinates}
           </Text>
@@ -292,7 +291,7 @@ const ReportsScreen = ({ navigation }) => {
           onPress={() => setSelectedIncident(incident)}
         >
           <Text style={styles.viewDetailsText}>View Details</Text>
-          <Icon name="arrow-forward" size={14} color="#14b8a6" />
+          <Icon name="arrow-forward" size={14} color={Colors.secondary.orange} />
         </TouchableOpacity>
       </View>
     </TouchableOpacity>
@@ -313,7 +312,7 @@ const ReportsScreen = ({ navigation }) => {
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Incident Details</Text>
               <TouchableOpacity onPress={() => setSelectedIncident(null)}>
-                <Icon name="close" size={24} color="#1f2937" />
+                <Icon name="close" size={24} color={Colors.text.primary} />
               </TouchableOpacity>
             </View>
 
@@ -331,7 +330,7 @@ const ReportsScreen = ({ navigation }) => {
                 <Text style={styles.modalSectionTitle}>Incident Information</Text>
 
                 <View style={styles.modalInfoRow}>
-                  <Icon name="person" size={20} color="#14b8a6" />
+                  <Icon name="person" size={20} color={Colors.secondary.orange} />
                   <View style={styles.modalInfoContent}>
                     <Text style={styles.modalInfoLabel}>Reported By</Text>
                     <Text style={styles.modalInfoValue}>{selectedIncident.reportedBy}</Text>
@@ -339,7 +338,7 @@ const ReportsScreen = ({ navigation }) => {
                 </View>
 
                 <View style={styles.modalInfoRow}>
-                  <Icon name="account-circle" size={20} color="#14b8a6" />
+                  <Icon name="account-circle" size={20} color={Colors.secondary.orange} />
                   <View style={styles.modalInfoContent}>
                     <Text style={styles.modalInfoLabel}>Username</Text>
                     <Text style={styles.modalInfoValue}>{selectedIncident.username}</Text>
@@ -347,7 +346,7 @@ const ReportsScreen = ({ navigation }) => {
                 </View>
 
                 <View style={styles.modalInfoRow}>
-                  <Icon name="access-time" size={20} color="#14b8a6" />
+                  <Icon name="access-time" size={20} color={Colors.secondary.orange} />
                   <View style={styles.modalInfoContent}>
                     <Text style={styles.modalInfoLabel}>Date & Time</Text>
                     <Text style={styles.modalInfoValue}>{formatDate(selectedIncident.timestamp)}</Text>
@@ -355,7 +354,7 @@ const ReportsScreen = ({ navigation }) => {
                 </View>
 
                 <View style={styles.modalInfoRow}>
-                  <Icon name="schedule" size={20} color="#14b8a6" />
+                  <Icon name="schedule" size={20} color={Colors.secondary.orange} />
                   <View style={styles.modalInfoContent}>
                     <Text style={styles.modalInfoLabel}>Time Elapsed</Text>
                     <Text style={styles.modalInfoValue}>{formatTimeAgo(selectedIncident.timestamp)}</Text>
@@ -368,7 +367,7 @@ const ReportsScreen = ({ navigation }) => {
                 <Text style={styles.modalSectionTitle}>Location Details</Text>
 
                 <View style={styles.modalInfoRow}>
-                  <Icon name="location-on" size={20} color="#ef4444" />
+                  <Icon name="location-on" size={20} color={Colors.primary.red} />
                   <View style={styles.modalInfoContent}>
                     <Text style={styles.modalInfoLabel}>Address</Text>
                     <Text style={styles.modalInfoValue}>{selectedIncident.location}</Text>
@@ -376,7 +375,7 @@ const ReportsScreen = ({ navigation }) => {
                 </View>
 
                 <View style={styles.modalInfoRow}>
-                  <Icon name="my-location" size={20} color="#ef4444" />
+                  <Icon name="my-location" size={20} color={Colors.primary.red} />
                   <View style={styles.modalInfoContent}>
                     <Text style={styles.modalInfoLabel}>Coordinates</Text>
                     <Text style={styles.modalInfoValue}>{selectedIncident.coordinates}</Text>
@@ -385,7 +384,7 @@ const ReportsScreen = ({ navigation }) => {
 
                 {selectedIncident.latitude && selectedIncident.longitude && (
                   <View style={styles.modalInfoRow}>
-                    <Icon name="map" size={20} color="#ef4444" />
+                    <Icon name="map" size={20} color={Colors.primary.red} />
                     <View style={styles.modalInfoContent}>
                       <Text style={styles.modalInfoLabel}>Exact Position</Text>
                       <Text style={styles.modalInfoValue}>
@@ -400,18 +399,18 @@ const ReportsScreen = ({ navigation }) => {
               {/* Action Buttons */}
               <View style={styles.modalActions}>
                 <TouchableOpacity
-                  style={[styles.modalActionButton, { backgroundColor: '#14b8a6' }]}
+                  style={[styles.modalActionButton, { backgroundColor: Colors.secondary.orange }]}
                   onPress={() => {
                     setSelectedIncident(null);
                     navigation.navigate('NavigationScreen', { selectedIncident });
                   }}
                 >
-                  <Icon name="directions" size={20} color="#ffffff" />
+                  <Icon name="directions" size={20} color={Colors.neutral.white} />
                   <Text style={styles.modalActionText}>Navigate</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={[styles.modalActionButton, { backgroundColor: '#3b82f6' }]}
+                  style={[styles.modalActionButton, { backgroundColor: Colors.alert.info }]}
                   onPress={() => {
                     setSelectedIncident(null);
                     navigation.navigate('Messages', {
@@ -421,7 +420,7 @@ const ReportsScreen = ({ navigation }) => {
                     });
                   }}
                 >
-                  <Icon name="message" size={20} color="#ffffff" />
+                  <Icon name="message" size={20} color={Colors.neutral.white} />
                   <Text style={styles.modalActionText}>Message</Text>
                 </TouchableOpacity>
               </View>
@@ -444,7 +443,7 @@ const ReportsScreen = ({ navigation }) => {
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Filter Reports</Text>
             <TouchableOpacity onPress={() => setShowFilterModal(false)}>
-              <Icon name="close" size={24} color="#1f2937" />
+              <Icon name="close" size={24} color={Colors.text.primary} />
             </TouchableOpacity>
           </View>
 
@@ -475,7 +474,7 @@ const ReportsScreen = ({ navigation }) => {
                     {option.label}
                   </Text>
                   {dateFilter === option.value && (
-                    <Icon name="check" size={20} color="#14b8a6" />
+                    <Icon name="check" size={20} color={Colors.secondary.orange} />
                   )}
                 </TouchableOpacity>
               ))}
@@ -494,14 +493,14 @@ const ReportsScreen = ({ navigation }) => {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Icon name="arrow-back" size={24} color="#1f2937" />
+          <Icon name="arrow-back" size={24} color={Colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Reports</Text>
         <TouchableOpacity
           style={styles.refreshButton}
           onPress={fetchReports}
         >
-          <Icon name="refresh" size={24} color="#1f2937" />
+          <Icon name="refresh" size={24} color={Colors.text.primary} />
         </TouchableOpacity>
       </View>
 
@@ -512,42 +511,42 @@ const ReportsScreen = ({ navigation }) => {
             title="Total Incidents"
             value={stats.total}
             icon="assessment"
-            color="#14b8a6"
+            color={Colors.secondary.orange}
           />
           <StatCard
             title="Active Cases"
             value={stats.active}
             icon="pending-actions"
-            color="#f59e0b"
+            color={Colors.alert.warning}
           />
           <StatCard
             title="Resolved Cases"
             value={stats.resolved}
             icon="check-circle"
-            color="#10b981"
+            color={Colors.alert.success}
           />
           <StatCard
             title="Cancelled"
             value={stats.cancelled}
             icon="cancel"
-            color="#6b7280"
+            color={Colors.text.secondary}
           />
         </View>
 
         {/* Search and Filter */}
         <View style={styles.searchFilterContainer}>
           <View style={styles.searchContainer}>
-            <Icon name="search" size={20} color="#6b7280" />
+            <Icon name="search" size={20} color={Colors.text.secondary} />
             <TextInput
               style={styles.searchInput}
               placeholder="Search by name or location..."
-              placeholderTextColor="#9ca3af"
+              placeholderTextcolor={Colors.neutral.gray400}
               value={searchQuery}
               onChangeText={setSearchQuery}
             />
             {searchQuery.length > 0 && (
               <TouchableOpacity onPress={() => setSearchQuery('')}>
-                <Icon name="close" size={20} color="#6b7280" />
+                <Icon name="close" size={20} color={Colors.text.secondary} />
               </TouchableOpacity>
             )}
           </View>
@@ -555,7 +554,7 @@ const ReportsScreen = ({ navigation }) => {
             style={styles.filterButton}
             onPress={() => setShowFilterModal(true)}
           >
-            <Icon name="filter-list" size={20} color="#ffffff" />
+            <Icon name="filter-list" size={20} color={Colors.neutral.white} />
           </TouchableOpacity>
         </View>
 
@@ -566,7 +565,7 @@ const ReportsScreen = ({ navigation }) => {
               Filter: {dateFilter === 'today' ? 'Today' : dateFilter === 'week' ? 'Last 7 Days' : 'Last 30 Days'}
             </Text>
             <TouchableOpacity onPress={() => setDateFilter('all')}>
-              <Icon name="close" size={16} color="#14b8a6" />
+              <Icon name="close" size={16} color={Colors.secondary.orange} />
             </TouchableOpacity>
           </View>
         )}
@@ -581,7 +580,7 @@ const ReportsScreen = ({ navigation }) => {
         {/* Incidents List */}
         {loading ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#14b8a6" />
+            <ActivityIndicator size="large" color={Colors.secondary.orange} />
             <Text style={styles.loadingText}>Loading reports...</Text>
           </View>
         ) : filteredIncidents.length > 0 ? (
@@ -595,7 +594,7 @@ const ReportsScreen = ({ navigation }) => {
           </View>
         ) : (
           <View style={styles.emptyState}>
-            <Icon name="folder-open" size={64} color="#d1d5db" />
+            <Icon name="folder-open" size={64} color={Colors.neutral.gray300} />
             <Text style={styles.emptyStateTitle}>No Incidents Found</Text>
             <Text style={styles.emptyStateText}>
               {searchQuery ? 'Try adjusting your search or filters' : 'No incidents to display'}
@@ -614,7 +613,7 @@ const ReportsScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafb',
+    backgroundColor: Colors.neutral.gray50,
   },
   header: {
     flexDirection: 'row',
@@ -622,9 +621,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: '#ffffff',
+    backgroundColor: Colors.neutral.white,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
+    borderBottomColor: Colors.border.light,
     elevation: 2,
     boxShadow: '0px 2px 4px rgba(0,0,0,0.1)',
   },
@@ -634,7 +633,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#1f2937',
+    color: Colors.text.primary,
     flex: 1,
     textAlign: 'center',
   },
@@ -652,7 +651,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   statCard: {
-    backgroundColor: '#ffffff',
+    backgroundColor: Colors.neutral.white,
     borderRadius: 12,
     padding: 15,
     width: '48%',
@@ -671,7 +670,7 @@ const styles = StyleSheet.create({
   },
   statTitle: {
     fontSize: 12,
-    color: '#6b7280',
+    color: Colors.text.secondary,
     marginBottom: 5,
   },
   statValue: {
@@ -694,7 +693,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#ffffff',
+    backgroundColor: Colors.neutral.white,
     borderRadius: 12,
     paddingHorizontal: 15,
     paddingVertical: 12,
@@ -705,11 +704,11 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 14,
-    color: '#1f2937',
+    color: Colors.text.primary,
     outlineStyle: 'none',
   },
   filterButton: {
-    backgroundColor: '#14b8a6',
+    backgroundColor: Colors.secondary.orange,
     borderRadius: 12,
     width: 48,
     height: 48,
@@ -722,7 +721,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#d1fae5',
+    backgroundColor: Colors.alert.success,
     paddingHorizontal: 15,
     paddingVertical: 8,
     borderRadius: 8,
@@ -730,12 +729,12 @@ const styles = StyleSheet.create({
   },
   activeFilterText: {
     fontSize: 12,
-    color: '#065f46',
+    color: Colors.text.primary,
     fontWeight: '600',
   },
   tabsContainer: {
     flexDirection: 'row',
-    backgroundColor: '#ffffff',
+    backgroundColor: Colors.neutral.white,
     borderRadius: 12,
     padding: 4,
     marginBottom: 20,
@@ -752,18 +751,18 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   activeTab: {
-    backgroundColor: '#14b8a6',
+    backgroundColor: Colors.secondary.orange,
   },
   tabText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#6b7280',
+    color: Colors.text.secondary,
   },
   activeTabText: {
-    color: '#ffffff',
+    color: Colors.neutral.white,
   },
   tabBadge: {
-    backgroundColor: '#e5e7eb',
+    backgroundColor: Colors.border.light,
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 10,
@@ -771,19 +770,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   activeTabBadge: {
-    backgroundColor: '#ffffff',
+    backgroundColor: Colors.neutral.white,
   },
   tabBadgeText: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#6b7280',
+    color: Colors.text.secondary,
   },
   activeTabBadgeText: {
-    color: '#14b8a6',
+    color: Colors.secondary.orange,
   },
   resultsCount: {
     fontSize: 13,
-    color: '#6b7280',
+    color: Colors.text.secondary,
     marginBottom: 15,
     fontWeight: '500',
   },
@@ -791,7 +790,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   incidentCard: {
-    backgroundColor: '#ffffff',
+    backgroundColor: Colors.neutral.white,
     borderRadius: 12,
     padding: 15,
     marginBottom: 12,
@@ -818,7 +817,7 @@ const styles = StyleSheet.create({
   incidentCardTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1f2937',
+    color: Colors.text.primary,
     flex: 1,
   },
   statusBadge: {
@@ -830,7 +829,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   statusBadgeText: {
-    color: '#ffffff',
+    color: Colors.neutral.white,
     fontSize: 10,
     fontWeight: '600',
   },
@@ -845,7 +844,7 @@ const styles = StyleSheet.create({
   },
   incidentDetailText: {
     fontSize: 13,
-    color: '#6b7280',
+    color: Colors.text.secondary,
     flex: 1,
   },
   incidentCardFooter: {
@@ -854,11 +853,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#f3f4f6',
+    borderTopColor: Colors.neutral.gray100,
   },
   timeAgoText: {
     fontSize: 12,
-    color: '#9ca3af',
+    color: Colors.neutral.gray400,
     fontStyle: 'italic',
   },
   viewDetailsButton: {
@@ -868,7 +867,7 @@ const styles = StyleSheet.create({
   },
   viewDetailsText: {
     fontSize: 13,
-    color: '#14b8a6',
+    color: Colors.secondary.orange,
     fontWeight: '600',
   },
   loadingContainer: {
@@ -878,7 +877,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 14,
-    color: '#6b7280',
+    color: Colors.text.secondary,
     marginTop: 12,
   },
   emptyState: {
@@ -889,12 +888,12 @@ const styles = StyleSheet.create({
   emptyStateTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1f2937',
+    color: Colors.text.primary,
     marginTop: 16,
   },
   emptyStateText: {
     fontSize: 14,
-    color: '#6b7280',
+    color: Colors.text.secondary,
     marginTop: 8,
     textAlign: 'center',
   },
@@ -907,7 +906,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   modalContent: {
-    backgroundColor: '#ffffff',
+    backgroundColor: Colors.neutral.white,
     borderRadius: 16,
     width: '100%',
     maxWidth: 500,
@@ -922,12 +921,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
+    borderBottomColor: Colors.border.light,
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1f2937',
+    color: Colors.text.primary,
   },
   modalBody: {
     padding: 20,
@@ -952,7 +951,7 @@ const styles = StyleSheet.create({
   modalSectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1f2937',
+    color: Colors.text.primary,
     marginBottom: 16,
   },
   modalInfoRow: {
@@ -966,12 +965,12 @@ const styles = StyleSheet.create({
   },
   modalInfoLabel: {
     fontSize: 12,
-    color: '#6b7280',
+    color: Colors.text.secondary,
     marginBottom: 4,
   },
   modalInfoValue: {
     fontSize: 14,
-    color: '#1f2937',
+    color: Colors.text.primary,
     fontWeight: '500',
   },
   modalActions: {
@@ -989,13 +988,13 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   modalActionText: {
-    color: '#ffffff',
+    color: Colors.neutral.white,
     fontSize: 14,
     fontWeight: '600',
   },
   // Filter Modal Styles
   filterModalContent: {
-    backgroundColor: '#ffffff',
+    backgroundColor: Colors.neutral.white,
     borderRadius: 16,
     width: '100%',
     maxWidth: 400,
@@ -1008,7 +1007,7 @@ const styles = StyleSheet.create({
   filterSectionTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#1f2937',
+    color: Colors.text.primary,
     marginBottom: 12,
   },
   filterOptions: {
@@ -1021,18 +1020,18 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 8,
-    backgroundColor: '#f9fafb',
+    backgroundColor: Colors.neutral.gray50,
   },
   filterOptionActive: {
-    backgroundColor: '#d1fae5',
+    backgroundColor: Colors.alert.success,
   },
   filterOptionText: {
     fontSize: 14,
-    color: '#6b7280',
+    color: Colors.text.secondary,
     fontWeight: '500',
   },
   filterOptionTextActive: {
-    color: '#065f46',
+    color: Colors.text.primary,
     fontWeight: '600',
   },
 });

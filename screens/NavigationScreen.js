@@ -18,6 +18,7 @@ import API_BASE from '../config/api';
 import socketService from '../utils/socketService';
 import { nodeCoordinates } from '../config/nodeCoordinates';
 import { nodeConnections } from '../config/nodeConnections';
+import Colors from '../constants/colors';
 
 // Initial map region configuration
 const initialRegion = {
@@ -652,8 +653,8 @@ const NavigationScreen = ({ navigation, route }) => {
       for (const [nodeName, coords] of Object.entries(nodeCoordinates)) {
         L.circleMarker(coords, {
           radius: 5,
-          color: '#3388ff',
-          fillColor: '#3388ff',
+          color: '${Colors.alert.info}',
+          fillColor: '${Colors.alert.info}',
           fillOpacity: 0.3,
           opacity: 0.3,
           weight: 1
@@ -847,7 +848,7 @@ const NavigationScreen = ({ navigation, route }) => {
         window.currentRoutePolylines = [];
         window.currentRouteLabels = [];
 
-        const colors = ['#3b82f6', '#22c55e', '#f59e0b'];
+        const colors = ['#3b82f6', '#10b981', '#fbbf24'];
         const labels = ['Shortest Path', 'Alternative Path 1', 'Alternative Path 2'];
         const opacities = [0.9, 0.7, 0.6];
         const weights = [5, 4, 4];
@@ -1138,7 +1139,7 @@ const NavigationScreen = ({ navigation, route }) => {
             window.currentRoutePolylines = [];
             window.currentRouteLabels = [];
 
-            const colors = ['#3b82f6', '#22c55e', '#f59e0b'];
+            const colors = ['#3b82f6', '#10b981', '#fbbf24'];
             const labels = ['Shortest Path', 'Alternative Path 1', 'Alternative Path 2'];
             const opacities = [0.9, 0.7, 0.6];
             const weights = [5, 4, 4];
@@ -1275,7 +1276,7 @@ const NavigationScreen = ({ navigation, route }) => {
           const incidentMarker = L.marker([incidentLat, incidentLng], {
             icon: L.divIcon({
               className: 'incident-destination-marker',
-              html: "<div style='background-color:#FF3B30;width:30px;height:30px;border-radius:50% 50% 50% 0;border:3px solid white;box-shadow:0 4px 10px rgba(255,59,48,0.6);transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;'><span style='transform:rotate(45deg);color:white;font-size:18px;font-weight:bold;'>🚨</span></div>",
+              html: "<div style='background-color:${Colors.primary.red};width:30px;height:30px;border-radius:50% 50% 50% 0;border:3px solid white;box-shadow:0 4px 10px rgba(220,38,38,0.6);transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;'><span style='transform:rotate(45deg);color:white;font-size:18px;font-weight:bold;'>🚨</span></div>",
               iconSize: [30, 30],
               iconAnchor: [15, 30]
             })
@@ -1283,8 +1284,8 @@ const NavigationScreen = ({ navigation, route }) => {
 
           const incidentCircle = L.circleMarker([incidentLat, incidentLng], {
             radius: 8,
-            color: '#FF3B30',
-            fillColor: '#FF3B30',
+            color: '${Colors.primary.red}',
+            fillColor: '${Colors.primary.red}',
             fillOpacity: 0.8,
             weight: 3
           }).addTo(map).bindTooltip('🚨 Emergency Location', { permanent: false, direction: 'top' });
@@ -1361,13 +1362,13 @@ const NavigationScreen = ({ navigation, route }) => {
 
   const renderIncidentList = () => {
     if (loading) {
-      return <ActivityIndicator size="large" color="#14b8a6" />;
+      return <ActivityIndicator size="large" color={Colors.secondary.orange} />;
     }
 
     if (incidents.length === 0) {
       return (
         <View style={styles.emptyState}>
-          <MaterialIcon name="check-circle" size={60} color="#10b981" />
+          <MaterialIcon name="check-circle" size={60} color={Colors.alert.success} />
           <Text style={styles.emptyStateTitle}>No Active Emergencies</Text>
           <Text style={styles.subText}>All clear! No emergency alerts at this time.</Text>
         </View>
@@ -1391,7 +1392,7 @@ const NavigationScreen = ({ navigation, route }) => {
         >
           <View style={styles.incidentHeader}>
             <View style={styles.incidentIcon}>
-              <Icon name="add-alert" size={24} color="#ef4444" />
+              <Icon name="add-alert" size={24} color={Colors.primary.red} />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.listItemText}>{fullname}</Text>
@@ -1405,7 +1406,7 @@ const NavigationScreen = ({ navigation, route }) => {
           <View style={styles.incidentDetail}>
             <View style={styles.iconContainer}>
               <View style={styles.detailIcon}>
-                <MaterialIcon name="person-pin" size={20} color="#4b5563" />
+                <MaterialIcon name="person-pin" size={20} color={Colors.neutral.gray600} />
               </View>
             </View>
             <Text style={styles.detailText}>@{incident.username || 'unknown'}</Text>
@@ -1414,7 +1415,7 @@ const NavigationScreen = ({ navigation, route }) => {
           <View style={styles.incidentDetail}>
             <View style={styles.iconContainer}>
               <View style={styles.detailIcon}>
-                <MaterialIcon name="phone" size={20} color="#22c55e" />
+                <MaterialIcon name="phone" size={20} color={Colors.alert.success} />
               </View>
             </View>
             <Text style={styles.detailText}>
@@ -1425,7 +1426,7 @@ const NavigationScreen = ({ navigation, route }) => {
           <View style={styles.incidentDetail}>
             <View style={styles.iconContainer}>
               <View style={styles.detailIcon}>
-                <MaterialIcon name="location-on" size={20} color="#ef4444" />
+                <MaterialIcon name="location-on" size={20} color={Colors.primary.red} />
               </View>
             </View>
             <Text style={styles.detailText} numberOfLines={2}>{address}</Text>
@@ -1434,7 +1435,7 @@ const NavigationScreen = ({ navigation, route }) => {
           <View style={styles.incidentDetail}>
             <View style={styles.iconContainer}>
               <View style={styles.detailIcon}>
-                <MaterialIcon name="my-location" size={20} color="#14b8a6" />
+                <MaterialIcon name="my-location" size={20} color={Colors.secondary.orange} />
               </View>
             </View>
             <Text style={styles.detailText}>
@@ -1445,7 +1446,7 @@ const NavigationScreen = ({ navigation, route }) => {
           <View style={styles.incidentDetail}>
             <View style={styles.iconContainer}>
               <View style={styles.detailIcon}>
-                <MaterialIcon name="place" size={20} color="#f59e0b" />
+                <MaterialIcon name="place" size={20} color={Colors.alert.warning} />
               </View>
             </View>
             <Text style={styles.detailText}>
@@ -1468,7 +1469,7 @@ const NavigationScreen = ({ navigation, route }) => {
                 showToast(`Navigating to ${fullname}'s location`, 'success');
               }}
             >
-              <MaterialIcon name="directions" size={16} color="#3b82f6" />
+              <MaterialIcon name="directions" size={16} color={Colors.alert.info} />
               <Text style={[styles.miniActionText, styles.navigateActionText]}>Navigate</Text>
             </TouchableOpacity>
 
@@ -1484,7 +1485,7 @@ const NavigationScreen = ({ navigation, route }) => {
                 }
               }}
             >
-              <MaterialIcon name="message" size={16} color="#8b5cf6" />
+              <MaterialIcon name="message" size={16} color={Colors.secondary.orange} />
               <Text style={[styles.miniActionText, styles.messageActionText]}>Message</Text>
             </TouchableOpacity>
 
@@ -1495,7 +1496,7 @@ const NavigationScreen = ({ navigation, route }) => {
                 showToast(`Calling ${fullname}: ${phoneNumber}`, 'success');
               }}
             >
-              <MaterialIcon name="phone" size={16} color="#22c55e" />
+              <MaterialIcon name="phone" size={16} color={Colors.alert.success} />
               <Text style={[styles.miniActionText, styles.callActionText]}>Call</Text>
             </TouchableOpacity>
 
@@ -1509,9 +1510,9 @@ const NavigationScreen = ({ navigation, route }) => {
               disabled={resolvingId === incident._id}
             >
               {resolvingId === incident._id ? (
-                <ActivityIndicator size="small" color="#10b981" />
+                <ActivityIndicator size="small" color={Colors.alert.success} />
               ) : (
-                <MaterialIcon name="check-circle" size={16} color="#10b981" />
+                <MaterialIcon name="check-circle" size={16} color={Colors.alert.success} />
               )}
               <Text style={[styles.miniActionText, styles.resolveActionText]}>
                 {resolvingId === incident._id ? 'Resolving...' : 'Resolve'}
@@ -1533,7 +1534,7 @@ const NavigationScreen = ({ navigation, route }) => {
           <MaterialIcon
             name={toast.type === 'success' ? 'check-circle' : 'error'}
             size={20}
-            color="#ffffff"
+            color={Colors.neutral.white}
           />
           <Text style={styles.toastText}>{toast.message}</Text>
         </View>
@@ -1546,10 +1547,10 @@ const NavigationScreen = ({ navigation, route }) => {
             onPress={handleBackPress}
             activeOpacity={0.7}
           >
-            <ArrowBackIcon style={{ fontSize: 28, color: '#14b8a6' }} />
+            <ArrowBackIcon style={{ fontSize: 28, color: Colors.secondary.orange }} />
           </TouchableOpacity>
           <View style={styles.titleIconContainer}>
-            <NavigationOutlinedIcon style={{ fontSize: 40, color: '#14b8a6' }} />
+            <NavigationOutlinedIcon style={{ fontSize: 40, color: Colors.secondary.orange }} />
           </View>
           <Text style={styles.title}>Navigation</Text>
         </View>
@@ -1561,7 +1562,7 @@ const NavigationScreen = ({ navigation, route }) => {
           <TextInput
             style={styles.searchInput}
             placeholder="Search location"
-            placeholderTextColor="#6b7280"
+            placeholderTextColor={Colors.text.secondary}
           />
           <TouchableOpacity style={styles.filterButton}>
             <Text style={styles.filterButtonText}>Filter</Text>
@@ -1570,7 +1571,7 @@ const NavigationScreen = ({ navigation, route }) => {
 
         <View style={styles.incidentsHeaderContainer}>
           <View style={styles.incidentsHeaderIcon}>
-            <Icon name="add-alert" size={30} color="#ef4444" />
+            <Icon name="add-alert" size={30} color={Colors.primary.red} />
           </View>
           <Text style={styles.incidentsHeaderText}>Active Incidents</Text>
         </View>
@@ -1599,7 +1600,7 @@ const NavigationScreen = ({ navigation, route }) => {
               renderLoading={() => (
                 <ActivityIndicator
                   size="large"
-                  color="#14b8a6"
+                  color={Colors.secondary.orange}
                   style={styles.mapLoading}
                 />
               )}
@@ -1626,14 +1627,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'row',
-    backgroundColor: '#f9fafb',
+    backgroundColor: Colors.neutral.gray50,
   },
   leftContainer: {
     flex: 1,
     padding: 15,
     borderRightWidth: 1,
-    borderRightColor: '#e5e7eb',
-    backgroundColor: '#ffffff',
+    borderRightColor: Colors.border.light,
+    backgroundColor: Colors.neutral.white,
   },
   titleContainer: {
     flexDirection: 'row',
@@ -1644,7 +1645,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#f0fdfa',
+    backgroundColor: Colors.secondary.background,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -1653,7 +1654,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#f0fdfa',
+    backgroundColor: Colors.secondary.background,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 10,
@@ -1661,44 +1662,44 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: '600',
-    color: '#1f2937',
+    color: Colors.text.primary,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
-    backgroundColor: '#f3f4f6',
+    backgroundColor: Colors.neutral.gray100,
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
+    borderColor: Colors.border.light,
   },
   searchIconContainer: {
     marginRight: 8,
   },
   searchIcon: {
     fontSize: 16,
-    color: '#6b7280',
+    color: Colors.text.secondary,
   },
   searchInput: {
     flex: 1,
     paddingVertical: 8,
     fontSize: 14,
-    color: '#1f2937',
+    color: Colors.text.primary,
     outlineStyle: 'none',
   },
   filterButton: {
     marginLeft: 10,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    backgroundColor: '#14b8a6',
+    backgroundColor: Colors.secondary.orange,
     borderRadius: 6,
     justifyContent: 'center',
     alignItems: 'center',
   },
   filterButtonText: {
-    color: '#fff',
+    color: Colors.neutral.white,
     fontSize: 12,
     fontWeight: '600',
   },
@@ -1712,7 +1713,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: '#fef2f2',
+    backgroundColor: Colors.primary.background,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 8,
@@ -1720,22 +1721,22 @@ const styles = StyleSheet.create({
   incidentsHeaderText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1f2937',
+    color: Colors.text.primary,
   },
   listContainer: {
     flex: 1,
   },
   listItem: {
     padding: 14,
-    backgroundColor: '#ffffff',
+    backgroundColor: Colors.neutral.white,
     borderRadius: 12,
     marginBottom: 12,
     borderLeftWidth: 4,
-    borderLeftColor: '#ef4444',
+    borderLeftColor: Colors.primary.red,
     ...(Platform.OS === 'web' ? {
       boxShadow: '0 2px 4px rgba(0, 0, 0, 0.08)',
     } : {
-      shadowColor: '#000',
+      shadowColor: Colors.neutral.black,
       shadowOpacity: 0.08,
       shadowOffset: { width: 0, height: 2 },
       shadowRadius: 4,
@@ -1751,7 +1752,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#fef2f2',
+    backgroundColor: Colors.primary.background,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 10,
@@ -1759,21 +1760,21 @@ const styles = StyleSheet.create({
   listItemText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1f2937',
+    color: Colors.text.primary,
   },
   incidentTime: {
     fontSize: 12,
-    color: '#6b7280',
+    color: Colors.text.secondary,
     marginTop: 2,
   },
   statusBadge: {
-    backgroundColor: '#ef4444',
+    backgroundColor: Colors.primary.red,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
   },
   statusText: {
-    color: '#ffffff',
+    color: Colors.neutral.white,
     fontSize: 10,
     fontWeight: '600',
   },
@@ -1785,7 +1786,7 @@ const styles = StyleSheet.create({
   emptyStateTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1f2937',
+    color: Colors.text.primary,
     marginTop: 16,
     marginBottom: 8,
   },
@@ -1803,13 +1804,13 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: '#f3f4f6',
+    backgroundColor: Colors.neutral.gray100,
     justifyContent: 'center',
     alignItems: 'center',
   },
   detailText: {
     fontSize: 14,
-    color: '#4b5563',
+    color: Colors.text.secondary,
     flex: 1,
     paddingLeft: 4,
   },
@@ -1823,39 +1824,39 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 12,
     paddingVertical: 6,
-    backgroundColor: '#f3f4f6',
+    backgroundColor: Colors.neutral.gray100,
     borderRadius: 6,
     marginLeft: 8,
   },
   miniActionText: {
     fontSize: 12,
-    color: '#14b8a6',
+    color: Colors.secondary.orange,
     fontWeight: '600',
     marginLeft: 4,
   },
   navigateAction: {
-    backgroundColor: '#dbeafe',
+    backgroundColor: Colors.alert.info + '20',
   },
   navigateActionText: {
-    color: '#3b82f6',
+    color: Colors.alert.info,
   },
   messageAction: {
-    backgroundColor: '#f3e8ff',
+    backgroundColor: Colors.secondary.orange + '20',
   },
   messageActionText: {
-    color: '#8b5cf6',
+    color: Colors.secondary.orange,
   },
   callAction: {
-    backgroundColor: '#dcfce7',
+    backgroundColor: Colors.alert.success + '20',
   },
   callActionText: {
-    color: '#22c55e',
+    color: Colors.alert.success,
   },
   resolveAction: {
-    backgroundColor: '#d1fae5',
+    backgroundColor: Colors.alert.success + '20',
   },
   resolveActionText: {
-    color: '#10b981',
+    color: Colors.alert.success,
   },
   rightContainer: {
     flex: 2,
@@ -1866,11 +1867,11 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     overflow: 'hidden',
     marginBottom: 15,
-    backgroundColor: '#e5e7eb',
+    backgroundColor: Colors.border.light,
     ...(Platform.OS === 'web' ? {
       boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
     } : {
-      shadowColor: '#000',
+      shadowColor: Colors.neutral.black,
       shadowOpacity: 0.1,
       shadowOffset: { width: 0, height: 2 },
       shadowRadius: 6,
@@ -1888,7 +1889,7 @@ const styles = StyleSheet.create({
   },
   subText: {
     fontSize: 14,
-    color: '#6b7280',
+    color: Colors.text.secondary,
   },
   toast: {
     position: 'absolute',
@@ -1906,7 +1907,7 @@ const styles = StyleSheet.create({
     ...(Platform.OS === 'web' ? {
       boxShadow: '0 4px 8px rgba(0, 0, 0, 0.15)',
     } : {
-      shadowColor: '#000',
+      shadowColor: Colors.neutral.black,
       shadowOpacity: 0.15,
       shadowOffset: { width: 0, height: 4 },
       shadowRadius: 8,
@@ -1914,13 +1915,13 @@ const styles = StyleSheet.create({
     }),
   },
   toastSuccess: {
-    backgroundColor: '#10b981',
+    backgroundColor: Colors.alert.success,
   },
   toastError: {
-    backgroundColor: '#ef4444',
+    backgroundColor: Colors.primary.red,
   },
   toastText: {
-    color: '#ffffff',
+    color: Colors.neutral.white,
     fontSize: 14,
     fontWeight: '600',
     marginLeft: 8,

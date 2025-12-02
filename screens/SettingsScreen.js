@@ -4,6 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import API_BASE from '../config/api';
+import Colors from '../constants/colors';
 
 const SettingsScreen = ({ navigation }) => {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
@@ -72,7 +73,7 @@ const SettingsScreen = ({ navigation }) => {
     >
       <View style={styles.settingsItemLeft}>
         <View style={styles.iconContainer}>
-          <Icon name={icon} size={24} color="#14b8a6" />
+          <Icon name={icon} size={24} color={Colors.secondary.orange} />
         </View>
         <View style={styles.textContainer}>
           <Text style={styles.settingsTitle}>{title}</Text>
@@ -80,7 +81,7 @@ const SettingsScreen = ({ navigation }) => {
         </View>
       </View>
       <View style={styles.rightContainer}>
-        {rightComponent || <Icon name="chevron-right" size={24} color="#666" />}
+        {rightComponent || <Icon name="chevron-right" size={24} color={Colors.neutral.gray600} />}
       </View>
     </TouchableOpacity>
   );
@@ -305,7 +306,7 @@ const SettingsScreen = ({ navigation }) => {
           <Icon
             name={toast.type === 'success' ? 'check-circle' : 'error'}
             size={20}
-            color="#ffffff"
+            color={Colors.neutral.white}
           />
           <Text style={styles.toastText}>{toast.message}</Text>
         </View>
@@ -317,7 +318,7 @@ const SettingsScreen = ({ navigation }) => {
           style={styles.backButton} 
           onPress={() => navigation.goBack()}
         >
-          <Icon name="arrow-back" size={24} color="#333" />
+          <Icon name="arrow-back" size={24} color={Colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Settings</Text>
         <View style={styles.placeholder} />
@@ -351,8 +352,8 @@ const SettingsScreen = ({ navigation }) => {
               <Switch
                 value={notificationsEnabled}
                 onValueChange={setNotificationsEnabled}
-                trackColor={{ false: '#E0E0E0', true: '#14b8a6' }}
-                thumbColor={notificationsEnabled ? '#FFFFFF' : '#FFFFFF'}
+                trackColor={{ false: Colors.neutral.gray300, true: Colors.secondary.orange }}
+                thumbColor={notificationsEnabled ? Colors.neutral.white : Colors.neutral.white}
               />
             }
           />
@@ -364,8 +365,8 @@ const SettingsScreen = ({ navigation }) => {
               <Switch
                 value={emergencyAlerts}
                 onValueChange={setEmergencyAlerts}
-                trackColor={{ false: '#E0E0E0', true: '#FF6B6B' }}
-                thumbColor={emergencyAlerts ? '#FFFFFF' : '#FFFFFF'}
+                trackColor={{ false: Colors.neutral.gray300, true: Colors.primary.red }}
+                thumbColor={emergencyAlerts ? Colors.neutral.white : Colors.neutral.white}
               />
             }
             showBorder={false}
@@ -382,8 +383,8 @@ const SettingsScreen = ({ navigation }) => {
               <Switch
                 value={locationServices}
                 onValueChange={setLocationServices}
-                trackColor={{ false: '#E0E0E0', true: '#14b8a6' }}
-                thumbColor={locationServices ? '#FFFFFF' : '#FFFFFF'}
+                trackColor={{ false: Colors.neutral.gray300, true: Colors.secondary.orange }}
+                thumbColor={locationServices ? Colors.neutral.white : Colors.neutral.white}
               />
             }
           />
@@ -412,8 +413,8 @@ const SettingsScreen = ({ navigation }) => {
               <Switch
                 value={darkMode}
                 onValueChange={setDarkMode}
-                trackColor={{ false: '#E0E0E0', true: '#14b8a6' }}
-                thumbColor={darkMode ? '#FFFFFF' : '#FFFFFF'}
+                trackColor={{ false: Colors.neutral.gray300, true: Colors.secondary.orange }}
+                thumbColor={darkMode ? Colors.neutral.white : Colors.neutral.white}
               />
             }
           />
@@ -431,8 +432,8 @@ const SettingsScreen = ({ navigation }) => {
               <Switch
                 value={autoBackup}
                 onValueChange={setAutoBackup}
-                trackColor={{ false: '#E0E0E0', true: '#14b8a6' }}
-                thumbColor={autoBackup ? '#FFFFFF' : '#FFFFFF'}
+                trackColor={{ false: Colors.neutral.gray300, true: Colors.secondary.orange }}
+                thumbColor={autoBackup ? Colors.neutral.white : Colors.neutral.white}
               />
             }
             showBorder={false}
@@ -522,7 +523,7 @@ const SettingsScreen = ({ navigation }) => {
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Edit Profile</Text>
               <TouchableOpacity onPress={() => setShowEditModal(false)}>
-                <Icon name="close" size={24} color="#333" />
+                <Icon name="close" size={24} color={Colors.text.primary} />
               </TouchableOpacity>
             </View>
 
@@ -576,7 +577,7 @@ const SettingsScreen = ({ navigation }) => {
                 disabled={isLoading}
               >
                 {isLoading ? (
-                  <ActivityIndicator color="#fff" />
+                  <ActivityIndicator color={Colors.neutral.white} />
                 ) : (
                   <Text style={styles.saveButtonText}>Save Changes</Text>
                 )}
@@ -598,7 +599,7 @@ const SettingsScreen = ({ navigation }) => {
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Change Password</Text>
               <TouchableOpacity onPress={() => setShowChangePasswordModal(false)}>
-                <Icon name="close" size={24} color="#333" />
+                <Icon name="close" size={24} color={Colors.text.primary} />
               </TouchableOpacity>
             </View>
 
@@ -645,7 +646,7 @@ const SettingsScreen = ({ navigation }) => {
                 disabled={isLoading}
               >
                 {isLoading ? (
-                  <ActivityIndicator color="#fff" />
+                  <ActivityIndicator color={Colors.neutral.white} />
                 ) : (
                   <Text style={styles.saveButtonText}>Change Password</Text>
                 )}
@@ -658,7 +659,7 @@ const SettingsScreen = ({ navigation }) => {
       {/* Loading Overlay */}
       {isLoading && !showEditModal && !showChangePasswordModal && (
         <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large" color="#4ECDC4" />
+          <ActivityIndicator size="large" color={Colors.secondary.orange} />
           <Text style={styles.loadingText}>Please wait...</Text>
         </View>
       )}
@@ -669,7 +670,7 @@ const SettingsScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: Colors.neutral.gray50,
   },
   header: {
     flexDirection: 'row',
@@ -677,14 +678,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.neutral.white,
     borderBottomWidth: 1,
-    borderBottomColor: '#E1E8ED',
+    borderBottomColor: Colors.border.light,
     ...(Platform.OS === 'web' ? {
       boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
     } : {
       elevation: 2,
-      shadowColor: '#000',
+      shadowColor: Colors.neutral.black,
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.1,
       shadowRadius: 4,
@@ -696,7 +697,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#333',
+    color: Colors.text.primary,
   },
   placeholder: {
     width: 40,
@@ -711,18 +712,18 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: Colors.text.primary,
     marginBottom: 10,
     marginLeft: 5,
   },
   sectionContainer: {
-    backgroundColor: 'white',
+    backgroundColor: Colors.neutral.white,
     borderRadius: 12,
     ...(Platform.OS === 'web' ? {
       boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
     } : {
       elevation: 2,
-      shadowColor: '#000',
+      shadowColor: Colors.neutral.black,
       shadowOffset: { width: 0, height: 1 },
       shadowOpacity: 0.1,
       shadowRadius: 2,
@@ -735,7 +736,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
+    borderBottomColor: Colors.neutral.gray100,
   },
   noBorder: {
     borderBottomWidth: 0,
@@ -749,7 +750,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#f0fdfa', // Mobile teal background light
+    backgroundColor: Colors.secondary.background,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 15,
@@ -760,12 +761,12 @@ const styles = StyleSheet.create({
   settingsTitle: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#333',
+    color: Colors.text.primary,
     marginBottom: 2,
   },
   settingsSubtitle: {
     fontSize: 14,
-    color: '#666',
+    color: Colors.text.secondary,
   },
   rightContainer: {
     alignItems: 'center',
@@ -778,7 +779,7 @@ const styles = StyleSheet.create({
   },
   appInfoText: {
     fontSize: 12,
-    color: '#666',
+    color: Colors.text.secondary,
     marginBottom: 5,
   },
   modalOverlay: {
@@ -790,14 +791,14 @@ const styles = StyleSheet.create({
   modalContainer: {
     width: '90%',
     maxWidth: 500,
-    backgroundColor: 'white',
+    backgroundColor: Colors.neutral.white,
     borderRadius: 20,
     maxHeight: '80%',
     ...(Platform.OS === 'web' ? {
       boxShadow: '0 2px 4px rgba(0, 0, 0, 0.25)',
     } : {
       elevation: 5,
-      shadowColor: '#000',
+      shadowColor: Colors.neutral.black,
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.25,
       shadowRadius: 4,
@@ -809,12 +810,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#E1E8ED',
+    borderBottomColor: Colors.border.light,
   },
   modalTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#333',
+    color: Colors.text.primary,
   },
   modalContent: {
     padding: 20,
@@ -825,21 +826,21 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#333',
+    color: Colors.text.primary,
     marginBottom: 8,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#E1E8ED',
+    borderColor: Colors.border.light,
     borderRadius: 10,
     paddingHorizontal: 15,
     paddingVertical: 12,
     fontSize: 16,
-    color: '#333',
-    backgroundColor: '#F8F9FA',
+    color: Colors.text.primary,
+    backgroundColor: Colors.neutral.gray50,
   },
   saveButton: {
-    backgroundColor: '#14b8a6', // Mobile primary teal
+    backgroundColor: Colors.secondary.orange,
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: 'center',
@@ -847,7 +848,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   saveButtonText: {
-    color: 'white',
+    color: Colors.neutral.white,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -863,7 +864,7 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   loadingText: {
-    color: 'white',
+    color: Colors.neutral.white,
     fontSize: 16,
     marginTop: 10,
   },
@@ -882,7 +883,7 @@ const styles = StyleSheet.create({
     ...(Platform.OS === 'web' ? {
       boxShadow: '0 4px 8px rgba(0, 0, 0, 0.15)',
     } : {
-      shadowColor: '#000',
+      shadowColor: Colors.neutral.black,
       shadowOpacity: 0.15,
       shadowOffset: { width: 0, height: 4 },
       shadowRadius: 8,
@@ -891,13 +892,13 @@ const styles = StyleSheet.create({
     zIndex: 9999,
   },
   toastSuccess: {
-    backgroundColor: '#10b981', // Mobile green
+    backgroundColor: Colors.alert.success,
   },
   toastError: {
-    backgroundColor: '#ef4444', // Mobile red
+    backgroundColor: Colors.primary.red,
   },
   toastText: {
-    color: '#ffffff',
+    color: Colors.neutral.white,
     fontSize: 14,
     fontWeight: '600',
     marginLeft: 8,

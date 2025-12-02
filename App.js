@@ -6,6 +6,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Platform, ActivityIndicator }
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import API_BASE from './config/api';
+import Colors from './constants/colors';
 
 // Import your screens
 import DashboardScreen from './screens/DashboardScreen';
@@ -38,7 +39,7 @@ const CustomDrawerContent = ({ navigation, state }) => {
       {/* Header */}
       <View style={styles.drawerHeader}>
         <View style={styles.logoContainer}>
-          <Icon name="security" size={40} color="#4ECDC4" />
+          <Icon name="security" size={40} color={Colors.secondary.orange} />
         </View>
         <Text style={styles.appTitle}>VAWC Prevention</Text>
         <Text style={styles.appSubtitle}>Violence Against Women & Children</Text>
@@ -56,10 +57,10 @@ const CustomDrawerContent = ({ navigation, state }) => {
               onPress={() => navigation.navigate(item.route)}
             >
               <View style={[styles.menuIconContainer, isActive && styles.activeMenuIconContainer]}>
-                <Icon 
-                  name={item.icon} 
-                  size={22} 
-                  color={isActive ? '#4ECDC4' : '#666'} 
+                <Icon
+                  name={item.icon}
+                  size={22}
+                  color={isActive ? Colors.secondary.orange : Colors.neutral.gray600}
                 />
               </View>
               <Text style={[styles.menuText, isActive && styles.activeMenuText]}>
@@ -246,9 +247,9 @@ const RootNavigator = () => {
   // Show loading screen while checking initial auth
   if (isAuthenticated === null) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f9fafb' }}>
-        <ActivityIndicator size="large" color="#14b8a6" />
-        <Text style={{ marginTop: 10, color: '#6b7280' }}>Loading...</Text>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.neutral.gray50 }}>
+        <ActivityIndicator size="large" color={Colors.secondary.orange} />
+        <Text style={{ marginTop: 10, color: Colors.text.secondary }}>Loading...</Text>
       </View>
     );
   }
@@ -515,10 +516,10 @@ const App = () => {
 const styles = StyleSheet.create({
   drawerContainer: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.neutral.white,
   },
   drawerHeader: {
-    backgroundColor: '#4ECDC4',
+    backgroundColor: Colors.secondary.orange,
     paddingTop: 50,
     paddingBottom: 20,
     paddingHorizontal: 20,
@@ -558,9 +559,9 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   activeMenuItem: {
-    backgroundColor: '#4ECDC420',
+    backgroundColor: Colors.secondary.background,
     borderRightWidth: 3,
-    borderRightColor: '#4ECDC4',
+    borderRightColor: Colors.secondary.orange,
   },
   menuIconContainer: {
     width: 35,
@@ -571,12 +572,12 @@ const styles = StyleSheet.create({
   },
   menuText: {
     fontSize: 16,
-    color: '#666',
+    color: Colors.neutral.gray600,
     fontWeight: '500',
     marginLeft: 10,
   },
   activeMenuText: {
-    color: '#4ECDC4',
+    color: Colors.secondary.orange,
     fontWeight: '600',
   },
   drawerFooter: {
@@ -590,15 +591,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FF4757',
+    backgroundColor: Colors.primary.red,
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 25,
     ...(Platform.OS === 'web' ? {
-      boxShadow: '0 2px 4px rgba(255, 71, 87, 0.3)',
+      boxShadow: `0 2px 4px ${Colors.primary.red}50`,
     } : {
       elevation: 3,
-      shadowColor: '#FF4757',
+      shadowColor: Colors.primary.red,
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.3,
       shadowRadius: 4,
@@ -612,7 +613,7 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 12,
-    color: '#999',
+    color: Colors.neutral.gray400,
     textAlign: 'center',
   },
 });

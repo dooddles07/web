@@ -4,6 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import API_BASE from '../config/api';
 import socketService from '../utils/socketService';
+import Colors from '../constants/colors';
 
 const DashboardScreen = ({ navigation }) => {
   const [stats, setStats] = useState({
@@ -453,7 +454,7 @@ const DashboardScreen = ({ navigation }) => {
           <Icon
             name={incident.status === 'critical' ? 'priority-high' : 'warning'}
             size={20}
-            color={incident.status === 'critical' ? '#ef4444' : '#f59e0b'}
+            color={incident.status === 'critical' ? Colors.primary.red : Colors.alert.warning}
           />
           <Text style={styles.incidentType}>{incident.type}</Text>
         </View>
@@ -469,25 +470,25 @@ const DashboardScreen = ({ navigation }) => {
 
       <View style={styles.incidentDetails}>
         <View style={styles.incidentDetailRow}>
-          <Icon name="location-on" size={16} color="#6b7280" />
+          <Icon name="location-on" size={16} color={Colors.text.secondary} />
           <Text style={styles.incidentDetailText}>{incident.location}</Text>
         </View>
         <View style={styles.incidentDetailRow}>
-          <Icon name="person" size={16} color="#6b7280" />
+          <Icon name="person" size={16} color={Colors.text.secondary} />
           <Text style={styles.incidentDetailText}>{incident.reportedBy}</Text>
         </View>
         <View style={styles.incidentDetailRow}>
-          <Icon name="phone" size={16} color="#6b7280" />
+          <Icon name="phone" size={16} color={Colors.text.secondary} />
           <Text style={styles.incidentDetailText}>
             {incident.userId?.contactNumber || 'No contact number'}
           </Text>
         </View>
         <View style={styles.incidentDetailRow}>
-          <Icon name="access-time" size={16} color="#6b7280" />
+          <Icon name="access-time" size={16} color={Colors.text.secondary} />
           <Text style={styles.incidentDetailText}>{incident.time}</Text>
         </View>
         <View style={styles.incidentDetailRow}>
-          <Icon name="my-location" size={16} color="#6b7280" />
+          <Icon name="my-location" size={16} color={Colors.text.secondary} />
           <Text style={styles.incidentDetailText}>{incident.distance}</Text>
         </View>
       </View>
@@ -503,7 +504,7 @@ const DashboardScreen = ({ navigation }) => {
           accessibilityLabel="Navigate to incident location"
           accessibilityRole="button"
         >
-          <Icon name="directions" size={16} color="#ffffff" />
+          <Icon name="directions" size={16} color={Colors.neutral.white} />
           <Text style={styles.incidentActionText}>Navigate</Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -520,7 +521,7 @@ const DashboardScreen = ({ navigation }) => {
           accessibilityLabel="Message reporter"
           accessibilityRole="button"
         >
-          <Icon name="message" size={16} color="#ffffff" />
+          <Icon name="message" size={16} color={Colors.neutral.white} />
           <Text style={styles.incidentActionText}>Message</Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -532,7 +533,7 @@ const DashboardScreen = ({ navigation }) => {
           accessibilityLabel="Call emergency contact"
           accessibilityRole="button"
         >
-          <Icon name="phone" size={16} color="#ffffff" />
+          <Icon name="phone" size={16} color={Colors.neutral.white} />
           <Text style={styles.incidentActionText}>Call</Text>
         </TouchableOpacity>
       </View>
@@ -550,7 +551,7 @@ const DashboardScreen = ({ navigation }) => {
           <Icon
             name={toast.type === 'success' ? 'check-circle' : 'error'}
             size={20}
-            color="#ffffff"
+            color={Colors.neutral.white}
           />
           <Text style={styles.toastText}>{toast.message}</Text>
         </View>
@@ -565,7 +566,7 @@ const DashboardScreen = ({ navigation }) => {
           accessibilityRole="button"
           accessibilityHint="Opens the navigation drawer"
         >
-          <Icon name="menu" size={24} color="#1f2937" />
+          <Icon name="menu" size={24} color={Colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Dashboard</Text>
         <View style={styles.headerRight}>
@@ -596,7 +597,7 @@ const DashboardScreen = ({ navigation }) => {
             accessibilityRole="button"
             accessibilityHint="View 3 new notifications"
           >
-            <Icon name="notifications" size={24} color="#1f2937" />
+            <Icon name="notifications" size={24} color={Colors.text.primary} />
             <View style={styles.notificationBadge}>
               <Text style={styles.badgeText}>3</Text>
             </View>
@@ -608,7 +609,7 @@ const DashboardScreen = ({ navigation }) => {
         {/* Emergency Alert */}
         {stats.criticalIncidents > 0 && (
           <View style={styles.emergencyAlert}>
-            <Icon name="warning" size={20} color="#ef4444" />
+            <Icon name="warning" size={20} color={Colors.primary.red} />
             <Text style={styles.emergencyText}>
               {stats.criticalIncidents} Critical {stats.criticalIncidents === 1 ? 'incident' : 'incidents'} requiring immediate attention
             </Text>
@@ -630,7 +631,7 @@ const DashboardScreen = ({ navigation }) => {
             title="Total Incidents"
             value={stats.totalIncidents}
             icon="bar-chart"
-            color="#14b8a6"
+            color={Colors.secondary.orange}
             onPress={() => navigation.navigate('Reports')}
           />
           <StatCard
@@ -638,7 +639,7 @@ const DashboardScreen = ({ navigation }) => {
             title="Active Cases"
             value={stats.activeIncidents}
             icon="pending-actions"
-            color="#f59e0b"
+            color={Colors.alert.warning}
             onPress={() => navigation.navigate('NavigationScreen')}
           />
           <StatCard
@@ -646,7 +647,7 @@ const DashboardScreen = ({ navigation }) => {
             title="Resolved Cases"
             value={stats.resolvedIncidents}
             icon="check-circle"
-            color="#10b981"
+            color={Colors.alert.success}
             onPress={() => navigation.navigate('Reports')}
           />
           <StatCard
@@ -654,7 +655,7 @@ const DashboardScreen = ({ navigation }) => {
             title="Critical Cases"
             value={stats.criticalIncidents}
             icon="priority-high"
-            color="#ef4444"
+            color={Colors.primary.red}
             onPress={() => navigation.navigate('NavigationScreen')}
           />
         </View>
@@ -667,28 +668,28 @@ const DashboardScreen = ({ navigation }) => {
               actionId="map"
               title="View Map"
               icon="map"
-              color="#14b8a6"
+              color={Colors.secondary.orange}
               onPress={() => navigation.navigate('NavigationScreen')}
             />
             <QuickAction
               actionId="messages"
               title="Messages"
               icon="message"
-              color="#3b82f6"
+              color={Colors.alert.info}
               onPress={() => navigation.navigate('Messages')}
             />
             <QuickAction
               actionId="reports"
               title="Reports"
               icon="assessment"
-              color="#8b5cf6"
+              color={Colors.secondary.orange}
               onPress={() => navigation.navigate('Reports')}
             />
             <QuickAction
               actionId="settings"
               title="Settings"
               icon="settings"
-              color="#6b7280"
+              color={Colors.text.secondary}
               onPress={() => navigation.navigate('Settings')}
             />
           </View>
@@ -709,7 +710,7 @@ const DashboardScreen = ({ navigation }) => {
 
           {error ? (
             <View style={styles.emptyState}>
-              <Icon name="error-outline" size={48} color="#ef4444" />
+              <Icon name="error-outline" size={48} color={Colors.primary.red} />
               <Text style={styles.emptyStateTitle}>Error Loading Data</Text>
               <Text style={styles.emptyStateText}>{error}</Text>
               <TouchableOpacity
@@ -719,13 +720,13 @@ const DashboardScreen = ({ navigation }) => {
                   fetchDashboardData();
                 }}
               >
-                <Icon name="refresh" size={20} color="#ffffff" />
+                <Icon name="refresh" size={20} color={Colors.neutral.white} />
                 <Text style={styles.retryButtonText}>Retry</Text>
               </TouchableOpacity>
             </View>
           ) : loading ? (
             <View style={styles.emptyState}>
-              <ActivityIndicator size="large" color="#14b8a6" />
+              <ActivityIndicator size="large" color={Colors.secondary.orange} />
               <Text style={styles.emptyStateText}>Loading incidents...</Text>
             </View>
           ) : activeIncidents.length > 0 ? (
@@ -736,7 +737,7 @@ const DashboardScreen = ({ navigation }) => {
             </View>
           ) : (
             <View style={styles.emptyState}>
-              <Icon name="check-circle" size={48} color="#10b981" />
+              <Icon name="check-circle" size={48} color={Colors.alert.success} />
               <Text style={styles.emptyStateTitle}>All Clear</Text>
               <Text style={styles.emptyStateText}>
                 No active incidents at this time
@@ -752,7 +753,7 @@ const DashboardScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafb', // Mobile gray50 (60% - primary background)
+    backgroundColor: Colors.neutral.gray50,
   },
   header: {
     flexDirection: 'row',
@@ -760,9 +761,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: '#ffffff', // Mobile white (30% - secondary)
+    backgroundColor: Colors.neutral.white,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb', // Mobile gray200
+    borderBottomColor: Colors.border.light,
     elevation: 2,
     boxShadow: '0px 2px 4px rgba(0,0,0,0.1)',
   },
@@ -777,7 +778,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#1f2937', // Mobile gray800 - primary text
+    color: Colors.text.primary,
   },
   notificationButton: {
     padding: 8,
@@ -787,7 +788,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 5,
     right: 5,
-    backgroundColor: '#ef4444', // Mobile red
+    backgroundColor: Colors.primary.red,
     borderRadius: 10,
     minWidth: 18,
     height: 18,
@@ -795,7 +796,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   badgeText: {
-    color: '#ffffff',
+    color: Colors.neutral.white,
     fontSize: 10,
     fontWeight: 'bold',
   },
@@ -808,10 +809,10 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   connected: {
-    backgroundColor: '#d1fae5',
+    backgroundColor: '#d1fae5', // Light success green background
   },
   disconnected: {
-    backgroundColor: '#fee2e2',
+    backgroundColor: Colors.primary.background, // Light red background
   },
   connectionDot: {
     width: 8,
@@ -819,15 +820,15 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   connectedDot: {
-    backgroundColor: '#10b981',
+    backgroundColor: Colors.alert.success,
   },
   disconnectedDot: {
-    backgroundColor: '#ef4444',
+    backgroundColor: Colors.primary.red,
   },
   connectionText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#1f2937',
+    color: Colors.text.primary,
   },
   content: {
     flex: 1,
@@ -836,27 +837,27 @@ const styles = StyleSheet.create({
   emergencyAlert: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fef2f2', // Mobile red50
+    backgroundColor: Colors.primary.background,
     padding: 15,
     borderRadius: 12,
     borderLeftWidth: 4,
-    borderLeftColor: '#ef4444', // Mobile red
+    borderLeftColor: Colors.primary.red,
     marginBottom: 20,
   },
   emergencyText: {
     flex: 1,
     marginLeft: 10,
-    color: '#6b7280', // Mobile gray500 - secondary text
+    color: Colors.text.secondary,
     fontSize: 14,
   },
   viewButton: {
-    backgroundColor: '#ef4444', // Mobile red
+    backgroundColor: Colors.primary.red,
     paddingHorizontal: 15,
     paddingVertical: 5,
     borderRadius: 8,
   },
   viewButtonText: {
-    color: '#ffffff',
+    color: Colors.neutral.white,
     fontSize: 12,
     fontWeight: '600',
   },
@@ -867,7 +868,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   statCard: {
-    backgroundColor: '#ffffff', // Mobile white
+    backgroundColor: Colors.neutral.white,
     borderRadius: 12,
     padding: 15,
     width: '48%',
@@ -891,7 +892,7 @@ const styles = StyleSheet.create({
   },
   statTitle: {
     fontSize: 12,
-    color: '#6b7280', // Mobile gray500 - secondary text
+    color: Colors.text.secondary,
     marginBottom: 5,
   },
   statValue: {
@@ -917,11 +918,11 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1f2937', // Mobile gray800 - primary text
+    color: Colors.text.primary,
   },
   viewAllText: {
     fontSize: 14,
-    color: '#14b8a6', // Mobile primary teal
+    color: Colors.secondary.orange,
     fontWeight: '600',
   },
   quickActionsContainer: {
@@ -930,7 +931,7 @@ const styles = StyleSheet.create({
   },
   quickAction: {
     alignItems: 'center',
-    backgroundColor: '#ffffff', // Mobile white
+    backgroundColor: Colors.neutral.white,
     padding: 15,
     borderRadius: 12,
     width: '23%',
@@ -951,25 +952,25 @@ const styles = StyleSheet.create({
   },
   quickActionText: {
     fontSize: 10,
-    color: '#6b7280', // Mobile gray500 - secondary text
+    color: Colors.text.secondary,
     textAlign: 'center',
   },
   incidentsContainer: {
     gap: 15,
   },
   incidentCard: {
-    backgroundColor: '#ffffff', // Mobile white
+    backgroundColor: Colors.neutral.white,
     borderRadius: 12,
     padding: 15,
     borderLeftWidth: 4,
-    borderLeftColor: '#f59e0b', // Mobile amber for active
+    borderLeftColor: Colors.alert.warning,
     elevation: 2,
     boxShadow: '0px 1px 2px rgba(0,0,0,0.1)',
     marginBottom: 15,
   },
   incidentCardCritical: {
-    borderLeftColor: '#ef4444', // Mobile red for critical
-    backgroundColor: '#fef2f2', // Mobile red50
+    borderLeftColor: Colors.primary.red,
+    backgroundColor: Colors.primary.background,
   },
   incidentHeader: {
     flexDirection: 'row',
@@ -985,7 +986,7 @@ const styles = StyleSheet.create({
   incidentType: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1f2937', // Mobile gray800 - primary text
+    color: Colors.text.primary,
   },
   statusBadge: {
     paddingHorizontal: 10,
@@ -993,13 +994,13 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   statusCritical: {
-    backgroundColor: '#ef4444', // Mobile red
+    backgroundColor: Colors.primary.red,
   },
   statusActive: {
-    backgroundColor: '#f59e0b', // Mobile amber
+    backgroundColor: Colors.alert.warning,
   },
   statusText: {
-    color: '#ffffff',
+    color: Colors.neutral.white,
     fontSize: 10,
     fontWeight: '600',
   },
@@ -1014,7 +1015,7 @@ const styles = StyleSheet.create({
   },
   incidentDetailText: {
     fontSize: 13,
-    color: '#6b7280', // Mobile gray500 - secondary text
+    color: Colors.text.secondary,
   },
   incidentActions: {
     flexDirection: 'row',
@@ -1031,21 +1032,21 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   navigateButton: {
-    backgroundColor: '#14b8a6', // Mobile primary teal
+    backgroundColor: Colors.secondary.orange,
   },
   messageButton: {
-    backgroundColor: '#3b82f6', // Mobile blue
+    backgroundColor: Colors.alert.info,
   },
   callButton: {
-    backgroundColor: '#10b981', // Mobile green
+    backgroundColor: Colors.alert.success,
   },
   incidentActionText: {
-    color: '#ffffff',
+    color: Colors.neutral.white,
     fontSize: 12,
     fontWeight: '600',
   },
   emptyState: {
-    backgroundColor: '#ffffff', // Mobile white
+    backgroundColor: Colors.neutral.white,
     borderRadius: 12,
     padding: 40,
     alignItems: 'center',
@@ -1054,12 +1055,12 @@ const styles = StyleSheet.create({
   emptyStateTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1f2937', // Mobile gray800 - primary text
+    color: Colors.text.primary,
     marginTop: 12,
   },
   emptyStateText: {
     fontSize: 14,
-    color: '#6b7280', // Mobile gray500 - secondary text
+    color: Colors.text.secondary,
     marginTop: 6,
     textAlign: 'center',
   },
@@ -1081,13 +1082,13 @@ const styles = StyleSheet.create({
     zIndex: 9999,
   },
   toastSuccess: {
-    backgroundColor: '#10b981', // Mobile green
+    backgroundColor: Colors.alert.success,
   },
   toastError: {
-    backgroundColor: '#ef4444', // Mobile red
+    backgroundColor: Colors.primary.red,
   },
   toastText: {
-    color: '#ffffff',
+    color: Colors.neutral.white,
     fontSize: 14,
     fontWeight: '600',
     marginLeft: 8,
@@ -1097,14 +1098,14 @@ const styles = StyleSheet.create({
     marginTop: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#14b8a6',
+    backgroundColor: Colors.secondary.orange,
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,
     gap: 8,
   },
   retryButtonText: {
-    color: '#ffffff',
+    color: Colors.neutral.white,
     fontSize: 14,
     fontWeight: '600',
   },

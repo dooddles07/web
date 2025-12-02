@@ -234,27 +234,6 @@ const MessagesScreen = ({ navigation, route }) => {
     }
   };
 
-  const assignToConversation = async (conversationId) => {
-    try {
-      const token = await AsyncStorage.getItem('authToken');
-      if (!token) return;
-
-      await axios.put(
-        `${API_BASE}/api/messages/conversation/${conversationId}/assign`,
-        {},
-        {
-          headers: { 'Authorization': `Bearer ${token}` },
-        }
-      );
-
-      showToast('You have been assigned to this conversation', 'success');
-      fetchConversations();
-    } catch (error) {
-      console.error('Error assigning to conversation:', error);
-      showToast('Failed to assign to conversation', 'error');
-    }
-  };
-
   const handleSendMessage = async () => {
     if (!messageInput.trim() || !selectedConversation) return;
 
@@ -435,11 +414,6 @@ const MessagesScreen = ({ navigation, route }) => {
         <Text style={styles.conversationPreview} numberOfLines={1}>
           {item.lastMessage || 'No messages yet'}
         </Text>
-        {item.adminId && item.adminName && (
-          <Text style={styles.assignedAdmin} numberOfLines={1}>
-            Assigned to: {item.adminName}
-          </Text>
-        )}
       </View>
     </TouchableOpacity>
   );
@@ -895,12 +869,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#6b7280',
   },
-  assignedAdmin: {
-    fontSize: 12,
-    color: '#14b8a6', // Mobile primary teal
-    marginTop: 4,
-    fontStyle: 'italic',
-  },
 
   // Empty State
   emptyContainer: {
@@ -962,24 +930,6 @@ const styles = StyleSheet.create({
   chatHeaderStatus: {
     fontSize: 13,
     color: '#6b7280',
-  },
-  chatHeaderActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  assignButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    backgroundColor: '#f0fdfa', // Mobile teal background light
-    borderRadius: 8,
-  },
-  assignButtonText: {
-    fontSize: 14,
-    fontWeight: '600', // Consistent weight
-    color: '#14b8a6', // Mobile primary teal
-    marginLeft: 6,
   },
 
   // Messages Area

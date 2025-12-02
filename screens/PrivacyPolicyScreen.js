@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import Colors from '../constants/colors';
 
 const PrivacyPolicyScreen = ({ navigation }) => {
   return (
@@ -14,7 +15,7 @@ const PrivacyPolicyScreen = ({ navigation }) => {
           accessibilityRole="button"
           accessibilityHint="Returns to the Settings screen"
         >
-          <Icon name="arrow-back" size={24} color="#1f2937" />
+          <Icon name="arrow-back" size={24} color={Colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Privacy Policy</Text>
         <View style={styles.placeholder} />
@@ -143,7 +144,7 @@ const PrivacyPolicyScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafb', // Mobile gray50 (60% - primary background)
+    backgroundColor: Colors.neutral.gray50,
   },
   header: {
     flexDirection: 'row',
@@ -151,14 +152,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: '#ffffff', // Mobile white (30% - secondary)
+    backgroundColor: Colors.neutral.white,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb', // Mobile gray200
+    borderBottomColor: Colors.border.light,
     ...(Platform.OS === 'web' ? {
       boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
     } : {
       elevation: 2,
-      shadowColor: '#000',
+      shadowColor: Colors.neutral.black,
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.1,
       shadowRadius: 4,
@@ -170,7 +171,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#1f2937', // Mobile gray800 - primary text
+    color: Colors.text.primary,
   },
   placeholder: {
     width: 40,
@@ -180,64 +181,64 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   section: {
-    backgroundColor: '#ffffff', // Mobile white
+    backgroundColor: Colors.neutral.white,
     borderRadius: 12,
     padding: 20,
     marginBottom: 20,
   },
   lastUpdated: {
     fontSize: 12,
-    color: '#6b7280', // Mobile gray500 - secondary text
+    color: Colors.text.secondary,
     fontStyle: 'italic',
     marginBottom: 15,
   },
   intro: {
     fontSize: 15,
-    color: '#374151', // Mobile gray700
+    color: Colors.neutral.gray700,
     lineHeight: 22,
     marginBottom: 20,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1f2937', // Mobile gray800 - primary text
+    color: Colors.text.primary,
     marginTop: 20,
     marginBottom: 12,
   },
   paragraph: {
     fontSize: 14,
-    color: '#4b5563', // Mobile gray600 - tertiary text
+    color: Colors.neutral.gray600,
     lineHeight: 20,
     marginBottom: 12,
   },
   bold: {
     fontWeight: '600',
-    color: '#1f2937', // Mobile gray800 - primary text
+    color: Colors.text.primary,
   },
   bulletPoint: {
     fontSize: 14,
-    color: '#4b5563', // Mobile gray600 - tertiary text
+    color: Colors.neutral.gray600,
     lineHeight: 20,
     marginBottom: 8,
     paddingLeft: 10,
   },
   contactInfo: {
     fontSize: 14,
-    color: '#14b8a6', // Mobile primary teal
+    color: Colors.secondary.orange,
     lineHeight: 20,
     marginBottom: 6,
   },
   footer: {
     marginTop: 30,
     padding: 15,
-    backgroundColor: '#f9fafb', // Mobile gray50
+    backgroundColor: Colors.neutral.gray50,
     borderRadius: 8,
     borderLeftWidth: 4,
-    borderLeftColor: '#14b8a6', // Mobile primary teal
+    borderLeftColor: Colors.secondary.orange,
   },
   footerText: {
     fontSize: 13,
-    color: '#6b7280', // Mobile gray500 - secondary text
+    color: Colors.text.secondary,
     lineHeight: 20,
     fontStyle: 'italic',
   },
