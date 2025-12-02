@@ -17,8 +17,6 @@ import API_BASE from '../config/api';
 import Logo from '../images/resqyou.png'; // Correctly import the logo image
 import Colors from '../constants/colors';
 
-
-
 const LoginScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');

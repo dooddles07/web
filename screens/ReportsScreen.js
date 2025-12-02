@@ -540,7 +540,7 @@ const ReportsScreen = ({ navigation }) => {
             <TextInput
               style={styles.searchInput}
               placeholder="Search by name or location..."
-              placeholderTextcolor={Colors.neutral.gray400}
+              placeholderTextColor={Colors.neutral.gray400}
               value={searchQuery}
               onChangeText={setSearchQuery}
             />

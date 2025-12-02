@@ -1,3 +1,5 @@
+// This file is kept for expo-router compatibility
+// The main app entry point is ../index.js which imports ../App.js
 import { StyleSheet, Text, View } from "react-native";
 
 export default function Page() {

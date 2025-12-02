@@ -33,8 +33,10 @@ const MessagesScreen = ({ navigation, route }) => {
   const scrollViewRef = useRef(null);
   const pollingInterval = useRef(null);
 
-  // Function to stop all playing media
+  // Function to stop all playing media (web only)
   const stopAllMedia = () => {
+    if (Platform.OS !== 'web') return;
+
     // Stop all audio elements
     const audioElements = document.querySelectorAll('audio');
     audioElements.forEach(audio => {

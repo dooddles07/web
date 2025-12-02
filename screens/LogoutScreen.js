@@ -11,6 +11,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import API_BASE from '../config/api';
+import Colors from '../constants/colors';
 
 const LogoutScreen = ({ navigation }) => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -127,7 +128,7 @@ const LogoutScreen = ({ navigation }) => {
   if (isLoggingOut) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#14b8a6" />
+        <ActivityIndicator size="large" color={Colors.secondary.orange} />
         <Text style={styles.loadingText}>Logging out...</Text>
       </View>
     );
@@ -144,7 +145,7 @@ const LogoutScreen = ({ navigation }) => {
           accessibilityRole="button"
           accessibilityHint="Returns to the previous screen"
         >
-          <Icon name="arrow-back" size={24} color="#1f2937" />
+          <Icon name="arrow-back" size={24} color={Colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Logout</Text>
         <View style={styles.placeholder} />
@@ -154,7 +155,7 @@ const LogoutScreen = ({ navigation }) => {
         {/* Main Section */}
         <View style={styles.mainSection}>
           <View style={styles.iconContainer}>
-            <Icon name="logout" size={64} color="#ef4444" />
+            <Icon name="logout" size={64} color={Colors.primary.red} />
           </View>
           
           <Text style={styles.title}>Ready to logout?</Text>
@@ -165,7 +166,7 @@ const LogoutScreen = ({ navigation }) => {
           {/* User Info */}
           <View style={styles.userCard}>
             <View style={styles.userAvatar}>
-              <Icon name="person" size={32} color="#14b8a6" />
+              <Icon name="person" size={32} color={Colors.secondary.orange} />
             </View>
             <View style={styles.userInfo}>
               <Text style={styles.userName}>{adminData?.fullname || 'Admin User'}</Text>
@@ -202,7 +203,7 @@ const LogoutScreen = ({ navigation }) => {
             accessibilityRole="button"
             accessibilityHint="Quickly logs out without server confirmation"
           >
-            <Icon name="flash-on" size={20} color="#14b8a6" />
+            <Icon name="flash-on" size={20} color={Colors.secondary.orange} />
             <Text style={styles.secondaryButtonText}>Quick Logout</Text>
           </TouchableOpacity>
         </View>
@@ -215,15 +216,15 @@ const LogoutScreen = ({ navigation }) => {
             style={styles.actionItem}
             onPress={() => navigation.navigate('Settings')}
           >
-            <Icon name="settings" size={20} color="#14b8a6" />
+            <Icon name="settings" size={20} color={Colors.secondary.orange} />
             <Text style={styles.actionText}>Settings</Text>
-            <Icon name="chevron-right" size={20} color="#6b7280" />
+            <Icon name="chevron-right" size={20} color={Colors.neutral.gray600} />
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.actionItem}>
-            <Icon name="contact-phone" size={20} color="#ef4444" />
+            <Icon name="contact-phone" size={20} color={Colors.primary.red} />
             <Text style={styles.actionText}>Emergency Contacts</Text>
-            <Icon name="chevron-right" size={20} color="#6b7280" />
+            <Icon name="chevron-right" size={20} color={Colors.neutral.gray600} />
           </TouchableOpacity>
         </View>
 
@@ -239,7 +240,7 @@ const LogoutScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafb', // Mobile gray50 (60% - primary background)
+    backgroundColor: Colors.neutral.gray50,
   },
   header: {
     flexDirection: 'row',
@@ -247,9 +248,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: '#ffffff', // Mobile white (30% - secondary)
+    backgroundColor: Colors.neutral.white,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb', // Mobile gray200
+    borderBottomColor: Colors.border.light,
     elevation: 2,
   },
   backButton: {
@@ -258,7 +259,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#1f2937', // Mobile gray800 - primary text
+    color: Colors.text.primary,
   },
   placeholder: {
     width: 40,
@@ -275,7 +276,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: '#fef2f2', // Mobile red50
+    backgroundColor: Colors.primary.background,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 20,
@@ -283,19 +284,19 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#1f2937', // Mobile gray800 - primary text
+    color: Colors.text.primary,
     marginBottom: 10,
   },
   subtitle: {
     fontSize: 16,
-    color: '#6b7280', // Mobile gray500 - secondary text
+    color: Colors.text.secondary,
     textAlign: 'center',
     marginBottom: 30,
   },
   userCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'white',
+    backgroundColor: Colors.neutral.white,
     padding: 20,
     borderRadius: 12,
     width: '100%',
@@ -306,7 +307,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#f0fdfa', // Mobile teal light
+    backgroundColor: Colors.secondary.background,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 15,
@@ -317,18 +318,18 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1f2937', // Mobile gray800 - primary text
+    color: Colors.text.primary,
     marginBottom: 5,
   },
   userEmail: {
     fontSize: 14,
-    color: '#6b7280', // Mobile gray500 - secondary text
+    color: Colors.text.secondary,
   },
   primaryButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#ef4444', // Mobile red
+    backgroundColor: Colors.primary.red,
     paddingVertical: 15,
     paddingHorizontal: 30,
     borderRadius: 12,
@@ -337,7 +338,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   primaryButtonText: {
-    color: 'white',
+    color: Colors.neutral.white,
     fontSize: 16,
     fontWeight: '600',
     marginLeft: 8,
@@ -346,32 +347,32 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'white',
+    backgroundColor: Colors.neutral.white,
     paddingVertical: 15,
     paddingHorizontal: 30,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#14b8a6', // Mobile teal
+    borderColor: Colors.secondary.orange,
     width: '100%',
   },
   secondaryButtonText: {
-    color: '#14b8a6', // Mobile teal
+    color: Colors.secondary.orange,
     fontSize: 16,
     fontWeight: '600',
     marginLeft: 8,
   },
   primaryButtonHover: {
-    backgroundColor: '#dc2626', // Mobile red700 (darker on hover)
+    backgroundColor: Colors.primary.redDark,
     transform: [{ scale: 1.02 }],
     elevation: 4,
   },
   secondaryButtonHover: {
-    backgroundColor: '#f0fdfa', // Mobile teal light
+    backgroundColor: Colors.secondary.background,
     transform: [{ scale: 1.02 }],
     elevation: 2,
   },
   quickActions: {
-    backgroundColor: 'white',
+    backgroundColor: Colors.neutral.white,
     borderRadius: 12,
     padding: 20,
     marginBottom: 20,
@@ -380,7 +381,7 @@ const styles = StyleSheet.create({
   quickActionsTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1f2937', // Mobile gray800 - primary text
+    color: Colors.text.primary,
     marginBottom: 15,
   },
   actionItem: {
@@ -388,29 +389,29 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb', // Mobile gray200
+    borderBottomColor: Colors.border.light,
   },
   actionText: {
     flex: 1,
     fontSize: 16,
-    color: '#1f2937', // Mobile gray800 - primary text
+    color: Colors.text.primary,
     marginLeft: 15,
   },
   footerText: {
     fontSize: 12,
-    color: '#6b7280', // Mobile gray500 - secondary text
+    color: Colors.text.secondary,
     textAlign: 'center',
   },
   loadingContainer: {
     flex: 1,
-    backgroundColor: '#f9fafb', // Mobile gray50 (60% - primary background)
+    backgroundColor: Colors.neutral.gray50,
     justifyContent: 'center',
     alignItems: 'center',
   },
   loadingText: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1f2937', // Mobile gray800 - primary text
+    color: Colors.text.primary,
     marginTop: 20,
   },
 });
