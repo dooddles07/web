@@ -25,6 +25,7 @@ const TermsOfServiceScreen = ({ navigation }) => {
         <View style={styles.section}>
           <Text style={styles.lastUpdated}>Last Updated: January 2025</Text>
 
+
           <Text style={styles.intro}>
             Welcome to ResqYOU. By using our emergency response and locator system, you agree to comply with and
             be bound by the following terms and conditions. Please read them carefully.
@@ -75,7 +76,7 @@ const TermsOfServiceScreen = ({ navigation }) => {
 
           <Text style={styles.sectionTitle}>6. Emergency Services Disclaimer</Text>
           <Text style={styles.warningBox}>
-            <Icon name="warning" size={20} color={Colors.primary.red} />
+            <Icon name="warning" size={20} color={Colors.primary.main} />
             <Text style={styles.warningText}>
               {' '}IMPORTANT: ResqYOU is a supplementary emergency tool and should NOT replace traditional emergency
               services (911, 112, or local emergency numbers). In life-threatening situations, always contact local
@@ -280,20 +281,20 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 8,
     borderLeftWidth: 4,
-    borderLeftColor: Colors.primary.red,
+    borderLeftColor: Colors.primary.main,
     marginBottom: 15,
     alignItems: 'flex-start',
   },
   warningText: {
     flex: 1,
     fontSize: 14,
-    color: Colors.primary.red,
+    color: Colors.primary.main,
     fontWeight: '500',
     lineHeight: 20,
   },
   contactInfo: {
     fontSize: 14,
-    color: Colors.secondary.orange,
+    color: Colors.accent.action,
     lineHeight: 20,
     marginBottom: 6,
   },
@@ -303,7 +304,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.neutral.gray50,
     borderRadius: 8,
     borderLeftWidth: 4,
-    borderLeftColor: Colors.secondary.orange,
+    borderLeftColor: Colors.accent.action,
   },
   footerText: {
     fontSize: 13,

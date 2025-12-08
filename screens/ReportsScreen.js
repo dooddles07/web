@@ -196,8 +196,8 @@ const ReportsScreen = ({ navigation }) => {
 
   const getStatusColor = (status) => {
     switch(status) {
-      case 'active': return Colors.alert.warning;
-      case 'resolved': return Colors.alert.success;
+      case 'active': return Colors.accent.warning;
+      case 'resolved': return Colors.semantic.success;
       case 'cancelled': return Colors.text.secondary;
       default: return Colors.text.secondary;
     }
@@ -291,7 +291,7 @@ const ReportsScreen = ({ navigation }) => {
           onPress={() => setSelectedIncident(incident)}
         >
           <Text style={styles.viewDetailsText}>View Details</Text>
-          <Icon name="arrow-forward" size={14} color={Colors.secondary.orange} />
+          <Icon name="arrow-forward" size={14} color={Colors.accent.action} />
         </TouchableOpacity>
       </View>
     </TouchableOpacity>
@@ -330,7 +330,7 @@ const ReportsScreen = ({ navigation }) => {
                 <Text style={styles.modalSectionTitle}>Incident Information</Text>
 
                 <View style={styles.modalInfoRow}>
-                  <Icon name="person" size={20} color={Colors.secondary.orange} />
+                  <Icon name="person" size={20} color={Colors.accent.action} />
                   <View style={styles.modalInfoContent}>
                     <Text style={styles.modalInfoLabel}>Reported By</Text>
                     <Text style={styles.modalInfoValue}>{selectedIncident.reportedBy}</Text>
@@ -338,7 +338,7 @@ const ReportsScreen = ({ navigation }) => {
                 </View>
 
                 <View style={styles.modalInfoRow}>
-                  <Icon name="account-circle" size={20} color={Colors.secondary.orange} />
+                  <Icon name="account-circle" size={20} color={Colors.accent.action} />
                   <View style={styles.modalInfoContent}>
                     <Text style={styles.modalInfoLabel}>Username</Text>
                     <Text style={styles.modalInfoValue}>{selectedIncident.username}</Text>
@@ -346,7 +346,7 @@ const ReportsScreen = ({ navigation }) => {
                 </View>
 
                 <View style={styles.modalInfoRow}>
-                  <Icon name="access-time" size={20} color={Colors.secondary.orange} />
+                  <Icon name="access-time" size={20} color={Colors.accent.action} />
                   <View style={styles.modalInfoContent}>
                     <Text style={styles.modalInfoLabel}>Date & Time</Text>
                     <Text style={styles.modalInfoValue}>{formatDate(selectedIncident.timestamp)}</Text>
@@ -354,7 +354,7 @@ const ReportsScreen = ({ navigation }) => {
                 </View>
 
                 <View style={styles.modalInfoRow}>
-                  <Icon name="schedule" size={20} color={Colors.secondary.orange} />
+                  <Icon name="schedule" size={20} color={Colors.accent.action} />
                   <View style={styles.modalInfoContent}>
                     <Text style={styles.modalInfoLabel}>Time Elapsed</Text>
                     <Text style={styles.modalInfoValue}>{formatTimeAgo(selectedIncident.timestamp)}</Text>
@@ -367,7 +367,7 @@ const ReportsScreen = ({ navigation }) => {
                 <Text style={styles.modalSectionTitle}>Location Details</Text>
 
                 <View style={styles.modalInfoRow}>
-                  <Icon name="location-on" size={20} color={Colors.primary.red} />
+                  <Icon name="location-on" size={20} color={Colors.primary.main} />
                   <View style={styles.modalInfoContent}>
                     <Text style={styles.modalInfoLabel}>Address</Text>
                     <Text style={styles.modalInfoValue}>{selectedIncident.location}</Text>
@@ -375,7 +375,7 @@ const ReportsScreen = ({ navigation }) => {
                 </View>
 
                 <View style={styles.modalInfoRow}>
-                  <Icon name="my-location" size={20} color={Colors.primary.red} />
+                  <Icon name="my-location" size={20} color={Colors.primary.main} />
                   <View style={styles.modalInfoContent}>
                     <Text style={styles.modalInfoLabel}>Coordinates</Text>
                     <Text style={styles.modalInfoValue}>{selectedIncident.coordinates}</Text>
@@ -384,7 +384,7 @@ const ReportsScreen = ({ navigation }) => {
 
                 {selectedIncident.latitude && selectedIncident.longitude && (
                   <View style={styles.modalInfoRow}>
-                    <Icon name="map" size={20} color={Colors.primary.red} />
+                    <Icon name="map" size={20} color={Colors.primary.main} />
                     <View style={styles.modalInfoContent}>
                       <Text style={styles.modalInfoLabel}>Exact Position</Text>
                       <Text style={styles.modalInfoValue}>
@@ -399,7 +399,7 @@ const ReportsScreen = ({ navigation }) => {
               {/* Action Buttons */}
               <View style={styles.modalActions}>
                 <TouchableOpacity
-                  style={[styles.modalActionButton, { backgroundColor: Colors.secondary.orange }]}
+                  style={[styles.modalActionButton, { backgroundColor: Colors.accent.action }]}
                   onPress={() => {
                     setSelectedIncident(null);
                     navigation.navigate('NavigationScreen', { selectedIncident });
@@ -410,7 +410,7 @@ const ReportsScreen = ({ navigation }) => {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={[styles.modalActionButton, { backgroundColor: Colors.alert.info }]}
+                  style={[styles.modalActionButton, { backgroundColor: Colors.semantic.info }]}
                   onPress={() => {
                     setSelectedIncident(null);
                     navigation.navigate('Messages', {
@@ -474,7 +474,7 @@ const ReportsScreen = ({ navigation }) => {
                     {option.label}
                   </Text>
                   {dateFilter === option.value && (
-                    <Icon name="check" size={20} color={Colors.secondary.orange} />
+                    <Icon name="check" size={20} color={Colors.accent.action} />
                   )}
                 </TouchableOpacity>
               ))}
@@ -511,19 +511,19 @@ const ReportsScreen = ({ navigation }) => {
             title="Total Incidents"
             value={stats.total}
             icon="assessment"
-            color={Colors.secondary.orange}
+            color={Colors.accent.action}
           />
           <StatCard
             title="Active Cases"
             value={stats.active}
             icon="pending-actions"
-            color={Colors.alert.warning}
+            color={Colors.accent.warning}
           />
           <StatCard
             title="Resolved Cases"
             value={stats.resolved}
             icon="check-circle"
-            color={Colors.alert.success}
+            color={Colors.semantic.success}
           />
           <StatCard
             title="Cancelled"
@@ -565,7 +565,7 @@ const ReportsScreen = ({ navigation }) => {
               Filter: {dateFilter === 'today' ? 'Today' : dateFilter === 'week' ? 'Last 7 Days' : 'Last 30 Days'}
             </Text>
             <TouchableOpacity onPress={() => setDateFilter('all')}>
-              <Icon name="close" size={16} color={Colors.secondary.orange} />
+              <Icon name="close" size={16} color={Colors.accent.action} />
             </TouchableOpacity>
           </View>
         )}
@@ -580,7 +580,7 @@ const ReportsScreen = ({ navigation }) => {
         {/* Incidents List */}
         {loading ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={Colors.secondary.orange} />
+            <ActivityIndicator size="large" color={Colors.accent.action} />
             <Text style={styles.loadingText}>Loading reports...</Text>
           </View>
         ) : filteredIncidents.length > 0 ? (
@@ -708,7 +708,7 @@ const styles = StyleSheet.create({
     outlineStyle: 'none',
   },
   filterButton: {
-    backgroundColor: Colors.secondary.orange,
+    backgroundColor: Colors.accent.action,
     borderRadius: 12,
     width: 48,
     height: 48,
@@ -721,7 +721,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: Colors.alert.success,
+    backgroundColor: Colors.semantic.success,
     paddingHorizontal: 15,
     paddingVertical: 8,
     borderRadius: 8,
@@ -751,7 +751,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   activeTab: {
-    backgroundColor: Colors.secondary.orange,
+    backgroundColor: Colors.accent.action,
   },
   tabText: {
     fontSize: 14,
@@ -778,7 +778,7 @@ const styles = StyleSheet.create({
     color: Colors.text.secondary,
   },
   activeTabBadgeText: {
-    color: Colors.secondary.orange,
+    color: Colors.accent.action,
   },
   resultsCount: {
     fontSize: 13,
@@ -867,7 +867,7 @@ const styles = StyleSheet.create({
   },
   viewDetailsText: {
     fontSize: 13,
-    color: Colors.secondary.orange,
+    color: Colors.accent.action,
     fontWeight: '600',
   },
   loadingContainer: {
@@ -1023,7 +1023,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.neutral.gray50,
   },
   filterOptionActive: {
-    backgroundColor: Colors.alert.success,
+    backgroundColor: Colors.semantic.success,
   },
   filterOptionText: {
     fontSize: 14,

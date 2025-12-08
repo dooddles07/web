@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
   },
   contactInfo: {
     fontSize: 14,
-    color: Colors.secondary.orange,
+    color: Colors.accent.action,
     lineHeight: 20,
     marginBottom: 6,
   },
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.neutral.gray50,
     borderRadius: 8,
     borderLeftWidth: 4,
-    borderLeftColor: Colors.secondary.orange,
+    borderLeftColor: Colors.accent.action,
   },
   footerText: {
     fontSize: 13,

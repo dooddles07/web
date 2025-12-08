@@ -454,7 +454,7 @@ const DashboardScreen = ({ navigation }) => {
           <Icon
             name={incident.status === 'critical' ? 'priority-high' : 'warning'}
             size={20}
-            color={incident.status === 'critical' ? Colors.primary.red : Colors.alert.warning}
+            color={incident.status === 'critical' ? Colors.primary.main : Colors.accent.warning}
           />
           <Text style={styles.incidentType}>{incident.type}</Text>
         </View>
@@ -609,7 +609,7 @@ const DashboardScreen = ({ navigation }) => {
         {/* Emergency Alert */}
         {stats.criticalIncidents > 0 && (
           <View style={styles.emergencyAlert}>
-            <Icon name="warning" size={20} color={Colors.primary.red} />
+            <Icon name="warning" size={20} color={Colors.primary.main} />
             <Text style={styles.emergencyText}>
               {stats.criticalIncidents} Critical {stats.criticalIncidents === 1 ? 'incident' : 'incidents'} requiring immediate attention
             </Text>
@@ -631,7 +631,7 @@ const DashboardScreen = ({ navigation }) => {
             title="Total Incidents"
             value={stats.totalIncidents}
             icon="bar-chart"
-            color={Colors.secondary.orange}
+            color={Colors.accent.action}
             onPress={() => navigation.navigate('Reports')}
           />
           <StatCard
@@ -639,7 +639,7 @@ const DashboardScreen = ({ navigation }) => {
             title="Active Cases"
             value={stats.activeIncidents}
             icon="pending-actions"
-            color={Colors.alert.warning}
+            color={Colors.accent.warning}
             onPress={() => navigation.navigate('NavigationScreen')}
           />
           <StatCard
@@ -647,7 +647,7 @@ const DashboardScreen = ({ navigation }) => {
             title="Resolved Cases"
             value={stats.resolvedIncidents}
             icon="check-circle"
-            color={Colors.alert.success}
+            color={Colors.semantic.success}
             onPress={() => navigation.navigate('Reports')}
           />
           <StatCard
@@ -655,7 +655,7 @@ const DashboardScreen = ({ navigation }) => {
             title="Critical Cases"
             value={stats.criticalIncidents}
             icon="priority-high"
-            color={Colors.primary.red}
+            color={Colors.primary.main}
             onPress={() => navigation.navigate('NavigationScreen')}
           />
         </View>
@@ -668,21 +668,21 @@ const DashboardScreen = ({ navigation }) => {
               actionId="map"
               title="View Map"
               icon="map"
-              color={Colors.secondary.orange}
+              color={Colors.accent.action}
               onPress={() => navigation.navigate('NavigationScreen')}
             />
             <QuickAction
               actionId="messages"
               title="Messages"
               icon="message"
-              color={Colors.alert.info}
+              color={Colors.semantic.info}
               onPress={() => navigation.navigate('Messages')}
             />
             <QuickAction
               actionId="reports"
               title="Reports"
               icon="assessment"
-              color={Colors.secondary.orange}
+              color={Colors.accent.action}
               onPress={() => navigation.navigate('Reports')}
             />
             <QuickAction
@@ -710,7 +710,7 @@ const DashboardScreen = ({ navigation }) => {
 
           {error ? (
             <View style={styles.emptyState}>
-              <Icon name="error-outline" size={48} color={Colors.primary.red} />
+              <Icon name="error-outline" size={48} color={Colors.primary.main} />
               <Text style={styles.emptyStateTitle}>Error Loading Data</Text>
               <Text style={styles.emptyStateText}>{error}</Text>
               <TouchableOpacity
@@ -726,7 +726,7 @@ const DashboardScreen = ({ navigation }) => {
             </View>
           ) : loading ? (
             <View style={styles.emptyState}>
-              <ActivityIndicator size="large" color={Colors.secondary.orange} />
+              <ActivityIndicator size="large" color={Colors.accent.action} />
               <Text style={styles.emptyStateText}>Loading incidents...</Text>
             </View>
           ) : activeIncidents.length > 0 ? (
@@ -737,7 +737,7 @@ const DashboardScreen = ({ navigation }) => {
             </View>
           ) : (
             <View style={styles.emptyState}>
-              <Icon name="check-circle" size={48} color={Colors.alert.success} />
+              <Icon name="check-circle" size={48} color={Colors.semantic.success} />
               <Text style={styles.emptyStateTitle}>All Clear</Text>
               <Text style={styles.emptyStateText}>
                 No active incidents at this time
@@ -788,7 +788,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 5,
     right: 5,
-    backgroundColor: Colors.primary.red,
+    backgroundColor: Colors.primary.main,
     borderRadius: 10,
     minWidth: 18,
     height: 18,
@@ -812,7 +812,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#d1fae5', // Light success green background
   },
   disconnected: {
-    backgroundColor: Colors.primary.background, // Light red background
+    backgroundColor: Colors.primary.background,
   },
   connectionDot: {
     width: 8,
@@ -820,10 +820,10 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   connectedDot: {
-    backgroundColor: Colors.alert.success,
+    backgroundColor: Colors.semantic.success,
   },
   disconnectedDot: {
-    backgroundColor: Colors.primary.red,
+    backgroundColor: Colors.primary.main,
   },
   connectionText: {
     fontSize: 12,
@@ -841,7 +841,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 12,
     borderLeftWidth: 4,
-    borderLeftColor: Colors.primary.red,
+    borderLeftColor: Colors.primary.main,
     marginBottom: 20,
   },
   emergencyText: {
@@ -851,7 +851,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   viewButton: {
-    backgroundColor: Colors.primary.red,
+    backgroundColor: Colors.primary.main,
     paddingHorizontal: 15,
     paddingVertical: 5,
     borderRadius: 8,
@@ -922,7 +922,7 @@ const styles = StyleSheet.create({
   },
   viewAllText: {
     fontSize: 14,
-    color: Colors.secondary.orange,
+    color: Colors.accent.action,
     fontWeight: '600',
   },
   quickActionsContainer: {
@@ -963,13 +963,13 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 15,
     borderLeftWidth: 4,
-    borderLeftColor: Colors.alert.warning,
+    borderLeftColor: Colors.accent.warning,
     elevation: 2,
     boxShadow: '0px 1px 2px rgba(0,0,0,0.1)',
     marginBottom: 15,
   },
   incidentCardCritical: {
-    borderLeftColor: Colors.primary.red,
+    borderLeftColor: Colors.primary.main,
     backgroundColor: Colors.primary.background,
   },
   incidentHeader: {
@@ -994,10 +994,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   statusCritical: {
-    backgroundColor: Colors.primary.red,
+    backgroundColor: Colors.primary.main,
   },
   statusActive: {
-    backgroundColor: Colors.alert.warning,
+    backgroundColor: Colors.accent.warning,
   },
   statusText: {
     color: Colors.neutral.white,
@@ -1032,13 +1032,13 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   navigateButton: {
-    backgroundColor: Colors.secondary.orange,
+    backgroundColor: Colors.accent.action,
   },
   messageButton: {
-    backgroundColor: Colors.alert.info,
+    backgroundColor: Colors.semantic.info,
   },
   callButton: {
-    backgroundColor: Colors.alert.success,
+    backgroundColor: Colors.semantic.success,
   },
   incidentActionText: {
     color: Colors.neutral.white,
@@ -1082,10 +1082,10 @@ const styles = StyleSheet.create({
     zIndex: 9999,
   },
   toastSuccess: {
-    backgroundColor: Colors.alert.success,
+    backgroundColor: Colors.semantic.success,
   },
   toastError: {
-    backgroundColor: Colors.primary.red,
+    backgroundColor: Colors.primary.main,
   },
   toastText: {
     color: Colors.neutral.white,
@@ -1098,7 +1098,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.secondary.orange,
+    backgroundColor: Colors.accent.action,
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,

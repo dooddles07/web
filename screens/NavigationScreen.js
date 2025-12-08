@@ -49,6 +49,8 @@ const NavigationScreen = ({ navigation, route }) => {
   // Navigation handlers
   const handleBackPress = () => {
     if (navigation && navigation.goBack) {
+      // Clear the selectedIncident param before going back
+      navigation.setParams({ selectedIncident: null });
       navigation.goBack();
     }
   };
@@ -416,8 +418,12 @@ const NavigationScreen = ({ navigation, route }) => {
 
     init();
 
-    // Refresh incidents every 30 seconds (Socket.IO handles real-time updates)
-    const interval = setInterval(fetchIncidents, 30000);
+    // Refresh incidents every 30 seconds as backup (Socket.IO handles primary real-time updates)
+    // This is only a fallback in case Socket.IO disconnects due to free tier limitations
+    const interval = setInterval(() => {
+      console.log('🔄 [Polling] Backup refresh triggered (30s interval)');
+      fetchIncidents();
+    }, 30000);
 
     return () => {
       clearInterval(interval);
@@ -462,6 +468,7 @@ const NavigationScreen = ({ navigation, route }) => {
     // Connect to socket if not already connected
     if (!socketService.isConnected()) {
       try {
+        console.log('🔌 [Socket.IO] Connecting to server for real-time updates...');
         // Get admin ID and token from storage
         const adminDataStr = await AsyncStorage.getItem('adminData');
         const token = await AsyncStorage.getItem('authToken');
@@ -469,15 +476,20 @@ const NavigationScreen = ({ navigation, route }) => {
         const adminId = adminData?._id || adminData?.id || 'web-admin';
 
         if (!token) {
-          console.error('No auth token found for socket connection');
+          console.error('❌ [Socket.IO] No auth token found for socket connection');
           return null;
         }
 
         await socketService.connect(adminId, token);
+        console.log('✅ [Socket.IO] Connected successfully! Real-time updates enabled.');
+        console.log('📡 [Socket.IO] Listening for: sos-alert, sos-updated, sos-cancelled, sos-resolved');
       } catch (error) {
-        console.error('Failed to connect to socket:', error);
+        console.error('❌ [Socket.IO] Connection failed:', error.message);
+        console.warn('⚠️ [Socket.IO] Falling back to polling mode (60s interval)');
         return null;
       }
+    } else {
+      console.log('✅ [Socket.IO] Already connected');
     }
 
     // Define named event handlers for proper cleanup
@@ -508,10 +520,19 @@ const NavigationScreen = ({ navigation, route }) => {
     };
 
     const handleSOSUpdate = (data) => {
+      console.log('🔄 [Socket.IO] Received location update:', {
+        id: data.id,
+        username: data.username,
+        latitude: data.latitude,
+        longitude: data.longitude,
+        timestamp: new Date().toISOString()
+      });
+
       // Update the specific incident in the list
       setIncidents(prevIncidents => {
         const updated = prevIncidents.map(incident => {
           if (incident._id === data.id || incident.username === data.username) {
+            console.log(`✅ Updating incident ${incident.username}: [${incident.latitude}, ${incident.longitude}] → [${data.latitude}, ${data.longitude}]`);
             return {
               ...incident,
               latitude: data.latitude,
@@ -522,10 +543,18 @@ const NavigationScreen = ({ navigation, route }) => {
           }
           return incident;
         });
+
+        // IMMEDIATELY update map markers (don't wait for useEffect)
+        // This ensures real-time updates even on slow connections
+        setTimeout(() => {
+          if (mapReady) {
+            console.log('🗺️ Immediately updating map with new location');
+            updateMapIncidents(updated);
+          }
+        }, 100);
+
         return updated;
       });
-
-      // Notification removed to prevent overwhelming the web interface with too many updates
     };
 
     const handleSOSCancelled = (data) => {
@@ -653,8 +682,8 @@ const NavigationScreen = ({ navigation, route }) => {
       for (const [nodeName, coords] of Object.entries(nodeCoordinates)) {
         L.circleMarker(coords, {
           radius: 5,
-          color: '${Colors.alert.info}',
-          fillColor: '${Colors.alert.info}',
+          color: '${Colors.semantic.info}',
+          fillColor: '${Colors.semantic.info}',
           fillOpacity: 0.3,
           opacity: 0.3,
           weight: 1
@@ -1276,7 +1305,7 @@ const NavigationScreen = ({ navigation, route }) => {
           const incidentMarker = L.marker([incidentLat, incidentLng], {
             icon: L.divIcon({
               className: 'incident-destination-marker',
-              html: "<div style='background-color:${Colors.primary.red};width:30px;height:30px;border-radius:50% 50% 50% 0;border:3px solid white;box-shadow:0 4px 10px rgba(220,38,38,0.6);transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;'><span style='transform:rotate(45deg);color:white;font-size:18px;font-weight:bold;'>🚨</span></div>",
+              html: "<div style='background-color:${Colors.primary.main};width:30px;height:30px;border-radius:50% 50% 50% 0;border:3px solid white;box-shadow:0 4px 10px rgba(128,0,0,0.6);transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;'><span style='transform:rotate(45deg);color:white;font-size:18px;font-weight:bold;'>🚨</span></div>",
               iconSize: [30, 30],
               iconAnchor: [15, 30]
             })
@@ -1284,8 +1313,8 @@ const NavigationScreen = ({ navigation, route }) => {
 
           const incidentCircle = L.circleMarker([incidentLat, incidentLng], {
             radius: 8,
-            color: '${Colors.primary.red}',
-            fillColor: '${Colors.primary.red}',
+            color: '${Colors.primary.main}',
+            fillColor: '${Colors.primary.main}',
             fillOpacity: 0.8,
             weight: 3
           }).addTo(map).bindTooltip('🚨 Emergency Location', { permanent: false, direction: 'top' });
@@ -1362,13 +1391,13 @@ const NavigationScreen = ({ navigation, route }) => {
 
   const renderIncidentList = () => {
     if (loading) {
-      return <ActivityIndicator size="large" color={Colors.secondary.orange} />;
+      return <ActivityIndicator size="large" color={Colors.accent.action} />;
     }
 
     if (incidents.length === 0) {
       return (
         <View style={styles.emptyState}>
-          <MaterialIcon name="check-circle" size={60} color={Colors.alert.success} />
+          <MaterialIcon name="check-circle" size={60} color={Colors.semantic.success} />
           <Text style={styles.emptyStateTitle}>No Active Emergencies</Text>
           <Text style={styles.subText}>All clear! No emergency alerts at this time.</Text>
         </View>
@@ -1392,7 +1421,7 @@ const NavigationScreen = ({ navigation, route }) => {
         >
           <View style={styles.incidentHeader}>
             <View style={styles.incidentIcon}>
-              <Icon name="add-alert" size={24} color={Colors.primary.red} />
+              <Icon name="add-alert" size={24} color={Colors.primary.main} />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.listItemText}>{fullname}</Text>
@@ -1415,7 +1444,7 @@ const NavigationScreen = ({ navigation, route }) => {
           <View style={styles.incidentDetail}>
             <View style={styles.iconContainer}>
               <View style={styles.detailIcon}>
-                <MaterialIcon name="phone" size={20} color={Colors.alert.success} />
+                <MaterialIcon name="phone" size={20} color={Colors.semantic.success} />
               </View>
             </View>
             <Text style={styles.detailText}>
@@ -1426,7 +1455,7 @@ const NavigationScreen = ({ navigation, route }) => {
           <View style={styles.incidentDetail}>
             <View style={styles.iconContainer}>
               <View style={styles.detailIcon}>
-                <MaterialIcon name="location-on" size={20} color={Colors.primary.red} />
+                <MaterialIcon name="location-on" size={20} color={Colors.primary.main} />
               </View>
             </View>
             <Text style={styles.detailText} numberOfLines={2}>{address}</Text>
@@ -1435,7 +1464,7 @@ const NavigationScreen = ({ navigation, route }) => {
           <View style={styles.incidentDetail}>
             <View style={styles.iconContainer}>
               <View style={styles.detailIcon}>
-                <MaterialIcon name="my-location" size={20} color={Colors.secondary.orange} />
+                <MaterialIcon name="my-location" size={20} color={Colors.accent.action} />
               </View>
             </View>
             <Text style={styles.detailText}>
@@ -1446,7 +1475,7 @@ const NavigationScreen = ({ navigation, route }) => {
           <View style={styles.incidentDetail}>
             <View style={styles.iconContainer}>
               <View style={styles.detailIcon}>
-                <MaterialIcon name="place" size={20} color={Colors.alert.warning} />
+                <MaterialIcon name="place" size={20} color={Colors.accent.warning} />
               </View>
             </View>
             <Text style={styles.detailText}>
@@ -1469,7 +1498,7 @@ const NavigationScreen = ({ navigation, route }) => {
                 showToast(`Navigating to ${fullname}'s location`, 'success');
               }}
             >
-              <MaterialIcon name="directions" size={16} color={Colors.alert.info} />
+              <MaterialIcon name="directions" size={16} color={Colors.semantic.info} />
               <Text style={[styles.miniActionText, styles.navigateActionText]}>Navigate</Text>
             </TouchableOpacity>
 
@@ -1485,7 +1514,7 @@ const NavigationScreen = ({ navigation, route }) => {
                 }
               }}
             >
-              <MaterialIcon name="message" size={16} color={Colors.secondary.orange} />
+              <MaterialIcon name="message" size={16} color={Colors.accent.action} />
               <Text style={[styles.miniActionText, styles.messageActionText]}>Message</Text>
             </TouchableOpacity>
 
@@ -1496,7 +1525,7 @@ const NavigationScreen = ({ navigation, route }) => {
                 showToast(`Calling ${fullname}: ${phoneNumber}`, 'success');
               }}
             >
-              <MaterialIcon name="phone" size={16} color={Colors.alert.success} />
+              <MaterialIcon name="phone" size={16} color={Colors.semantic.success} />
               <Text style={[styles.miniActionText, styles.callActionText]}>Call</Text>
             </TouchableOpacity>
 
@@ -1510,9 +1539,9 @@ const NavigationScreen = ({ navigation, route }) => {
               disabled={resolvingId === incident._id}
             >
               {resolvingId === incident._id ? (
-                <ActivityIndicator size="small" color={Colors.alert.success} />
+                <ActivityIndicator size="small" color={Colors.semantic.success} />
               ) : (
-                <MaterialIcon name="check-circle" size={16} color={Colors.alert.success} />
+                <MaterialIcon name="check-circle" size={16} color={Colors.semantic.success} />
               )}
               <Text style={[styles.miniActionText, styles.resolveActionText]}>
                 {resolvingId === incident._id ? 'Resolving...' : 'Resolve'}
@@ -1547,10 +1576,10 @@ const NavigationScreen = ({ navigation, route }) => {
             onPress={handleBackPress}
             activeOpacity={0.7}
           >
-            <ArrowBackIcon style={{ fontSize: 28, color: Colors.secondary.orange }} />
+            <ArrowBackIcon style={{ fontSize: 28, color: Colors.accent.action }} />
           </TouchableOpacity>
           <View style={styles.titleIconContainer}>
-            <NavigationOutlinedIcon style={{ fontSize: 40, color: Colors.secondary.orange }} />
+            <NavigationOutlinedIcon style={{ fontSize: 40, color: Colors.accent.action }} />
           </View>
           <Text style={styles.title}>Navigation</Text>
         </View>
@@ -1564,14 +1593,14 @@ const NavigationScreen = ({ navigation, route }) => {
             placeholder="Search location"
             placeholderTextColor={Colors.text.secondary}
           />
-          <TouchableOpacity style={styles.filterButton}>
+          <TouchableOpacity style={[styles.filterButton, { backgroundColor: Colors.accent.action }]}>
             <Text style={styles.filterButtonText}>Filter</Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.incidentsHeaderContainer}>
           <View style={styles.incidentsHeaderIcon}>
-            <Icon name="add-alert" size={30} color={Colors.primary.red} />
+            <Icon name="add-alert" size={30} color={Colors.primary.main} />
           </View>
           <Text style={styles.incidentsHeaderText}>Active Incidents</Text>
         </View>
@@ -1600,7 +1629,7 @@ const NavigationScreen = ({ navigation, route }) => {
               renderLoading={() => (
                 <ActivityIndicator
                   size="large"
-                  color={Colors.secondary.orange}
+                  color={Colors.accent.action}
                   style={styles.mapLoading}
                 />
               )}
@@ -1693,7 +1722,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    backgroundColor: Colors.secondary.orange,
+    backgroundColor: Colors.accent.action,
     borderRadius: 6,
     justifyContent: 'center',
     alignItems: 'center',
@@ -1732,7 +1761,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 12,
     borderLeftWidth: 4,
-    borderLeftColor: Colors.primary.red,
+    borderLeftColor: Colors.primary.main,
     ...(Platform.OS === 'web' ? {
       boxShadow: '0 2px 4px rgba(0, 0, 0, 0.08)',
     } : {
@@ -1768,7 +1797,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   statusBadge: {
-    backgroundColor: Colors.primary.red,
+    backgroundColor: Colors.primary.main,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
@@ -1830,33 +1859,33 @@ const styles = StyleSheet.create({
   },
   miniActionText: {
     fontSize: 12,
-    color: Colors.secondary.orange,
+    color: Colors.accent.action,
     fontWeight: '600',
     marginLeft: 4,
   },
   navigateAction: {
-    backgroundColor: Colors.alert.info + '20',
+    backgroundColor: Colors.semantic.info + '20',
   },
   navigateActionText: {
-    color: Colors.alert.info,
+    color: Colors.semantic.info,
   },
   messageAction: {
-    backgroundColor: Colors.secondary.orange + '20',
+    backgroundColor: Colors.accent.action + '20',
   },
   messageActionText: {
-    color: Colors.secondary.orange,
+    color: Colors.accent.action,
   },
   callAction: {
-    backgroundColor: Colors.alert.success + '20',
+    backgroundColor: Colors.semantic.success + '20',
   },
   callActionText: {
-    color: Colors.alert.success,
+    color: Colors.semantic.success,
   },
   resolveAction: {
-    backgroundColor: Colors.alert.success + '20',
+    backgroundColor: Colors.semantic.success + '20',
   },
   resolveActionText: {
-    color: Colors.alert.success,
+    color: Colors.semantic.success,
   },
   rightContainer: {
     flex: 2,
@@ -1915,10 +1944,10 @@ const styles = StyleSheet.create({
     }),
   },
   toastSuccess: {
-    backgroundColor: Colors.alert.success,
+    backgroundColor: Colors.semantic.success,
   },
   toastError: {
-    backgroundColor: Colors.primary.red,
+    backgroundColor: Colors.primary.main,
   },
   toastText: {
     color: Colors.neutral.white,

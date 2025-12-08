@@ -93,7 +93,7 @@ const HelpCenterScreen = ({ navigation }) => {
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.welcomeSection}>
-          <Icon name="help-outline" size={48} color={Colors.secondary.orange} />
+          <Icon name="help-outline" size={48} color={Colors.accent.action} />
           <Text style={styles.welcomeTitle}>How can we help you?</Text>
           <Text style={styles.welcomeText}>
             Find answers to common questions about ResqYOU Emergency Response System
@@ -101,7 +101,7 @@ const HelpCenterScreen = ({ navigation }) => {
         </View>
 
         <View style={styles.emergencyCard}>
-          <Icon name="warning" size={24} color={Colors.primary.red} />
+          <Icon name="warning" size={24} color={Colors.primary.main} />
           <View style={styles.emergencyTextContainer}>
             <Text style={styles.emergencyTitle}>In Case of Emergency</Text>
             <Text style={styles.emergencyText}>
@@ -133,7 +133,7 @@ const HelpCenterScreen = ({ navigation }) => {
               <Icon
                 name={expandedIndex === index ? 'expand-less' : 'expand-more'}
                 size={24}
-                color={Colors.secondary.orange}
+                color={Colors.accent.action}
               />
             </View>
             {expandedIndex === index && (
@@ -150,19 +150,19 @@ const HelpCenterScreen = ({ navigation }) => {
 
           <View style={styles.contactMethods}>
             <View style={styles.contactMethod}>
-              <Icon name="email" size={24} color={Colors.secondary.orange} />
+              <Icon name="email" size={24} color={Colors.accent.action} />
               <Text style={styles.contactMethodLabel}>Email Support</Text>
               <Text style={styles.contactMethodValue}>support@resqyou.com</Text>
             </View>
 
             <View style={styles.contactMethod}>
-              <Icon name="phone" size={24} color={Colors.secondary.orange} />
+              <Icon name="phone" size={24} color={Colors.accent.action} />
               <Text style={styles.contactMethodLabel}>Phone Support</Text>
               <Text style={styles.contactMethodValue}>+1 (555) 123-4567</Text>
             </View>
 
             <View style={styles.contactMethod}>
-              <Icon name="chat" size={24} color={Colors.secondary.orange} />
+              <Icon name="chat" size={24} color={Colors.accent.action} />
               <Text style={styles.contactMethodLabel}>Live Chat</Text>
               <Text style={styles.contactMethodValue}>Available 24/7 in app</Text>
             </View>
@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 20,
     borderLeftWidth: 4,
-    borderLeftColor: Colors.primary.red,
+    borderLeftColor: Colors.primary.main,
   },
   emergencyTextContainer: {
     flex: 1,
@@ -254,12 +254,12 @@ const styles = StyleSheet.create({
   emergencyTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: Colors.primary.red,
+    color: Colors.primary.main,
     marginBottom: 5,
   },
   emergencyText: {
     fontSize: 14,
-    color: Colors.primary.red,
+    color: Colors.primary.main,
     lineHeight: 20,
   },
   sectionTitle: {
@@ -339,7 +339,7 @@ const styles = StyleSheet.create({
   },
   contactMethodValue: {
     fontSize: 14,
-    color: Colors.secondary.orange,
+    color: Colors.accent.action,
     fontWeight: '500',
   },
   footer: {

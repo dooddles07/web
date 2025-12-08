@@ -1,76 +1,102 @@
 // ResQYou Web App Color Constants
-// Matching mobile app's emergency red/orange theme
+// Matching mobile app's maroon theme (60:30:10 color rule)
 
 export const Colors = {
-  // Primary Colors - Emergency Red Theme
+  // Primary Colors (60%) - Maroon Theme
   primary: {
-    red: '#dc2626',       // Main emergency red (primary brand color)
-    redDark: '#b91c1c',   // Darker red for hover/active states
-    redLight: '#fca5a5',  // Light red for highlights/backgrounds
-    background: '#fef2f2', // Very light red for backgrounds
+    main: '#800000',        // Maroon - Professional urgency & critical action
+    dark: '#5c0000',        // Darker maroon for hover/active states
+    light: '#a64d4d',       // Light maroon for highlights
+    background: '#f5e6e6',  // Very light maroon for backgrounds
   },
 
-  // Secondary Colors - Action Orange
+  // Secondary Colors (30%) - Gray Scale
   secondary: {
-    orange: '#f97316',    // Action orange (buttons, CTAs)
-    orangeDark: '#ea580c', // Darker orange for hover states
-    orangeLight: '#fed7aa', // Light orange for highlights
-    background: '#fff7ed', // Light orange background
+    gray50: '#f5f5f5',
+    gray100: '#e8e8e8',
+    gray200: '#d4d4d4',
+    gray300: '#b8b8b8',
+    gray400: '#999999',
+    gray500: '#777777',     // Base gray
+    gray600: '#5a5a5a',
+    gray700: '#3d3d3d',
+    gray800: '#2b2b2b',
+    gray900: '#1a1a1a',
   },
 
-  // Alert Colors
-  alert: {
-    emergency: '#dc2626', // Emergency/Critical alerts
-    warning: '#fbbf24',   // Warning/Caution
-    success: '#10b981',   // Success states
-    info: '#3b82f6',      // Informational
+  // Accent Colors (10%) - Strategic Actions
+  accent: {
+    action: '#b85c5c',      // Lighter maroon-red for action buttons/CTAs
+    actionDark: '#8c3d3d',  // Darker action color for hover
+    warning: '#d9a84d',     // Gold/amber - Warnings/Caution
+    success: '#6b8e6b',     // Muted green - Success states
+    info: '#5c7a99',        // Muted blue - Informational
+  },
+
+  // Semantic Colors
+  semantic: {
+    error: '#800000',       // Maroon for errors
+    success: '#6b8e6b',     // Muted green for success
+    warning: '#d9a84d',     // Gold for warnings
+    info: '#5c7a99',        // Muted blue for info
   },
 
   // Neutral Colors
   neutral: {
     white: '#ffffff',
-    gray50: '#f9fafb',
-    gray100: '#f3f4f6',
-    gray200: '#e5e7eb',
-    gray300: '#d1d5db',
-    gray400: '#9ca3af',
-    gray500: '#6b7280',
-    gray600: '#4b5563',
-    gray700: '#374151',
-    gray800: '#1f2937',
-    gray900: '#111827',
+    gray50: '#f5f5f5',
+    gray100: '#e8e8e8',
+    gray200: '#d4d4d4',
+    gray300: '#b8b8b8',
+    gray400: '#999999',
+    gray500: '#777777',
+    gray600: '#5a5a5a',
+    gray700: '#3d3d3d',
+    gray800: '#2b2b2b',
+    gray900: '#1a1a1a',
     black: '#000000',
   },
 
-  // Semantic Colors
+  // Text Colors
   text: {
-    primary: '#1f2937',
-    secondary: '#6b7280',
-    tertiary: '#9ca3af',
-    inverse: '#ffffff',
-    disabled: '#d1d5db',
+    primary: '#1a1a1a',     // Main text - WCAG AAA compliant
+    secondary: '#5a5a5a',   // Secondary text - WCAG AA compliant
+    tertiary: '#999999',    // Tertiary text - Less emphasis
+    inverse: '#ffffff',     // Text on dark backgrounds
+    disabled: '#d4d4d4',    // Disabled state
   },
 
+  // Background Colors
   background: {
     primary: '#ffffff',
-    secondary: '#f9fafb',
-    tertiary: '#f3f4f6',
-    emergency: '#fef2f2',   // Light red-tinted background
+    secondary: '#f5f5f5',
+    tertiary: '#e8e8e8',
+    emergency: '#f5e6e6',   // Light maroon-tinted background
+    dark: '#1a1a1a',        // Dark mode primary
+    darkSecondary: '#2b2b2b', // Dark mode secondary
   },
 
+  // Border Colors
   border: {
-    light: '#e5e7eb',
-    medium: '#d1d5db',
-    dark: '#9ca3af',
-    focus: '#dc2626',       // Emergency red for focus states
+    light: '#d4d4d4',
+    medium: '#b8b8b8',
+    dark: '#777777',
+    focus: '#800000',       // Maroon for focus states
+  },
+
+  // Overlay Colors
+  overlay: {
+    light: 'rgba(0, 0, 0, 0.1)',
+    medium: 'rgba(0, 0, 0, 0.3)',
+    dark: 'rgba(0, 0, 0, 0.6)',
   },
 
   // Status-specific colors for incidents
   status: {
-    high: '#dc2626',      // High priority - emergency red
-    medium: '#fbbf24',    // Medium priority - warning yellow
-    low: '#10b981',       // Low priority - success green
-    resolved: '#10b981',  // Resolved - success green
+    high: '#800000',      // High priority - maroon
+    medium: '#d9a84d',    // Medium priority - gold/amber
+    low: '#6b8e6b',       // Low priority - muted green
+    resolved: '#6b8e6b',  // Resolved - muted green
   },
 };
 

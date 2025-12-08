@@ -14,7 +14,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import API_BASE from '../config/api';
-import Logo from '../images/resqyou.png'; // Correctly import the logo image
+import Logo from '../images/bg1.png'; // Correctly import the logo image
 import Colors from '../constants/colors';
 
 const LoginScreen = ({ navigation }) => {
@@ -247,15 +247,15 @@ const styles = StyleSheet.create({
   button: {
     width: '100%',
     height: 56,
-    backgroundColor: Colors.secondary.orange, // Mobile action orange (10% - accent)
+    backgroundColor: Colors.accent.action, // Mobile action maroon-red (10% - accent)
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 12,
     marginTop: 12,
     ...(Platform.OS === 'web' ? {
-      boxShadow: `0 4px 8px ${Colors.secondary.orange}50`,
+      boxShadow: `0 4px 8px ${Colors.accent.action}50`,
     } : {
-      shadowColor: Colors.secondary.orange,
+      shadowColor: Colors.accent.action,
       shadowOpacity: 0.3,
       shadowOffset: { width: 0, height: 4 },
       shadowRadius: 8,
@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
     }),
   },
   buttonHover: {
-    backgroundColor: Colors.secondary.orangeDark, // Mobile orange dark - hover state
+    backgroundColor: Colors.accent.actionDark, // Mobile maroon-red dark - hover state
     transform: [{ scale: 1.02 }],
   },
   buttonText: {
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     fontWeight: '600', // Consistent weight
   },
   buttonDisabled: {
-    backgroundColor: `${Colors.secondary.orange}80`, // Semi-transparent orange
+    backgroundColor: `${Colors.accent.action}80`, // Semi-transparent maroon-red
     opacity: 0.6,
   },
   // Toast notification styles
@@ -300,10 +300,10 @@ const styles = StyleSheet.create({
     zIndex: 9999,
   },
   toastSuccess: {
-    backgroundColor: Colors.alert.success, // Mobile green
+    backgroundColor: Colors.semantic.success, // Mobile green
   },
   toastError: {
-    backgroundColor: Colors.primary.red, // Mobile emergency red
+    backgroundColor: Colors.primary.main, // Mobile emergency maroon
   },
   toastText: {
     color: '#ffffff',

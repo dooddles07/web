@@ -128,7 +128,7 @@ const LogoutScreen = ({ navigation }) => {
   if (isLoggingOut) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={Colors.secondary.orange} />
+        <ActivityIndicator size="large" color={Colors.accent.action} />
         <Text style={styles.loadingText}>Logging out...</Text>
       </View>
     );
@@ -155,7 +155,7 @@ const LogoutScreen = ({ navigation }) => {
         {/* Main Section */}
         <View style={styles.mainSection}>
           <View style={styles.iconContainer}>
-            <Icon name="logout" size={64} color={Colors.primary.red} />
+            <Icon name="logout" size={64} color={Colors.primary.main} />
           </View>
           
           <Text style={styles.title}>Ready to logout?</Text>
@@ -166,7 +166,7 @@ const LogoutScreen = ({ navigation }) => {
           {/* User Info */}
           <View style={styles.userCard}>
             <View style={styles.userAvatar}>
-              <Icon name="person" size={32} color={Colors.secondary.orange} />
+              <Icon name="person" size={32} color={Colors.accent.action} />
             </View>
             <View style={styles.userInfo}>
               <Text style={styles.userName}>{adminData?.fullname || 'Admin User'}</Text>
@@ -203,7 +203,7 @@ const LogoutScreen = ({ navigation }) => {
             accessibilityRole="button"
             accessibilityHint="Quickly logs out without server confirmation"
           >
-            <Icon name="flash-on" size={20} color={Colors.secondary.orange} />
+            <Icon name="flash-on" size={20} color={Colors.accent.action} />
             <Text style={styles.secondaryButtonText}>Quick Logout</Text>
           </TouchableOpacity>
         </View>
@@ -216,13 +216,13 @@ const LogoutScreen = ({ navigation }) => {
             style={styles.actionItem}
             onPress={() => navigation.navigate('Settings')}
           >
-            <Icon name="settings" size={20} color={Colors.secondary.orange} />
+            <Icon name="settings" size={20} color={Colors.accent.action} />
             <Text style={styles.actionText}>Settings</Text>
             <Icon name="chevron-right" size={20} color={Colors.neutral.gray600} />
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.actionItem}>
-            <Icon name="contact-phone" size={20} color={Colors.primary.red} />
+            <Icon name="contact-phone" size={20} color={Colors.primary.main} />
             <Text style={styles.actionText}>Emergency Contacts</Text>
             <Icon name="chevron-right" size={20} color={Colors.neutral.gray600} />
           </TouchableOpacity>
@@ -329,7 +329,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Colors.primary.red,
+    backgroundColor: Colors.primary.main,
     paddingVertical: 15,
     paddingHorizontal: 30,
     borderRadius: 12,
@@ -352,17 +352,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: Colors.secondary.orange,
+    borderColor: Colors.accent.action,
     width: '100%',
   },
   secondaryButtonText: {
-    color: Colors.secondary.orange,
+    color: Colors.accent.action,
     fontSize: 16,
     fontWeight: '600',
     marginLeft: 8,
   },
   primaryButtonHover: {
-    backgroundColor: Colors.primary.redDark,
+    backgroundColor: Colors.primary.mainDark,
     transform: [{ scale: 1.02 }],
     elevation: 4,
   },

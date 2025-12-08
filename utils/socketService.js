@@ -49,21 +49,28 @@ class SocketService {
     return new Promise((resolve, reject) => {
       try {
         // 🔒 Create socket connection with authentication
+        // Optimized for free tier services (Render, Vercel) with aggressive reconnection
         this.socket = io(API_BASE, {
           auth: {
             token: this.token // Pass JWT token for authentication
           },
-          transports: ['websocket', 'polling'],
+          transports: ['websocket', 'polling'], // Try WebSocket first, fallback to polling
           reconnection: true,
-          reconnectionAttempts: 5,
-          reconnectionDelay: 1000,
+          reconnectionAttempts: Infinity, // Keep trying to reconnect (important for free tier cold starts)
+          reconnectionDelay: 1000, // Start with 1s delay
+          reconnectionDelayMax: 5000, // Max 5s between reconnection attempts
+          timeout: 20000, // 20s timeout for initial connection (free tier can be slow)
+          pingTimeout: 60000, // 60s ping timeout (free tier servers can be slow)
+          pingInterval: 25000, // Ping every 25s to keep connection alive
         });
 
-        // Set up connection timeout
+        // Set up connection timeout (longer for free tier services)
         const connectionTimeout = setTimeout(() => {
-          console.error('❌ Socket connection timeout');
-          reject(new Error('Connection timeout'));
-        }, 10000); // 10 second timeout
+          console.error('❌ Socket connection timeout (20s limit)');
+          console.warn('⚠️ This may be due to free tier cold start - will keep retrying in background');
+          // Don't reject - let it keep trying via reconnection
+          resolve(this.socket); // Resolve anyway to not block app
+        }, 20000); // 20 second timeout to match socket config
 
         // Connection event handlers
         this.socket.on('connect', () => {
@@ -89,21 +96,36 @@ class SocketService {
         });
 
         this.socket.on('disconnect', (reason) => {
+          console.warn(`⚠️ [Socket.IO] Disconnected. Reason: ${reason}`);
           this.isJoinedAdminRoom = false; // Reset flag on disconnect
 
           // Auto-reconnect on certain disconnect reasons
           if (reason === 'io server disconnect') {
+            console.log('🔄 [Socket.IO] Server disconnected, attempting to reconnect...');
             this.socket.connect();
+          } else if (reason === 'transport close' || reason === 'ping timeout') {
+            console.log('🔄 [Socket.IO] Connection lost (free tier timeout?), will auto-reconnect...');
           }
         });
 
         this.socket.on('reconnect', (attemptNumber) => {
+          console.log(`✅ [Socket.IO] Reconnected successfully after ${attemptNumber} attempts`);
           // Re-join admin room after reconnection
           if (this.adminId) {
-            this.joinAdminRoom().catch((err) => {
-              console.error('Failed to re-join admin room:', err);
-            });
+            this.joinAdminRoom()
+              .then(() => console.log('✅ [Socket.IO] Re-joined admin room after reconnection'))
+              .catch((err) => {
+                console.error('❌ [Socket.IO] Failed to re-join admin room:', err);
+              });
           }
+        });
+
+        this.socket.on('reconnect_attempt', (attemptNumber) => {
+          console.log(`🔄 [Socket.IO] Reconnection attempt #${attemptNumber}...`);
+        });
+
+        this.socket.on('reconnect_failed', () => {
+          console.error('❌ [Socket.IO] Reconnection failed after all attempts');
         });
       } catch (error) {
         console.error('Failed to initialize socket:', error);

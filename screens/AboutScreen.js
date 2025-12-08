@@ -27,7 +27,7 @@ const AboutScreen = ({ navigation }) => {
         {/* App Logo Section */}
         <View style={styles.logoSection}>
           <View style={styles.logoContainer}>
-            <Icon name="emergency" size={80} color={Colors.secondary.orange} />
+            <Icon name="emergency" size={80} color={Colors.accent.action} />
           </View>
           <Text style={styles.appName}>ResqYOU</Text>
           <Text style={styles.tagline}>Emergency Response & Locator System</Text>
@@ -63,7 +63,7 @@ const AboutScreen = ({ navigation }) => {
 
           <View style={styles.featureItem}>
             <View style={styles.featureIcon}>
-              <Icon name="emergency" size={24} color={Colors.primary.red} />
+              <Icon name="emergency" size={24} color={Colors.primary.main} />
             </View>
             <View style={styles.featureContent}>
               <Text style={styles.featureTitle}>One-Touch SOS</Text>
@@ -75,7 +75,7 @@ const AboutScreen = ({ navigation }) => {
 
           <View style={styles.featureItem}>
             <View style={styles.featureIcon}>
-              <Icon name="location-on" size={24} color={Colors.secondary.orange} />
+              <Icon name="location-on" size={24} color={Colors.accent.action} />
             </View>
             <View style={styles.featureContent}>
               <Text style={styles.featureTitle}>Real-Time Tracking</Text>
@@ -87,7 +87,7 @@ const AboutScreen = ({ navigation }) => {
 
           <View style={styles.featureItem}>
             <View style={styles.featureIcon}>
-              <Icon name="route" size={24} color={Colors.alert.success} />
+              <Icon name="route" size={24} color={Colors.semantic.success} />
             </View>
             <View style={styles.featureContent}>
               <Text style={styles.featureTitle}>Smart Routing</Text>
@@ -99,7 +99,7 @@ const AboutScreen = ({ navigation }) => {
 
           <View style={styles.featureItem}>
             <View style={styles.featureIcon}>
-              <Icon name="history" size={24} color={Colors.alert.warning} />
+              <Icon name="history" size={24} color={Colors.accent.warning} />
             </View>
             <View style={styles.featureContent}>
               <Text style={styles.featureTitle}>Emergency History</Text>
@@ -111,7 +111,7 @@ const AboutScreen = ({ navigation }) => {
 
           <View style={styles.featureItem}>
             <View style={styles.featureIcon}>
-              <Icon name="contacts" size={24} color={Colors.alert.info} />
+              <Icon name="contacts" size={24} color={Colors.semantic.info} />
             </View>
             <View style={styles.featureContent}>
               <Text style={styles.featureTitle}>Emergency Contacts</Text>
@@ -123,7 +123,7 @@ const AboutScreen = ({ navigation }) => {
 
           <View style={styles.featureItem}>
             <View style={styles.featureIcon}>
-              <Icon name="security" size={24} color={Colors.primary.red} />
+              <Icon name="security" size={24} color={Colors.primary.main} />
             </View>
             <View style={styles.featureContent}>
               <Text style={styles.featureTitle}>Secure & Private</Text>
@@ -161,7 +161,7 @@ const AboutScreen = ({ navigation }) => {
           <Text style={styles.sectionTitle}>How It Works</Text>
 
           <View style={styles.stepItem}>
-            <View style={styles.stepNumber}>
+            <View style={[styles.stepNumber, { backgroundColor: Colors.accent.action }]}>
               <Text style={styles.stepNumberText}>1</Text>
             </View>
             <View style={styles.stepContent}>
@@ -218,12 +218,12 @@ const AboutScreen = ({ navigation }) => {
             our system meets the highest standards of reliability and effectiveness.
           </Text>
           <View style={styles.commitmentList}>
-            <Text style={styles.commitmentItem}>✓ 24/7 System Availability</Text>
-            <Text style={styles.commitmentItem}>✓ Regular Security Audits</Text>
-            <Text style={styles.commitmentItem}>✓ Privacy-First Approach</Text>
-            <Text style={styles.commitmentItem}>✓ Free for All Users</Text>
-            <Text style={styles.commitmentItem}>✓ Continuous Feature Updates</Text>
-            <Text style={styles.commitmentItem}>✓ Community Safety Focus</Text>
+            <Text style={[styles.commitmentItem, { color: Colors.semantic.success }]}>✓ 24/7 System Availability</Text>
+            <Text style={[styles.commitmentItem, { color: Colors.semantic.success }]}>✓ Regular Security Audits</Text>
+            <Text style={[styles.commitmentItem, { color: Colors.semantic.success }]}>✓ Privacy-First Approach</Text>
+            <Text style={[styles.commitmentItem, { color: Colors.semantic.success }]}>✓ Free for All Users</Text>
+            <Text style={[styles.commitmentItem, { color: Colors.semantic.success }]}>✓ Continuous Feature Updates</Text>
+            <Text style={[styles.commitmentItem, { color: Colors.semantic.success }]}>✓ Community Safety Focus</Text>
           </View>
         </View>
 
@@ -445,7 +445,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: Colors.secondary.orange,
+    backgroundColor: Colors.accent.action,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 15,
@@ -474,12 +474,12 @@ const styles = StyleSheet.create({
   },
   commitmentItem: {
     fontSize: 14,
-    color: Colors.alert.success,
+    color: Colors.semantic.success,
     fontWeight: '500',
     marginBottom: 8,
   },
   statsSection: {
-    backgroundColor: Colors.secondary.orange,
+    backgroundColor: Colors.accent.action,
     padding: 20,
     marginTop: 10,
   },
@@ -499,7 +499,7 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 28,
     fontWeight: '700',
-    color: Colors.secondary.orange,
+    color: Colors.accent.action,
     marginBottom: 5,
   },
   statLabel: {
@@ -509,7 +509,7 @@ const styles = StyleSheet.create({
   },
   contactInfo: {
     fontSize: 14,
-    color: Colors.secondary.orange,
+    color: Colors.accent.action,
     marginBottom: 6,
   },
   socialSection: {

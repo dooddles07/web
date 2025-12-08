@@ -73,7 +73,7 @@ const SettingsScreen = ({ navigation }) => {
     >
       <View style={styles.settingsItemLeft}>
         <View style={styles.iconContainer}>
-          <Icon name={icon} size={24} color={Colors.secondary.orange} />
+          <Icon name={icon} size={24} color={Colors.accent.action} />
         </View>
         <View style={styles.textContainer}>
           <Text style={styles.settingsTitle}>{title}</Text>
@@ -352,7 +352,7 @@ const SettingsScreen = ({ navigation }) => {
               <Switch
                 value={notificationsEnabled}
                 onValueChange={setNotificationsEnabled}
-                trackColor={{ false: Colors.neutral.gray300, true: Colors.secondary.orange }}
+                trackColor={{ false: Colors.neutral.gray300, true: Colors.accent.action }}
                 thumbColor={notificationsEnabled ? Colors.neutral.white : Colors.neutral.white}
               />
             }
@@ -365,7 +365,7 @@ const SettingsScreen = ({ navigation }) => {
               <Switch
                 value={emergencyAlerts}
                 onValueChange={setEmergencyAlerts}
-                trackColor={{ false: Colors.neutral.gray300, true: Colors.primary.red }}
+                trackColor={{ false: Colors.neutral.gray300, true: Colors.primary.main }}
                 thumbColor={emergencyAlerts ? Colors.neutral.white : Colors.neutral.white}
               />
             }
@@ -383,7 +383,7 @@ const SettingsScreen = ({ navigation }) => {
               <Switch
                 value={locationServices}
                 onValueChange={setLocationServices}
-                trackColor={{ false: Colors.neutral.gray300, true: Colors.secondary.orange }}
+                trackColor={{ false: Colors.neutral.gray300, true: Colors.accent.action }}
                 thumbColor={locationServices ? Colors.neutral.white : Colors.neutral.white}
               />
             }
@@ -413,7 +413,7 @@ const SettingsScreen = ({ navigation }) => {
               <Switch
                 value={darkMode}
                 onValueChange={setDarkMode}
-                trackColor={{ false: Colors.neutral.gray300, true: Colors.secondary.orange }}
+                trackColor={{ false: Colors.neutral.gray300, true: Colors.accent.action }}
                 thumbColor={darkMode ? Colors.neutral.white : Colors.neutral.white}
               />
             }
@@ -432,7 +432,7 @@ const SettingsScreen = ({ navigation }) => {
               <Switch
                 value={autoBackup}
                 onValueChange={setAutoBackup}
-                trackColor={{ false: Colors.neutral.gray300, true: Colors.secondary.orange }}
+                trackColor={{ false: Colors.neutral.gray300, true: Colors.accent.action }}
                 thumbColor={autoBackup ? Colors.neutral.white : Colors.neutral.white}
               />
             }
@@ -505,9 +505,9 @@ const SettingsScreen = ({ navigation }) => {
 
         {/* App Info */}
         <View style={styles.appInfo}>
-          <Text style={styles.appInfoText}>VAWC Prevention App</Text>
+          <Text style={styles.appInfoText}>ResqYou App</Text>
           <Text style={styles.appInfoText}>Version 1.2.3</Text>
-          <Text style={styles.appInfoText}>© 2024 VAWC Prevention Initiative</Text>
+          <Text style={styles.appInfoText}>© 2024 ResqYou Initiative</Text>
         </View>
       </ScrollView>
 
@@ -659,7 +659,7 @@ const SettingsScreen = ({ navigation }) => {
       {/* Loading Overlay */}
       {isLoading && !showEditModal && !showChangePasswordModal && (
         <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large" color={Colors.secondary.orange} />
+          <ActivityIndicator size="large" color={Colors.accent.action} />
           <Text style={styles.loadingText}>Please wait...</Text>
         </View>
       )}
@@ -840,7 +840,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.neutral.gray50,
   },
   saveButton: {
-    backgroundColor: Colors.secondary.orange,
+    backgroundColor: Colors.accent.action,
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: 'center',
@@ -892,10 +892,10 @@ const styles = StyleSheet.create({
     zIndex: 9999,
   },
   toastSuccess: {
-    backgroundColor: Colors.alert.success,
+    backgroundColor: Colors.semantic.success,
   },
   toastError: {
-    backgroundColor: Colors.primary.red,
+    backgroundColor: Colors.primary.main,
   },
   toastText: {
     color: Colors.neutral.white,

@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createStackNavigator } from '@react-navigation/stack';
-import { View, Text, StyleSheet, TouchableOpacity, Platform, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Platform, ActivityIndicator, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import API_BASE from './config/api';
 import Colors from './constants/colors';
+import Logo from './images/bg1.png';
 
 // Import your screens
 import DashboardScreen from './screens/DashboardScreen';
@@ -39,9 +40,9 @@ const CustomDrawerContent = ({ navigation, state }) => {
       {/* Header */}
       <View style={styles.drawerHeader}>
         <View style={styles.logoContainer}>
-          <Icon name="security" size={40} color={Colors.secondary.orange} />
+          <Image source={Logo} style={styles.logoImage} resizeMode="contain" />
         </View>
-        <Text style={styles.appTitle}>VAWC Prevention</Text>
+        <Text style={styles.appTitle}>ResqYou</Text>
         <Text style={styles.appSubtitle}>Violence Against Women & Children</Text>
       </View>
 
@@ -60,7 +61,7 @@ const CustomDrawerContent = ({ navigation, state }) => {
                 <Icon
                   name={item.icon}
                   size={22}
-                  color={isActive ? Colors.secondary.orange : Colors.neutral.gray600}
+                  color={isActive ? Colors.accent.action : Colors.neutral.gray600}
                 />
               </View>
               <Text style={[styles.menuText, isActive && styles.activeMenuText]}>
@@ -248,7 +249,7 @@ const RootNavigator = () => {
   if (isAuthenticated === null) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.neutral.gray50 }}>
-        <ActivityIndicator size="large" color={Colors.secondary.orange} />
+        <ActivityIndicator size="large" color={Colors.accent.action} />
         <Text style={{ marginTop: 10, color: Colors.text.secondary }}>Loading...</Text>
       </View>
     );
@@ -307,7 +308,7 @@ const App = () => {
   // Set initial document title
   useEffect(() => {
     if (Platform.OS === 'web') {
-      document.title = 'VAWC Prevention';
+      document.title = 'ResqYou';
     }
   }, []);
 
@@ -428,20 +429,20 @@ const App = () => {
 
     // Set document title based on route
     const titles = {
-      'Dashboard': 'Dashboard - VAWC Prevention',
-      'NavigationScreen': 'Map - VAWC Prevention',
-      'Messages': 'Messages - VAWC Prevention',
-      'Reports': 'Reports - VAWC Prevention',
-      'Settings': 'Settings - VAWC Prevention',
-      'Logout': 'Logout - VAWC Prevention',
-      'Login': 'Login - VAWC Prevention',
-      'PrivacyPolicy': 'Privacy Policy - VAWC Prevention',
-      'TermsOfService': 'Terms of Service - VAWC Prevention',
-      'HelpCenter': 'Help Center - VAWC Prevention',
-      'About': 'About - VAWC Prevention',
+      'Dashboard': 'Dashboard - ResqYou',
+      'NavigationScreen': 'Map - ResqYou',
+      'Messages': 'Messages - ResqYou',
+      'Reports': 'Reports - ResqYou',
+      'Settings': 'Settings - ResqYou',
+      'Logout': 'Logout - ResqYou',
+      'Login': 'Login - ResqYou',
+      'PrivacyPolicy': 'Privacy Policy - ResqYou',
+      'TermsOfService': 'Terms of Service - ResqYou',
+      'HelpCenter': 'Help Center - ResqYou',
+      'About': 'About - ResqYou',
     };
 
-    document.title = titles[currentRoute] || 'VAWC Prevention';
+    document.title = titles[currentRoute] || 'ResqYou';
   };
 
   const enforceAuthentication = async () => {
@@ -519,7 +520,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.neutral.white,
   },
   drawerHeader: {
-    backgroundColor: Colors.secondary.orange,
+    backgroundColor: Colors.primary.main,
     paddingTop: 50,
     paddingBottom: 20,
     paddingHorizontal: 20,
@@ -529,10 +530,15 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 15,
+    overflow: 'hidden',
+  },
+  logoImage: {
+    width: 70,
+    height: 70,
   },
   appTitle: {
     fontSize: 20,
@@ -559,9 +565,9 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   activeMenuItem: {
-    backgroundColor: Colors.secondary.background,
+    backgroundColor: Colors.primary.background,
     borderRightWidth: 3,
-    borderRightColor: Colors.secondary.orange,
+    borderRightColor: Colors.accent.action,
   },
   menuIconContainer: {
     width: 35,
@@ -577,7 +583,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   activeMenuText: {
-    color: Colors.secondary.orange,
+    color: Colors.accent.action,
     fontWeight: '600',
   },
   drawerFooter: {
@@ -591,15 +597,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Colors.primary.red,
+    backgroundColor: Colors.primary.main,
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 25,
     ...(Platform.OS === 'web' ? {
-      boxShadow: `0 2px 4px ${Colors.primary.red}50`,
+      boxShadow: `0 2px 4px ${Colors.primary.main}50`,
     } : {
       elevation: 3,
-      shadowColor: Colors.primary.red,
+      shadowColor: Colors.primary.main,
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.3,
       shadowRadius: 4,
